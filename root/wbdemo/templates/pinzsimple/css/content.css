@@ -1,0 +1,22 @@
+#text img {
+		position: relative;
+		left: 0px;
+		-webkit-border-radius: 15px;
+		-moz-border-radius: 15px;
+		border-radius: 15px;
+		float: none;
+}
+	
+#text p {
+		margin-bottom: 15px;
+}
+
+/* News */	
+.post-title a {
+	font-size: 14px !important;
+    font-weight: bold !important;
+}
+
+/* Search */
+input#match_all, input#match_any, input#match_exact {width: 17px!important;}
+form[name="searchpage"] label {float:left; width: 70px!important; padding: 8px 0 0 0!important}

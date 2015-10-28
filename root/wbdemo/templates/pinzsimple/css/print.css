@@ -1,0 +1,352 @@
+/**
+ * $Id: print.css 865 2008-10-25 08:29:52Z doc $
+ * Website Baker template: round
+ * This template is one of four basis templates distributed with Website Baker.
+ * Feel free to modify or build up on this template.
+ *
+ * This file defines the CSS styles used for print devices.
+ *
+ * LICENSE: GNU General Public License
+ * 
+ * @author     Ryan Djurovich, C. Sommer
+ * @copyright  GNU General Public License
+ * @license    http://www.gnu.org/licenses/gpl.html
+ * @version    2.70
+ * @platform   Website Baker 2.7
+ *
+ * Website Baker is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Website Baker is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+*/
+
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #000;
+}
+body {
+	background-color: #FFF;
+	margin: 0px;
+}
+a:link, a:visited, a:active {
+	color: #036;
+	text-decoration: none;
+}
+a:hover {
+	color: #369;
+	text-decoration: none;
+}
+.header, .menu, .search, .powered_by, .footer {
+	display: none;
+}
+.content {
+	vertical-align: top;
+}
+
+#line_1
+{
+background: none;
+}
+
+#logo2
+{
+background-image: url(img/wblogo.jpg);
+background-repeat: no-repeat;
+background-position: top left;
+margin-top: 20px;
+margin-bottom: 40px;
+width: 300px;
+height: 72px;
+display: block;
+}
+
+#clear
+{
+clear: both;
+}
+
+#content_1
+{
+display: none;
+}
+
+#left
+{
+display: none;
+}
+
+#toplink
+{
+display: none;
+}
+
+#line_3
+{
+display: none;
+}
+
+#header1
+{
+display: none;
+}
+
+
+
+	#text h1
+		{
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:24px;
+			color: #000000;
+			margin-bottom:25px;
+		}
+		
+		#text input
+{
+border: 1px solid #33AAFE;
+width: 120px;
+height: 26px;
+padding-left: 5px;
+color: #000000;
+	font-family: arial;
+	font-size: 13px;
+	font-weight: normal;
+}
+
+	#text	input#match_all, #text	input#match_any, #text	input#match_exact
+{
+width: 30px;
+color: #000000;
+	font-family: arial;
+	font-size: 13px;
+	font-weight: normal;
+	float: left;
+}
+
+	#text	 label
+{
+width: 200px;
+height: 26px;
+display: block;
+margin-bottom: 5px;
+padding-top: 8px;
+color: #000000;
+	font-family: arial;
+	font-size: 13px;
+	font-weight: normal;
+}
+
+	#text input#remember
+{
+width: 30px;
+color: #000000;
+	font-family: arial;
+	font-size: 13px;
+	font-weight: normal;
+	float: left;
+}
+
+	#text	 label#remember
+{
+width: 200px;
+height: 26px;
+display: block;
+margin-bottom: 5px;
+padding-top: 8px;
+color: #000000;
+	font-family: arial;
+	font-size: 13px;
+	font-weight: normal;
+}
+
+
+	#text img
+	{
+	position: relative;
+	left: 0px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	float: left;
+	margin-bottom: 35px;
+	}
+	
+	#text p
+	{
+	margin-bottom: 15px;
+	}
+
+		#text select
+{
+border: 1px solid #33AAFE;
+width: 300px;
+padding: 5px;
+color: #000000;
+	font-family: arial;
+	font-size: 12px;
+	font-weight: normal;
+}
+		
+
+		#text h2
+		{
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:22px;
+			color: #000000;
+			margin-bottom:20px;
+		}
+
+		#text h3
+		{
+			font-family: Arial, sans-serif;
+			font-weight: bold;
+			font-size:18px;
+			color: #000000;
+			margin-bottom:18px;
+		}
+
+		#text h4
+		{
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:16px;
+			color: #000000;
+			margin-bottom:16px;
+		}
+		
+		#text h5
+		{
+			font-family: Arial, sans-serif;
+			font-weight: bold;
+			font-size:14px;
+			color: #000000;
+			margin-bottom:15px;
+		}
+
+		#text h6
+		{
+			font-family: Arial, sans-serif;
+			font-weight: bold;
+			font-size:13px;
+			color: #000000;
+			margin-bottom:10px;
+		}
+
+		#text hr
+		{
+			width:100%;
+			height:1px;
+			border-bottom:#ececec solid 1px;
+			border-top:#cacaca solid 0;
+			border-left:#cacaca solid 0;
+			border-right:#cacaca solid 0;
+			margin-top:25px;
+			margin-bottom:25px;
+		}
+
+		#text a
+		{
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:13px;
+			color: #32aaff;
+			text-decoration:none;
+		}
+		#text a:hover
+		{
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:13px;
+			color: #000000;
+			text-decoration:none;
+		}
+
+		#text table
+		{
+			border:0px solid #FFFFFF;
+			margin-bottom:15px;
+			width:100%;
+			color:#000000;
+		}
+
+		#text table tr
+		{
+			border:0px solid #FFFFFF;
+			color:#000000;
+		}
+
+		#text table tr td
+		{
+			border:1px solid #FFFFFF;
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:13px;
+			color: #000000;
+			vertical-align:middle;
+			background-color: #FFFFFF;
+			padding:5px;
+		}
+		
+		#text table caption
+		{
+			font-family: Arial, sans-serif;
+			font-weight: bold;
+			font-size:13px;
+			color: #000000;
+			vertical-align:middle;
+			padding-bottom:5px;
+		}
+		
+		#text table tr th
+		{
+			border:1px solid #FFFFFF;
+			font-family: Arial, sans-serif;
+			font-weight: normal;
+			font-size:13px;
+			color: #FFFFFF;
+			vertical-align:middle;
+			background-color: #32aaff;
+			padding:5px;
+		}
+
+		#text ol
+		{
+			margin-bottom:20px;
+			margin-top:20px;
+			position:relative;
+			left:17px;
+		}
+
+		#text ol li
+		{
+			padding-bottom:1px;
+			list-style-type:decimal;
+			margin-left:17px;
+			padding-left:15px;
+		}
+
+		#text ul
+		{
+			margin-bottom:20px;
+			margin-top:20px;
+			position:relative;
+			left:17px;
+		}
+
+		#text ul li
+		{
+			padding-bottom:1px;
+			list-style-type:square;
+			margin-left:17px;
+			padding-left:15px;
+		}
+
+
+

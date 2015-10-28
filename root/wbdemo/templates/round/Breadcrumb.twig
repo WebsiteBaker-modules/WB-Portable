@@ -1,0 +1,42 @@
+{#
+    Template to show breadcrumbs
+
+available variables:
+Lang[]  => $GLOBALS['MENU']
+Items[]
+    Item[]
+        'link'
+        'target'
+        'page_title'
+        'menu_title'
+        'description'
+        'visibility'
+        'language'
+        'modified_when'
+        'display_name' (from last_modified_by)
+
+Example for CSS:
+#}
+
+<style>
+.breadcrumb {}
+.breadcrumb span {}
+.breadcrumb span:first-child {}
+.breadcrumb a {}
+.breadcrumb a:hover {}
+</style>
+
+
+{% if Items %} {# skip this block if no items available! #}
+  <div class="breadcrumb">
+    <span>{{ Lang.BREADCRUMB }}: </span>
+  {% for Item in Items %}
+    {% if Item.link %}
+      <a href="{{ Item.link }}" title="{{ Item.menu_title }}">{{ Item.menu_title }}</a>
+    {% else %}
+      <span>{{ Item.menu_title }}</span>
+    {% endif %}
+    {% if not loop.last %} » {% endif %}
+  {% endfor %}
+  </div>
+{% endif %}
