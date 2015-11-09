@@ -1,6 +1,5 @@
 <?php
 $lang = 'en';
-$aCurrent = array( 'nl' => 'link', 'de' => 'link', 'en' => 'current' );
 $title = 'Welcome to WebsiteBaker CMS Portable ';
 $crumb = 'You\'re here';
 $TEXT['PORT_DONATE'] = '<form action="https://www.paypal.com/cgi-bin/webscr" target="_blank" method="post">
@@ -37,20 +36,20 @@ include ("head.php");
         <hr />
         <br />
         <h2>WebsiteBaker official support</h2>
-        <p>Please visit the <a href="http://help.websitebaker.org/" target="_blank">official WebsiteBaker Help site</a> to learn more about WebsiteBaker. If you have any problems or questions, please do not hesitate to visit the&nbsp;<a href="http://forum.websitebaker.org/" target="_blank"> WebsiteBaker Forum</a>.</p>
+        <p>Please visit the <a href="http://www.websitebaker.org/en/help/help-project.php" target="_blank">official WebsiteBaker Help site</a> to learn more about WebsiteBaker. If you have any problems or questions, please do not hesitate to visit the&nbsp;<a href="http://www.websitebaker.org/forum/" target="_blank"> WebsiteBaker Forum</a>.</p>
         <br />
         <hr />
         <br />
         <h2>WebsiteBaker Add-ons (modules and templates)</h2>
-        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://addon.websitebaker.org/" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
+        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://www.websitebaker.org/en/add-ons/add-ons-project.php" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
         <br />
         <hr />
         <br />
         <fieldset>
             <legend>WebsiteBaker Portable</legend>
             <ul>
-            <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/index.php"><strong>Direct access to the frontend </strong></a> (visitors)</li>
-            <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/login/index.php"><strong>Direct access to the backend</strong></a> (admin)<br /><br />
+            <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/"><strong>Direct access to the frontend </strong></a> (visitors)</li>
+            <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/"><strong>Direct access to the backend</strong></a> (admin)<br /><br />
                  <b>Loginname: </b>admin<br />
                  <b>Password: </b>admin</li>
             </ul>        

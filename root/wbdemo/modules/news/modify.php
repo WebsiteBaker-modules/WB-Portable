@@ -31,19 +31,34 @@ if(function_exists('ini_set')) {
     ini_set('arg_separator.output', '&amp;');
 }
 
-$tan = $admin->getFTAN('');
+$FTAN = $admin->getFTAN('');
 
 ?>
 <table style="width: 100%;">
 <tr>
     <td>
-        <input type="button" value="<?php echo $TEXT['ADD'].' '.$TEXT['POST']; ?>" onclick="window.location = '<?php echo WB_URL; ?>/modules/news/add_post.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;<?php echo $tan; ?>';" style="width: 100%;" />
+        <form action="<?php echo WB_URL; ?>/modules/news/add_post.php" method="get" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['POST']; ?>" style="width: 100%;" />
+        </form>
     </td>
     <td>
-        <input type="button" value="<?php echo $TEXT['ADD'].' '.$TEXT['GROUP']; ?>" onclick="window.location = '<?php echo WB_URL; ?>/modules/news/add_group.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;<?php echo $tan; ?>';" style="width: 100%;" />
+        <form action="<?php echo WB_URL; ?>/modules/news/add_group.php" method="get" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['GROUP']; ?>" style="width: 100%;" />
+        </form>
     </td>
     <td >
-        <input type="button" value="<?php echo $TEXT['SETTINGS']; ?>" onclick="window.location = '<?php echo WB_URL; ?>/modules/news/modify_settings.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;<?php echo $tan; ?>';" style="width: 100%;" />
+        <form action="<?php echo WB_URL; ?>/modules/news/modify_settings.php" method="get" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
+        </form>
     </td>
 </tr>
 </table>

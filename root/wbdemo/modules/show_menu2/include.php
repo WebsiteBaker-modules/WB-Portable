@@ -465,7 +465,7 @@ function show_menu2(
         @error_logs('show_menu2 error: $aOptions is invalid. No flags from group 1 supplied!');
         $flags |= SM2_TRIM; // default to TRIM
     }
-    
+
     // search page results don't have any of the page data loaded by WB, so we load it 
     // ourselves using the referrer ID as the current page
     $CURR_PAGE_ID = defined('REFERRER_ID') ? REFERRER_ID : PAGE_ID;

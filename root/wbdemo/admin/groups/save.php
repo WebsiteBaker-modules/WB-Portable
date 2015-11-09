@@ -17,8 +17,8 @@
  */
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'groups_modify', false);
 // Create a javascript back link
@@ -27,7 +27,7 @@ $js_back = ADMIN_URL.'/groups/index.php';
 if (!$admin->checkFTAN())
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 
 // Check if group group_id is a valid number and doesnt equal 1
@@ -36,20 +36,27 @@ if( ($group_id < 2 ) )
 {
     // if($admin_header) { $admin->print_header(); }
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
-
 // Gather details entered
 $group_name = $admin->get_post_escaped('group_name');
 
 // Check values
 if($group_name == "") {
-    $admin->print_error($MESSAGE['GROUPS']['GROUP_NAME_BLANK'], $js_back);
+    $admin->print_error($MESSAGE['GROUPS_GROUP_NAME_BLANK'], $js_back);
 }
 // After check print the header
 $admin->print_header();
+
+$system_permissions = array();
+$query = 'SELECT * FROM `'.TABLE_PREFIX.'groups` WHERE `group_id` = '.$group_id;
+if($oRes = $database->query($query)) {
+   $aRes = $oRes->fetchRow(MYSQLI_ASSOC);
+   $system_permissions = (explode(',', $aRes['system_permissions']));
+}
+
 // Get system permissions
-require_once(ADMIN_PATH.'/groups/get_permissions.php');
+require(ADMIN_PATH.'/groups/get_permissions.php');
 
 // Update the database
 $sql  = 'UPDATE `'.TABLE_PREFIX.'groups` SET '
@@ -63,7 +70,7 @@ $database->query($sql);
 if($database->is_error()) {
     $admin->print_error($database->get_error());
 } else {
-    $admin->print_success($MESSAGE['GROUPS']['SAVED'], ADMIN_URL.'/groups/index.php');
+    $admin->print_success($MESSAGE['GROUPS_SAVED'], ADMIN_URL.'/groups/index.php');
 }
 
 // Print admin footer

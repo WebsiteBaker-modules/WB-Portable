@@ -16,8 +16,8 @@
  *
  */
 
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages');
 
 $admin->clearIDKEY();
@@ -60,15 +60,16 @@ function make_list($parent = 0, $editable_pages = 0) {
     print set_node ($parent,$par);
 
     // Get page list from database
-    $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent.' ';
-    $sql .= (PAGE_TRASH != 'inline') ?  'AND `visibility` != \'deleted\' ' : ' ';
-    $sql .= 'ORDER BY `position` ASC';
+    $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` '
+         .'WHERE `parent` = '.$parent.' '
+         . ((PAGE_TRASH != 'inline') ?  'AND `visibility` != \'deleted\' ' : ' ' )
+         . 'ORDER BY `position` ASC';
     $get_pages = $database->query($sql);
 
     // Insert values into main page list
     if($get_pages->numRows() > 0)
     {
-        while($page = $get_pages->fetchRow())
+        while($page = $get_pages->fetchRow(MYSQLI_ASSOC))
         {
             // Get user perms
             $admin_groups = explode(',', str_replace('_', '', $page['admin_groups']));
@@ -121,6 +122,8 @@ function make_list($parent = 0, $editable_pages = 0) {
             } else {
                 $get_page_subs = $database->query("SELECT page_id,admin_groups,admin_users FROM ".TABLE_PREFIX."pages WHERE parent = '".$page['page_id']."'");
             }
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
+print_r( $page ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
 */
             if($get_page_subs->numRows() > 0)
             {
@@ -132,15 +135,19 @@ function make_list($parent = 0, $editable_pages = 0) {
             $num_pages = $get_pages->numRows();
             ?>
             <li class="p<?php echo $page['parent']; ?>">
-            <table summary="<?php echo $TEXT['EXPAND'].'/'.$TEXT['COLLAPSE']; ?>" class="pages_view" cellpadding="0" cellspacing="0">
+            <table title="<?php echo $TEXT['EXPAND'].'/'.$TEXT['COLLAPSE']; ?>" class="pages_view" >
             <tr>
-                <td valign="middle" width="20" style="padding-left: <?php if($page['level'] > 0){ echo $page['level']*20; } else { echo '7'; } ?>px;">
+                <td class="level_<?php echo $page['level']; ?>" style="width: 0.99525em; padding-left: <?php if($page['level'] > 0){ echo $page['level']*20; } else { echo '0'; } ?>px;">
                     <?php
                     if($display_plus == true) {
                     ?>
                     <a href="javascript:toggle_visibility('p<?php echo $page['page_id']; ?>');" title="<?php echo $TEXT['EXPAND'].'/'.$TEXT['COLLAPSE']; ?>">
                         <img src="<?php echo THEME_URL; ?>/images/<?php if(isset($_COOKIE['p'.$page['page_id']]) && $_COOKIE['p'.$page['page_id']] == '1'){ echo 'minus'; } else { echo 'plus'; } ?>_16.png" onclick="toggle_plus_minus('<?php echo $page['page_id']; ?>');" name="plus_minus_<?php echo $page['page_id']; ?>" alt="+" />
                     </a>
+                    <?php
+                    } else {
+                    ?>
+                    <img  src="<?php echo THEME_URL; ?>/images/blank.gif" width="16" />
                     <?php
                     }
                     ?>
@@ -221,7 +228,7 @@ function make_list($parent = 0, $editable_pages = 0) {
                     if( ($query_sections = $database->query($sql)) )
                     {
                         $mdate_display=false;
-                        while($mdate_res = $query_sections->fetchRow())
+                        while($mdate_res = $query_sections->fetchRow(MYSQLI_ASSOC))
                         {
                             if($mdate_res['publ_start']!='0' || $mdate_res['publ_end']!='0')
                             {
@@ -308,30 +315,25 @@ function make_list($parent = 0, $editable_pages = 0) {
 if($admin->get_permission('pages_view') == true) {
     ?>
     <div class="jsadmin hide"></div>
-    <table summary="<?php echo $HEADING['MODIFY_DELETE_PAGE']; ?>" cellpadding="0" cellspacing="0" width="100%">
-    <tr>
-        <td>
-            <h2><?php echo $HEADING['MODIFY_DELETE_PAGE']; ?></h2>
-        </td>
-        <td align="right"></td>
-    </tr>
-    </table>
     <div class="pages_list">
-    <table summary="<?php echo $HEADING['MODIFY_DELETE_PAGE']; ?>" cellpadding="0" cellspacing="0">
+    <table class="pages_list">
+    <caption><h2 style="font-size: 1.9525em;"><?php echo $HEADING['MODIFY_DELETE_PAGE']; ?></h2></caption>
+    <thead>
     <tr class="pages_list_header">
-        <td class="header_list_menu_title">
+        <th class="header_list_menu_title">
             <?php echo $TEXT['VISIBILITY'] .' / ' .$TEXT['MENU_TITLE']; ?>:
-        </td>
-        <td class="header_list_page_title">
+        </th>
+        <th class="header_list_page_title">
             <?php echo $TEXT['PAGE_TITLE']; ?>:
-        </td>
-        <td class="header_list_page_id">
-            ID:
-        </td>
-        <td class="header_list_actions">
+        </th>
+        <th class="header_list_page_id">
+            PID:
+        </th>
+        <th class="header_list_actions">
             <?php echo $TEXT['ACTIONS']; ?>:
-        </td>
+        </th>
     </tr>
+    </thead>
     </table>
     <?php
     // Work-out if we should check for existing page_code
@@ -367,7 +369,7 @@ $template->set_var('FTAN', $admin->getFTAN());
     $get_groups = $database->query($query);
     $template->set_block('main_block', 'group_list_block', 'group_list');
     // Insert admin group and current group first
-    $admin_group_name = $get_groups->fetchRow();
+    $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
     $template->set_var(array(
                                     'ID' => 1,
                                     'TOGGLE' => '1',
@@ -380,7 +382,7 @@ $template->set_var('FTAN', $admin->getFTAN());
                             );
     $template->parse('group_list', 'group_list_block', true);
 
-    while($group = $get_groups->fetchRow()) {
+    while($group = $get_groups->fetchRow(MYSQLI_ASSOC)) {
         // check if the user is a member of this group
         $flag_disabled = '';
         $flag_checked =  '';
@@ -416,7 +418,7 @@ $template->set_var('FTAN', $admin->getFTAN());
     $get_groups = $database->query($query);
     $template->set_block('main_block', 'group_list_block2', 'group_list2');
     // Insert admin group and current group first
-    $admin_group_name = $get_groups->fetchRow();
+    $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
     $template->set_var(array(
                                     'ID' => 1,
                                     'TOGGLE' => '1',
@@ -429,7 +431,7 @@ $template->set_var('FTAN', $admin->getFTAN());
                             );
     $template->parse('group_list2', 'group_list_block2', true);
 
-    while($group = $get_groups->fetchRow()) {
+    while($group = $get_groups->fetchRow(MYSQLI_ASSOC)) {
         // check if the user is a member of this group
         $flag_disabled = '';
         $flag_checked =  '';
@@ -461,9 +463,9 @@ $template->set_var('FTAN', $admin->getFTAN());
 function parent_list($parent)
 {
     global $admin, $database, $template, $field_set;
-    $query = "SELECT * FROM ".TABLE_PREFIX."pages WHERE parent = '$parent' AND visibility!='deleted' ORDER BY position ASC";
+    $query = "SELECT * FROM `".TABLE_PREFIX."pages` WHERE `parent` = '$parent' AND `visibility` !='deleted' ORDER BY `position` ASC";
     $get_pages = $database->query($query);
-    while($page = $get_pages->fetchRow()) {
+    while($page = $get_pages->fetchRow(MYSQLI_ASSOC)) {
         if($admin->page_is_visible($page)==false)
             continue;
         // if parent = 0 set flag_icon
@@ -472,7 +474,7 @@ function parent_list($parent)
             $template->set_var('FLAG_ROOT_ICON','url('.THEME_URL.'/images/flags/'.strtolower($page['language']).'.png)');
         }
         // Stop users from adding pages with a level of more than the set page level limit
-        if($page['level']+1 < PAGE_LEVEL_LIMIT) {
+        if( $page['level'] <= PAGE_LEVEL_LIMIT + 1 ) {
             // Get user perms
             $admin_groups = explode(',', str_replace('_', '', $page['admin_groups']));
             $admin_users = explode(',', str_replace('_', '', $page['admin_users']));
@@ -524,9 +526,9 @@ parent_list(0);
 $module_permissions = $_SESSION['MODULE_PERMISSIONS'];
 // Modules list
 $template->set_block('main_block', 'module_list_block', 'module_list');
-$result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'module' AND function = 'page' order by name");
+$result = $database->query("SELECT * FROM `".TABLE_PREFIX."addons` WHERE `type` = 'module' AND `function` = 'page' ORDER BY `name`");
 if($result->numRows() > 0) {
-    while ($module = $result->fetchRow()) {
+    while ($module = $result->fetchRow(MYSQLI_ASSOC)) {
         // Check if user is allowed to use this module
         if(!is_numeric(array_search($module['directory'], $module_permissions))) {
             $template->set_var('VALUE', $module['directory']);

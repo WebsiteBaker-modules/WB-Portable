@@ -16,7 +16,7 @@
  * @description     
  */
 
-require('../../config.php');
+if ( !defined('WB_PATH') ){ require(dirname(dirname(__dir__))."/config.php"); }
 
 // Include WB admin wrapper script
 require(WB_PATH.'/modules/admin.php');
@@ -73,7 +73,7 @@ if($get_user = $database->query($sql)) {
 
 <br />
 
-<input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="javascript: window.location = '<?php echo ADMIN_URL; ?>/pages/modify.php?page_id=<?php echo $page_id.$sec_anchor; ?>';" style="width: 150px; margin-top: 5px;" />
+<input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="javascript: window.location = '<?php echo ADMIN_URL; ?>/pages/modify.php?page_id=<?php echo $page_id; ?>';" style="width: 150px; margin-top: 5px;" />
 <input type="button" value="<?php echo $TEXT['DELETE']; ?>" onclick="javascript: confirm_link('<?php echo $TEXT['ARE_YOU_SURE']; ?>', '<?php echo WB_URL; ?>/modules/form/delete_submission.php?page_id=<?php echo $page_id; ?>&section_id=<?php echo $section_id; ?>&submission_id=<?php echo $admin->getIDKEY($submission_id); ?>');" style="width: 150px; margin-top: 5px;" />
 <?php
 

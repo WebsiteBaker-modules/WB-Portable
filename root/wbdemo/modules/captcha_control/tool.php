@@ -18,7 +18,7 @@
 // prevent this file from being accessed directly
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
 /* -------------------------------------------------------- */
 // check if module language file exists for the language set by the user (e.g. DE, EN)
 if(!file_exists(WB_PATH .'/modules/captcha_control/languages/'.LANGUAGE .'.php')) {
@@ -42,7 +42,7 @@ $table = TABLE_PREFIX.'mod_captcha_control';
 if(isset($_POST['save_settings'])) {
     if (!$admin->checkFTAN())
     {
-        if(!$admin_header) { $admin->print_header(); }
+//        if(!$admin_header) { $admin->print_header(); }
         $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
     }
     

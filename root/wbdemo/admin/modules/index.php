@@ -112,20 +112,20 @@ $template->set_var(array(
                 );
 // Insert language text and messages
 $template->set_var(array(
-    'URL_TEMPLATES' => $admin->get_permission('templates') ? 
-        '<a href="' . ADMIN_URL . '/templates/index.php">' . $MENU['TEMPLATES'] . '</a>' : '',
-    'URL_LANGUAGES' => $admin->get_permission('languages') ? 
-        '<a href="' . ADMIN_URL . '/languages/index.php">' . $MENU['LANGUAGES'] . '</a>' : '',
-    'URL_ADVANCED' => $admin->get_permission('admintools') ? 
-        '<a href="' . ADMIN_URL . '/modules/index.php?advanced">' . $TEXT['ADVANCED'] . '</a>' : '',
-    'TEXT_INSTALL' => $TEXT['INSTALL'],
+    'URL_TEMPLATES'  => $admin->get_permission('templates') ? ADMIN_URL . '/templates/index.php' : '#',
+    'URL_LANGUAGES'  => $admin->get_permission('languages') ? ADMIN_URL . '/languages/index.php'  : '#',
+    'URL_ADVANCED'   => $admin->get_permission('admintools') ? ADMIN_URL . '/modules/index.php?advanced' : '#',
+    'MENU_LANGUAGES' => $admin->get_permission('languages') ? $MENU['LANGUAGES'] : '&#160;&#160;&#160;',
+    'MENU_TEMPLATES' => $admin->get_permission('templates') ? $MENU['TEMPLATES'] : '&#160;&#160;&#160;',
+    'TEXT_ADVANCED'  => $admin->get_permission('admintools') ? $TEXT['ADVANCED'] : '&#160;&#160;&#160;',
+    'TEXT_INSTALL'   => $TEXT['INSTALL'],
     'TEXT_UNINSTALL' => $TEXT['UNINSTALL'],
-    'TEXT_VIEW_DETAILS' => $TEXT['VIEW_DETAILS'],
+    'TEXT_VIEW_DETAILS'  => $TEXT['VIEW_DETAILS'],
     'TEXT_PLEASE_SELECT' => $TEXT['PLEASE_SELECT'],
     'TEXT_MANUAL_INSTALLATION' => $MESSAGE['ADDON']['MANUAL_INSTALLATION'],
     'TEXT_MANUAL_INSTALLATION_WARNING' => $MESSAGE['ADDON']['MANUAL_INSTALLATION_WARNING'],
     'TEXT_EXECUTE' => $TEXT['EXECUTE'],
-    'TEXT_FILE' => $TEXT['FILE']
+    'TEXT_FILE'    => $TEXT['FILE']
     )
 );
 

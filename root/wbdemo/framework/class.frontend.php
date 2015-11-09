@@ -48,7 +48,7 @@ class frontend extends wb {
     public $extra_where_sql, $sql_where_language;
     
     public function __construct() {
-        parent::__construct(SecureForm::FRONTEND);
+        parent::__construct(1);
     }
 
     public function page_select() {

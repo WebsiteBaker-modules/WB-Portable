@@ -17,17 +17,17 @@
  */
 
 // prevent this file from being accessed directly in the browser (would set all entries in DB settings table to '')
-if(!isset($_POST['default_language']) || $_POST['default_language'] == '') die(header('Location: index.php'));
+//if(!isset($_POST['default_language']) || $_POST['default_language'] == '') die(header('Location: index.php'));
 
 // Find out if the user was view advanced options or not
-$advanced = ($_POST['advanced'] == 'yes') ? '?advanced=yes' : '';
+$bAdvanced = intval ( isset( $_POST['advanced'] ) && ($_POST['advanced'] == 1) ? 1 : 0 );
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 // suppress to print the header, so no new FTAN will be set
-if($advanced == '')
+if(!$bAdvanced)
 {
     $admin = new admin('Settings', 'settings_basic',false);
 } else {
@@ -35,55 +35,52 @@ if($advanced == '')
 }
 
 // Create a javascript back link
-$js_back = ADMIN_URL.'/settings/index.php'.$advanced;
+$js_back = ADMIN_URL.'/settings/index.php?advanced='.$bAdvanced;
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
-// After check print the header
 $admin->print_header();
 
-// Ensure that the specified default email is formally valid
-if(isset($_POST['server_email']))
-{
-    $_POST['server_email'] = strip_tags($_POST['server_email']);
-    // $pattern = '/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9]([-a-z0-9_]?[a-z0-9])*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z]{2})|([1]?\d{1,2}|2[0-4]{1}\d{1}|25[0-5]{1})(\.([1]?\d{1,2}|2[0-4]{1}\d{1}|25[0-5]{1})){3})(:[0-9]{1,5})?\r/im';
-    $pattern = '/^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.(([0-9]{1,3})|([a-zA-Z]{2,6}))$/';
-    if(false == preg_match($pattern, $_POST['server_email']))
-    {
-        $admin->print_error($MESSAGE['USERS_INVALID_EMAIL'].
-            '<br /><strong>Email: '.htmlentities($_POST['server_email']).'</strong>', $js_back);
+$TOKENS = unserialize($_SESSION['TOKENS']);
+$array  = $_POST;
+ksort($array);
+
+$aInputs = array();
+$aOutputs = array();
+
+$sql = 'SELECT `name`, `value` FROM `'.TABLE_PREFIX.'settings` '
+     . 'ORDER BY `name`';
+if($oSettings = $database->query($sql)) {
+    while($aSetting = $oSettings->fetchRow( MYSQLI_ASSOC )) {
+      $aOutputs['_POST'][$aSetting['name']] = $aSetting['value'];
     }
 }
-
-if(isset($_POST['wbmailer_routine']) && ($_POST['wbmailer_routine']=='smtp')) {
-
-    $checkSmtpHost = (isset($_POST['wbmailer_smtp_host']) && ($_POST['wbmailer_smtp_host']=='') ? false : true);
-    $checkSmtpUser = (isset($_POST['wbmailer_smtp_username']) && ($_POST['wbmailer_smtp_username']=='') ? false : true);
-    $checkSmtpPassword = (isset($_POST['wbmailer_smtp_password']) && ($_POST['wbmailer_smtp_password']=='') ? false : true);
-    if(!$checkSmtpHost || !$checkSmtpUser || !$checkSmtpPassword) {
-        $admin->print_error($TEXT['REQUIRED'].' '.$TEXT['WBMAILER_SMTP_AUTH'].
-            '<br /><strong>'.$MESSAGE['GENERIC_FILL_IN_ALL'].'</strong>', $js_back);
-    }
-
-}
+/**
+ * 
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.sizeof($TOKENS).' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
+print_r( $array ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
+ */
+// After check print the header
 
 // Work-out file mode
-if($advanced == '')
+if( !$bAdvanced )
 {
     // Check if should be set to 777 or left alone
     if(isset($_POST['world_writeable']) && $_POST['world_writeable'] == 'true')
     {
         $file_mode = '0777';
-        $dir_mode = '0777';
+        $dir_mode  = '0777';
     } else {
         $file_mode = STRING_FILE_MODE;
-        $dir_mode = STRING_DIR_MODE;
+        $dir_mode  = STRING_DIR_MODE;
     }
 } else {
     $file_mode = STRING_FILE_MODE;
-    $dir_mode = STRING_DIR_MODE;
+    $dir_mode  = STRING_DIR_MODE;
+
     if($admin->get_user_id()=='1')
     {
         // Work-out the octal value for file mode
@@ -151,6 +148,30 @@ if($advanced == '')
         }
         $dir_mode = "0".$u.$g.$o;
     }
+// Ensure that the specified default email is formally valid
+    if(isset($_POST['server_email']))
+    {
+        $_POST['server_email'] = strip_tags($_POST['server_email']);
+        // $pattern = '/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9]([-a-z0-9_]?[a-z0-9])*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z]{2})|([1]?\d{1,2}|2[0-4]{1}\d{1}|25[0-5]{1})(\.([1]?\d{1,2}|2[0-4]{1}\d{1}|25[0-5]{1})){3})(:[0-9]{1,5})?\r/im';
+        $pattern = '/^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.(([0-9]{1,3})|([a-zA-Z]{2,6}))$/';
+        if(false == preg_match($pattern, $_POST['server_email']))
+        {
+            $admin->print_error($MESSAGE['USERS_INVALID_EMAIL'].
+                '<br /><strong>Email: '.htmlentities($_POST['server_email']).'</strong>', $js_back);
+        }
+    }
+    
+    if(isset($_POST['wbmailer_routine']) && ($_POST['wbmailer_routine']=='smtp')) {
+    
+        $checkSmtpHost = (isset($_POST['wbmailer_smtp_host']) && ($_POST['wbmailer_smtp_host']=='') ? false : true);
+        $checkSmtpUser = (isset($_POST['wbmailer_smtp_username']) && ($_POST['wbmailer_smtp_username']=='') ? false : true);
+        $checkSmtpPassword = (isset($_POST['wbmailer_smtp_password']) && ($_POST['wbmailer_smtp_password']=='') ? false : true);
+        if(!$checkSmtpHost || !$checkSmtpUser || !$checkSmtpPassword) {
+            $admin->print_error($TEXT['REQUIRED'].' '.$TEXT['WBMAILER_SMTP_AUTH'].
+                '<br /><strong>'.$MESSAGE['GENERIC_FILL_IN_ALL'].'</strong>', $js_back);
+        }
+    
+    }
 }
 
 $allow_tags_in_fields = array('website_header', 'website_footer');
@@ -165,7 +186,7 @@ $sql = 'SELECT `name`, `value` FROM `'.TABLE_PREFIX.'settings` '
      . 'ORDER BY `name`';
 if($res_settings = $database->query($sql)) {
     $passed = false;
-    while($setting = $res_settings->fetchRow()) :
+    while($setting = $res_settings->fetchRow(MYSQLI_ASSOC)) :
         $old_settings[$setting['name']] = $setting['value'];
         $setting_name = $setting['name'];
         $value = $admin->get_post($setting_name);
@@ -181,25 +202,41 @@ if($res_settings = $database->query($sql)) {
                 break;
             case 'string_file_mode':
                 $value=$file_mode;
-                 $passed = true;
+                $passed = true;
             break;
             case 'pages_directory':
                 break;
             case 'wbmailer_smtp_auth':
                 // $value = isset($_POST[$setting_name]) ? $_POST[$setting_name] : '' ;
                 $value = true ;
-                 $passed = true;
+                $passed = true;
+                break;
+            case 'sec_token_netmask4':
+                $iValue = intval( $value );
+                $value  = (($iValue > 32) || ( $iValue < 0 ) ? '24' : $value);
+                $passed = true;
+                break;
+            case 'sec_token_netmask6':
+                $iValue = intval( $value );
+                $value  = (($iValue > 128) || ( $iValue < 0 ) ? '64' : $value);
+                $passed = true;
+                break;
+            case 'sec_token_life_time':
+                $value = $admin->sanitizeLifeTime(intval( $value ) * 60 );
+                $passed = true;
                 break;
             default :
                 $passed = in_array($setting_name, $allow_empty_values);
                 break;
         endswitch;
 
-        if (!in_array($setting_name, $allow_tags_in_fields)) {
+        if(is_array($value)){
+            $value = $value['0'];
+        }
+        if ( !in_array($setting_name, $allow_tags_in_fields)) {
             $value = strip_tags($value);
         }
-
-        if (!in_array($value, $disallow_in_fields) && (isset($_POST[$setting_name]) || $passed == true)) {
+        if ( !in_array($value, $disallow_in_fields) && (isset($_POST[$setting_name]) || $passed == true)) {
             $value = trim($admin->add_slashes($value));
             $sql = 'UPDATE `'.TABLE_PREFIX.'settings` '
                  . 'SET `value`=\''.$value.'\' '

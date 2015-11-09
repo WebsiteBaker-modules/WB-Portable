@@ -37,18 +37,28 @@ $sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR
 //Delete all form fields with no title
 $sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_form_fields` ';
 $sql .= 'WHERE page_id = '.(int)$page_id.' ';
-$sql .=   'AND section_id = '.(int)$section_id.' ';
+$sql .=   'AND section_id = 0 ';
 $sql .=   'AND title=\'\' ';
-//if( !$database->query($sql) ) { // error msg }
-$ftan = $admin->getFTAN('get');
+if( !$database->query($sql) ) {  }
+$FTAN = $admin->getFTAN('');
 ?>
-<table summary="" width="100%" cellpadding="0" cellspacing="0" border="0">
+<table style="width: 100%;" class="mod_form">
 <tr>
-    <td align="left" width="50%">
-        <input type="button" value="<?php echo $TEXT['ADD'].' '.$TEXT['FIELD']; ?>" onclick="javascript: window.location = '<?php echo WB_URL; ?>/modules/form/add_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;<?php echo $ftan; ?>';" style="width: 100%;" />
+    <td >
+        <form action="<?php echo WB_URL; ?>/modules/form/add_field.php" method="get" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['FIELD']; ?>" style="width: 100%;" />
+        </form>
     </td>
-    <td align="right" width="50%">
-        <input type="button" value="<?php echo $TEXT['SETTINGS']; ?>" onclick="javascript: window.location = '<?php echo WB_URL; ?>/modules/form/modify_settings.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;<?php echo $ftan; ?>';" style="width: 100%;" />
+    <td >
+        <form action="<?php echo WB_URL; ?>/modules/form/modify_settings.php" method="get" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
+        </form>
     </td>
 </tr>
 </table>
@@ -57,7 +67,7 @@ $ftan = $admin->getFTAN('get');
 
 <h2><?php echo $TEXT['MODIFY'].'/'.$TEXT['DELETE'].' '.$TEXT['FIELD']; ?></h2>
 <?php
-
+$module_dir = basename(__DIR__);
 // Loop through existing fields
 $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_fields` ';
 $sql .= 'WHERE `section_id` = '.(int)$section_id.' ';
@@ -67,7 +77,8 @@ if($query_fields = $database->query($sql)) {
         $num_fields = $query_fields->numRows();
         $row = 'a';
         ?>
-        <table summary="" width="100%" cellpadding="2" cellspacing="0" border="0">
+        <div class="jsadmin hide"></div>
+        <table class="mod_form" >
         <thead>
             <tr style="background-color: #dddddd; font-weight: bold;">
                 <th width="20" style="padding-left: 5px;">&nbsp;</th>
@@ -84,6 +95,7 @@ if($query_fields = $database->query($sql)) {
                 <?php
                     echo $TEXT['ACTIONS'];
                 ?>
+                <th >POS</th>
                 </th>
             </tr>
         </thead>
@@ -91,7 +103,7 @@ if($query_fields = $database->query($sql)) {
         <?php
         while($field = $query_fields->fetchRow(MYSQL_ASSOC)) {
             ?>
-            <tr class="row_<?php echo $row; ?>">
+            <tr class="row_<?php echo $row; ?> sectionrow">
                 <td style="padding-left: 5px;">
                     <a href="<?php echo WB_URL; ?>/modules/form/modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>" title="<?php echo $TEXT['MODIFY']; ?>">
                         <img src="<?php echo THEME_URL; ?>/images/modify_16.png" border="0" alt="^" />
@@ -143,14 +155,14 @@ if($query_fields = $database->query($sql)) {
                 </td>
                 <td width="20" style="text-align: center;">
                 <?php if($field['position'] != 1) { ?>
-                    <a href="<?php echo WB_URL; ?>/modules/form/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
+                    <a href="<?php echo WB_URL; ?>/modules/form/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>&amp;move_id=<?php echo $field['field_id']; ?>&amp;position=<?php echo $field['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>"> 
                         <img src="<?php echo THEME_URL; ?>/images/up_16.png" border="0" alt="^" />
                     </a>
                 <?php } ?>
                 </td>
                 <td width="20" style="text-align: center;">
                 <?php if($field['position'] != $num_fields) { ?>
-                    <a href="<?php echo WB_URL; ?>/modules/form/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
+                    <a href="<?php echo WB_URL; ?>/modules/form/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>&amp;move_id=<?php echo $field['field_id']; ?>&amp;position=<?php echo $field['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
                         <img src="<?php echo THEME_URL; ?>/images/down_16.png" border="0" alt="v" />
                     </a>
                 <?php } ?>
@@ -159,9 +171,14 @@ if($query_fields = $database->query($sql)) {
 <?php
                 $url = (WB_URL.'/modules/form/delete_field.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;field_id='.$admin->getIDKEY($field['field_id']))
 ?>
-                    <a href="javascript: confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>', '<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
+                    <a href="confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>','<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
                         <img src="<?php echo THEME_URL; ?>/images/delete_16.png" border="0" alt="X" />
                     </a>
+                </td>
+                <td>
+                <?php
+                    echo $field['position'];
+                ?>
                 </td>
             </tr>
 <?php
@@ -203,7 +220,7 @@ $sql .= 'ORDER BY s.`submitted_when` ASC ';
 if($query_submissions = $database->query($sql)) {
 ?>
 <!-- submissions -->
-        <table summary="" width="100%" cellpadding="2" cellspacing="0" border="0" class="" id="frm-ScrollTable" >
+        <table id="frm-ScrollTable" >
         <thead>
         <tr style="background-color: #dddddd; font-weight: bold;">
             <th width="23" style="text-align: center;">&nbsp;</th>
@@ -267,22 +284,13 @@ if($query_submissions = $database->query($sql)) {
     }
 ?>
         </tbody>
-        <tfoot>
-        <tr style="background-color: #dddddd; font-weight: bold;">
-            <th width="23" style="text-align: center;">&nbsp;</th>
-            <th width="33" style="text-align: right;"> ID </th>
-            <th width="250" style="padding-left: 10px;"><?php echo $TEXT['SUBMITTED'] ?></th>
-            <th width="250" style="padding-left: 10px;"><?php echo $TEXT['USER']; ?></th>
-            <th width="250"><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['FROM'] ?></th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
-        </tr>
-        </tfoot>
         </table>
 <?php
 } else {
     echo $database->get_error().'<br />';
     echo $sql;
+}
+if(file_exists(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php'))
+{
+    include(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php');
 }

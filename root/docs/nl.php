@@ -1,6 +1,5 @@
 <?php
 $lang = 'NL';
-$aCurrent = array( 'nl' => 'current', 'de' => 'link', 'en' => 'link' );
 $title = 'Welkom bij WebsiteBaker CMS Portable';
 $crumb = 'U bent hier';
 $TEXT['PORT_DONATE'] = '<form method="post" target="_blank" action="https://www.paypal.com/cgi-bin/webscr">
@@ -39,20 +38,20 @@ include ("head.php");
         <hr />
         <br />
         <h2>Offici&euml;le ondersteuning voor WebsiteBaker</h2>
-        <p>Voor hulp bij de verschillende thema's en de manier waarop WebsiteBaker werkt staan <a href="http://help.websitebaker.org/" target="_blank">de officiële WebsiteBaker hulppagina's</a> ter beschikking. Voor specifieke vragen of problemen kunt u ook <a href="http://forum.websitebaker.org/" target="_blank">het WebsiteBaker Forum</a> doorzoeken.</p>
+        <p>Voor hulp bij de verschillende thema's en de manier waarop WebsiteBaker werkt staan <a href="http://www.websitebaker.org/nl/hulp/hulpproject.php?lang=NL" target="_blank">de officiële WebsiteBaker hulppagina's</a> ter beschikking. Voor specifieke vragen of problemen kunt u ook <a href="http://www.websitebaker.org/forum/" target="_blank">het WebsiteBaker Forum</a> doorzoeken.</p>
         <br />
         <hr />
         <br />
         <h2>WebsiteBaker Add-ons (modules and templates)</h2>
-        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://addon.websitebaker.org/" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
+        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://www.websitebaker.org/nl/add-ons/add-ons-project.php" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
         <br />
         <hr />
         <br />
         <fieldset>
         <legend>WebsiteBaker Portable</legend>
         <ul>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/index.php"><strong>Directe toegang tot de frontend </strong></a>(voor bezoekers)</li>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/login/index.php"><strong>Directe toegang tot de backend</strong></a>(administratie)<br /><br />
+        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/"><strong>Directe toegang tot de frontend </strong></a>(voor bezoekers)</li>
+        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/"><strong>Directe toegang tot de backend</strong></a>(administratie)<br /><br />
              <b>Loginname:</b> admin<br />
              <b>Password: </b>admin</li>
         </ul>        

@@ -19,22 +19,25 @@
 // do not display notices and warnings during installation
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
-// Setup admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 $admin = new admin('Addons', 'modules_install', false);
+
+$js_back = ADMIN_URL.'/modules/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
 // Check if user uploaded a file
 if(!isset($_FILES['userfile'])) {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
 }
 
 // Include the WB functions file
@@ -54,7 +57,7 @@ if(!$_FILES['userfile']['error']) {
 } else {
 // index for language files
     $key = 'UNKNOW_UPLOAD_ERROR';
-    switch ($error_code) {
+    switch ($_FILES['userfile']['error']) {
         case UPLOAD_ERR_INI_SIZE:
             $key = 'UPLOAD_ERR_INI_SIZE';
         case UPLOAD_ERR_FORM_SIZE:

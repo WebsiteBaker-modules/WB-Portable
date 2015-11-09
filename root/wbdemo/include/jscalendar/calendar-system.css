@@ -10,6 +10,7 @@
   background: Window;
   color: WindowText;
   font-family: tahoma,verdana,sans-serif;
+  width: 20.225em;
 }
 
 .calendar table {
@@ -20,11 +21,12 @@
   background: Window;
   color: WindowText;
   font-family: tahoma,verdana,sans-serif;
+  width: 100%;
 }
 
 /* Header part -- contains navigation buttons and day names. */
 
-.calendar .button { /* "<<", "<", ">", ">>" buttons have this class */
+.calendar .cal-button { /* "<<", "<", ">", ">>" buttons have this class */
   text-align: center;
   padding: 1px;
   border: 1px solid;
@@ -46,9 +48,11 @@
 }
 
 .calendar thead .headrow { /* Row <TR> containing navigation buttons */
+height: 0.525em;
 }
 
 .calendar thead .daynames { /* Row <TR> containing the day names */
+
 }
 
 .calendar thead .name { /* Cells <TD> containing the day names */

@@ -17,16 +17,18 @@
  *
  */
 
-// Include the config code
-require('../../config.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
-// Print admin header
-require_once(WB_PATH.'/framework/class.admin.php');
 $admin = new admin('Addons', 'languages_view', false);
+
+$js_back = ADMIN_URL.'/languages/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
@@ -34,23 +36,22 @@ $admin->print_header();
 // Get language name
 if(!isset($_POST['code']) OR $_POST['code'] == "") {
     $code = '';
+    $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 } else {
-    $code = $_POST['code'];
+    $code = preg_replace('/[^a-z0-9_-]/i', "", $_POST['code']);  // fix secunia 2010-92-2
 }
 
 // fix secunia 2010-93-2
-if (!preg_match('/^[A-Z]{2}$/', $code)) {
-    header("Location: index.php");
-    exit(0);
+if (!preg_match('/^[A-Z]{2}$/', $code) && $code!='' ) {
+    $admin->print_error( $MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
 }
 
 // Check if the language exists
 if(!file_exists(WB_PATH.'/languages/'.$code.'.php')) {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_NOT_INSTALLED'], $js_back );
 }
 
-// Setup template object, parse vars to it, then parse it
+// Setup template object, parse vars to it, then parse it      
 // Create new template object
 $template = new Template(dirname($admin->correct_theme_source('languages_details.htt')));
 // $template->debug = true;

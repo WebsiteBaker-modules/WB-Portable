@@ -35,7 +35,7 @@ class admin extends wb {
     // Authenticate user then auto print the header
     public function __construct($section_name= '##skip##', $section_permission = 'start', $auto_header = true, $auto_auth = true)
     {
-        parent::__construct(SecureForm::BACKEND);
+        parent::__construct(1);
     if( $section_name != '##skip##' )
     {
         global $database, $MESSAGE;
@@ -116,9 +116,9 @@ class admin extends wb {
             if($row) $view_url .= PAGES_DIRECTORY .$row['link']. PAGE_EXTENSION;
         }
 
-        $HelpUrl = '/en/help/helpproject.php';
         $header_template->set_var(    array(
                             'SECTION_NAME'        => $MENU[strtoupper($this->section_name)],
+                            'STYLE'               => strtolower($this->section_name),
                             'BODY_TAGS'           => $body_tags,
                             'WEBSITE_TITLE'       => ($title['value']),
                             'TEXT_ADMINISTRATION' => $TEXT['ADMINISTRATION'],
@@ -137,26 +137,29 @@ class admin extends wb {
                             'WB_URL'              => WB_URL,
                             'ADMIN_URL'           => ADMIN_URL,
                             'THEME_URL'           => THEME_URL,
+                            'TEMPLATE'            => defined('TEMPLATE')?TEMPLATE:DEFAULT_TEMPLATE,
+                            'EDITOR'              => WYSIWYG_EDITOR,
                             'TITLE_START'         => $MENU['START'],
                             'TITLE_VIEW'          => $MENU['VIEW'],
                             'TITLE_HELP'          => $MENU['HELP'],
                             'TITLE_LOGOUT'        =>  $MENU['LOGOUT'],
                             'URL_VIEW'            => $view_url,
-                            'URL_HELP'            => 'http://help.websitebaker.org'.$HelpUrl,
+                            'URL_HELP'            => 'http://help.websitebaker.org/',
                             'BACKEND_MODULE_CSS'  => $this->register_backend_modfiles('css'),    // adds backend.css
                             'BACKEND_MODULE_JS'   => $this->register_backend_modfiles('js')        // adds backend.js
                         )
                     );
 
-        // Create the menu
+        // Create the backend menu
         $menu = array(
-                    array(ADMIN_URL.'/pages/index.php',       '', $MENU['PAGES'],       'pages',       1),
-                    array(ADMIN_URL.'/media/index.php',       '', $MENU['MEDIA'],       'media',       1),
-                    array(ADMIN_URL.'/addons/index.php',      '', $MENU['ADDONS'],      'addons',      1),
-                    array(ADMIN_URL.'/preferences/index.php', '', $MENU['PREFERENCES'], 'preferences', 0),
-                    array(ADMIN_URL.'/settings/index.php',    '', $MENU['SETTINGS'],    'settings',    1),
-                    array(ADMIN_URL.'/admintools/index.php',  '', $MENU['ADMINTOOLS'],  'admintools',  1),
-                    array(ADMIN_URL.'/access/index.php',      '', $MENU['ACCESS'],      'access',      1)
+//                    array(ADMIN_URL.'/start/index.php',               '', $MENU['START'],       'start',       1),
+                    array(ADMIN_URL.'/pages/index.php',               '', $MENU['PAGES'],       'pages',       1),
+                    array(ADMIN_URL.'/media/index.php',               '', $MENU['MEDIA'],       'media',       1),
+                    array(ADMIN_URL.'/addons/index.php',              '', $MENU['ADDONS'],      'addons',      1),
+                    array(ADMIN_URL.'/preferences/index.php',         '', $MENU['PREFERENCES'], 'preferences', 0),
+                    array(ADMIN_URL.'/settings/index.php?advanced=0', '', $MENU['SETTINGS'],    'settings',    1),
+                    array(ADMIN_URL.'/admintools/index.php',          '', $MENU['ADMINTOOLS'],  'admintools',  1),
+                    array(ADMIN_URL.'/access/index.php',              '', $MENU['ACCESS'],      'access',      1)
                     );
         $header_template->set_block('header_block', 'linkBlock', 'link');
         foreach($menu AS $menu_item) {
@@ -328,9 +331,14 @@ class admin extends wb {
         }
     }
 
-    // Function to add optional module Javascript or CSS stylesheets into the <body> section of the backend
+    // Function to add optional module Javascript or CSS stylesheets into the <body> section of the backend   
     function register_backend_modfiles_body($file_id="js")
-        {
+    {
+        $sCallingScript = $_SERVER['SCRIPT_NAME'];
+        $AcpDir = str_replace('\\','/', ADMIN_PATH).'/';
+        if( preg_match( '/'.'pages\/(settings|sections)\.php$/is', $sCallingScript)) {
+          return;
+        }
         // sanity check of parameter passed to the function
         $file_id = strtolower($file_id);
         if($file_id !== "javascript" && $file_id !== "js")
@@ -390,8 +398,13 @@ class admin extends wb {
     }
 
 
-    // Function to add optional module Javascript or CSS stylesheets into the <head> section of the backend
+    // Function to add optional module Javascript or CSS stylesheets into the <head> section of the backend  preg_quote($AcpDir,'/').
     function register_backend_modfiles($file_id="css") {
+        $sCallingScript = $_SERVER['SCRIPT_NAME'];
+        $AcpDir = str_replace('\\','/', ADMIN_PATH).'/';
+        if( preg_match( '/'.'pages\/(settings|sections)\.php$/is', $sCallingScript)) {
+          return;
+        }
         // sanity check of parameter passed to the function
         $file_id = strtolower($file_id);
         if($file_id !== "css" && $file_id !== "javascript" && $file_id !== "js") {

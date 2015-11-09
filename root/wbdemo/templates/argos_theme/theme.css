@@ -2,7 +2,7 @@ html { overflow :-moz-scrollbars-vertical; /* Force firefox to always show room 
 body,td,th,input,textarea { font-family :verdana,arial,helvetica,sans-serif; font-size :11px; color :#333333; }
 body { background :url(images/background.jpg) #f9f9f9 0 0 repeat-x; margin :0; text-align :center; }
 img { border :0px; }
-#admin_header { text-align :center; width :900px; height :105px; margin :0 auto; padding :8px 0 0 0; }
+#admin_header { text-align :center;height :105px; margin :0 auto; padding :10px 0 0 0; }
 #admin_header a#website_title { display :block; text-align :left; font-size :14px; font-weight :bold; color :#ffffff; text-transform :uppercase; text-decoration :none; }
 #topmenu { float :right; text-align :right; color :#ffffff; }
 #topmenu a { font-size :11px; color :#ffffff; text-decoration :underline; margin :0 5px; }
@@ -13,15 +13,25 @@ h2 { text-align :left; font-size :18px; color :#000000; margin :5px 0; font-fami
 h3 { text-align :left; font-size :14px; color :#000000; margin :5px 0; }
 a:link, a:visited, a:active { color :#28609b; text-decoration :none; }
 a:hover { text-decoration :underline; color :#28609b; }
-.menu { margin :0 auto; padding :0; text-align :center; width :900px; }
+.menu { margin :0 auto; padding :0; text-align :center; }
 .menu ul { list-style-type :none; margin :0; padding :0; }
 .menu li { display :inline; margin :0 2px 0 0; padding :0; font-weight :bold; border-bottom :3px solid #c9c9c9; }
 .menu a { float :left; color :#ffffff !important; background :url(images/tabl.jpg) #28609b no-repeat left top; margin :0 5px 0 0; padding :0 0 0 3px; text-decoration :none; border-bottom :3px solid #cacaca; }
 .menu a span { display :block; background :url(images/tabr.jpg) #28609b no-repeat right top; padding :6px 9px 6px 6px; }
 .menu a:hover, .menu a:hover span { background-color :#28609b; text-decoration :none; }
 .menu .current a, .menu a:hover { border-bottom :3px solid #d25e59; }
-#content_container { text-align :center; width :900px; clear :both; margin :0 auto; }
-.content { margin :0; padding :20px 0; width :900px; text-align :left; vertical-align :top; }
+#content_container { text-align :center;  clear :both; margin :0 auto; }
+.content { margin :0; padding :20px 0;  text-align :left; vertical-align :top; }
+.menu,
+.content,
+#admin_header,
+#content_container,
+.sections_list table, 
+.pages_list table, 
+table.pages_view  {
+  width :998px;
+}
+
 hr { margin :15px 0; color :#003366; height :1px; }
 .hide { display :none; }
 .note { color :#666666; font-size :11px; }
@@ -69,10 +79,8 @@ select option.disabled { color :#aaaaaa; }
 #hide2 { display :none; }
 .pages_list { font-weight :bold; margin :10px auto; }
 .pages_list .icon_col td img { display :block; border-style :none; float :left; padding-right :7px; }
-.pages_list table { width :900px; }
 .pages_list ul { margin :0; font-weight :normal; padding :0; }
 .pages_list ul li { list-style-type :none; margin :2px 0; }
-table.pages_view { width :900px; }
 table.pages_view tr, tr.sectionrow { background :#f0f0f0; line-height :2.2em; }
 table.pages_view tr:hover, tr.sectionrow:hover { background :#eaeff6; }
 tr.sectionrow { padding :0 10px; }
@@ -81,7 +89,7 @@ tr.sectionrow td { border-top :3px solid #f9f9f9; }
 .page_list_show li { display :block; }
 img.page_list_rights { border :none; float :left; margin :0; vertical-align :middle; padding :2px; }
 .sections_list { font-weight :bold; padding-left :10px; }
-.sections_list table { width :900px; }
+
 .header_list_type { text-align :left; }
 .header_list_block { text-align :left; width :180px; }
 .header_list_pubdate_start { text-align :left; width :200px; }
@@ -157,3 +165,11 @@ div#username { height :17px; width :118%; text-align :left; font-weight :bold; m
 .error-box p { font-size :120%; }
 select > option.user-inactive { color :#990000; }
 button.status { cursor :pointer; border-radius :5px; -khtml-border-radius :5px; -webkit-border-radius :5px; -moz-border-radius :5px; }
+/*
+.outer { padding: 5px; border: 2px solid #7DA2C2; border-radius: 5px; margin-bottom: 1.8525em; }
+.section-active { padding:1px 5px; background:#C5DBEE; border-radius: 5px 5px 0 0; margin-bottom:5px; }
+.section-inactive { padding:1px 5px; background:#D8D8D8; border-radius: 5px 5px 0 0; margin-bottom:5px; }
+*/
+.block-outer {padding: 3px 3px 0; border: 1px solid #DEE5F8; border-radius: 5px; margin-bottom: 25px; box-shadow: 1px 1px 5px #666; }
+.section-active { padding:1px 5px; background:#DEE5F8; border-radius: 5px 5px 0 0; margin-bottom:5px; }
+.section-inactive { padding:1px 5px; background:#eee; border-radius: 5px 5px 0 0; margin-bottom:5px; }

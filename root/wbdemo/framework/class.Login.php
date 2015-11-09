@@ -9,8 +9,8 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: class.login.php 1625 2012-02-29 00:50:57Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/framework/class.login.php $
+ * @version         $Id: class.Login.php 1625 2012-02-29 00:50:57Z Luisehahne $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/framework/class.Login.php $
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
  */
@@ -289,6 +289,8 @@ class Login extends admin {
                 'TEXT_PASSWORD' => $TEXT['PASSWORD'],
                 'TEXT_REMEMBER_ME' => $TEXT['REMEMBER_ME'],
                 'TEXT_LOGIN' => $TEXT['LOGIN'],
+                'TEXT_SAVE' => $TEXT['SAVE'],
+                'TEXT_RESET' => $TEXT['RESET'],
                 'TEXT_HOME' => $TEXT['HOME'],
                 'PAGES_DIRECTORY' => PAGES_DIRECTORY,
                 'SECTION_LOGIN' => $MENU['LOGIN']

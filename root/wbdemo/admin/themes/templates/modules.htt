@@ -1,13 +1,13 @@
 <!-- BEGIN main_block -->
 <table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
-	<tr style="background:#f0f0f0;">
-		<td align="right">
-			{URL_TEMPLATES}
-			-
-			{URL_LANGUAGES}
-			-
-			{URL_ADVANCED}
-		</td>
+    <tr>
+        <td align="right">
+            <span><a class="button" href="{URL_TEMPLATES}">{MENU_TEMPLATES}</a> </span>
+            -
+            <span ><a class="button" href="{URL_LANGUAGES}">{MENU_LANGUAGES}</a></span>
+            -
+            <span ><a class="button" href="{URL_ADVANCED}">{TEXT_ADVANCED}</a></span>
+        </td>
      </tr>
 </table>
 
@@ -19,10 +19,10 @@
       <td valign="middle">
         <input type="file" name="userfile" size="97" />
         <script type="text/javascript">
-		document.install.userfile.focus();
-		</script><br />
+        document.install.userfile.focus();
+        </script><br />
         <input type="checkbox" name="overwrite" value="false"  />
-		<span>{OVERWRITE_NEWER_FILES}</span>
+        <span>{OVERWRITE_NEWER_FILES}</span>
       </td>
       <td width="110" align="left">
         <input type="submit" name="submit" value="{TEXT_INSTALL}" style="width: 100px;" />
@@ -38,9 +38,9 @@
     <tr>
       <td>
         <select name="file" style="width: 77%;">
-		<option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-		<!-- BEGIN module_list_block -->
-			<option value="{VALUE}">{NAME}</option>
+        <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+        <!-- BEGIN module_list_block -->
+            <option value="{VALUE}">{NAME}</option>
           <!-- END module_list_block -->
         </select>
       </td>
@@ -58,9 +58,9 @@
     <tr>
       <td>
         <select name="file" style="width: 77%;">
-		<option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-		<!-- BEGIN module_list_block -->
-			<option value="{VALUE}">{NAME}</option>
+        <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+        <!-- BEGIN module_list_block -->
+            <option value="{VALUE}">{NAME}</option>
           <!-- END module_list_block -->
         </select>
       </td>
@@ -77,57 +77,57 @@
   <form name="manual_install" action="manual_install.php" method="post" class="{INSTALL_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
-	  <tr>
-		<td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "install.php"</td>
-		<td valign="middle">
-			<input type="hidden" name="action" value="install" />
-			<select name="file" style="width: 250px;">
-	        <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-			<!-- BEGIN install_list_block -->
-			<option value="{VALUE}">{NAME}</option>
-			<!-- END install_list_block -->
-			</select>
-			<input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
-		</td>
-	  </tr>
+      <tr>
+        <td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "install.php"</td>
+        <td valign="middle">
+            <input type="hidden" name="action" value="install" />
+            <select name="file" style="width: 250px;">
+            <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+            <!-- BEGIN install_list_block -->
+            <option value="{VALUE}">{NAME}</option>
+            <!-- END install_list_block -->
+            </select>
+            <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
+        </td>
+      </tr>
   </table>
   </form>
   
   <form name="manual_upgrade" action="manual_install.php" method="post" class="{UPGRADE_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
-	  <tr>
-		<td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "upgrade.php"</td>
-		<td valign="middle" >
-			<input type="hidden" name="action" value="upgrade" />
-			<select name="file" style="width: 250px;">
-	        <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-			<!-- BEGIN install_list_block -->
-			<option value="{VALUE}">{NAME}</option>
-			<!-- END install_list_block -->
-			</select>
-			<input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
-		</td>
-	  </tr>
+      <tr>
+        <td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "upgrade.php"</td>
+        <td valign="middle" >
+            <input type="hidden" name="action" value="upgrade" />
+            <select name="file" style="width: 250px;">
+            <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+            <!-- BEGIN install_list_block -->
+            <option value="{VALUE}">{NAME}</option>
+            <!-- END install_list_block -->
+            </select>
+            <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
+        </td>
+      </tr>
   </table>
   </form>
 
   <form name="manual_uninstall" action="manual_install.php" method="post" class="{UNINSTALL_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
-	  <tr>
-		<td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "uninstall.php"</td>
-		<td valign="middle">
-			<input type="hidden" name="action" value="uninstall" />
-			<select name="file" style="width: 250px;">
-	        <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-			<!-- BEGIN install_list_block -->
-			<option value="{VALUE}">{NAME}</option>
-			<!-- END install_list_block -->
-			</select>
-			<input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
-			</td>
-	  </tr>
+      <tr>
+        <td width="150" valign="middle" nowrap="nowrap">{TEXT_FILE}: "uninstall.php"</td>
+        <td valign="middle">
+            <input type="hidden" name="action" value="uninstall" />
+            <select name="file" style="width: 250px;">
+            <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+            <!-- BEGIN install_list_block -->
+            <option value="{VALUE}">{NAME}</option>
+            <!-- END install_list_block -->
+            </select>
+            <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
+            </td>
+      </tr>
   </table>
   </form>
 

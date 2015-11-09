@@ -1,0 +1,56 @@
+Anleitung zur Installation des Servicepack 5 (Rev 1643)
+
+Dieses Servicepack beinhaltet alle Fixes fuer die WebsiteBaker-Version 2.8.3 und kann ueber alle bereits veroeffentlichten WB 2.8.3-Versionen mit oder ohne installiertem Servicepack installiert werden.
+
+Fuer die Installation ist es lediglich noetig, die im SP5 enthaltenen Dateien auf den Server zu uebertragen bzw. in den lokalen Ordner zu kopieren.
+Wichtig: Die Einstellungen im FTP-Programm muessen so gewaehlt werden, das Dateien mit einem aelterem Datum ueberschrieben werden koennen.
+
+Wer seine Installationen lokal vorbereitet, kann diese Einstellungen auch im jeweiligen Packprogramm (z.B. 7Zip, Winzip, Winrar) einstellen.
+Es wird empfohlen, die Datei / framework / class.login.php in der vorhandenen Installation manuell zu loeschen. Diese wird ersetzt durch die Datei / framework / class.Login.php, die Bestandteil des Servicepack 5 ist. Abhaengig von der Vorgehensweise kann es unter Windows moeglich sein, das diese Datei nicht ueberschrieben wird oder zwar der Inhalt, jedoch nicht der Dateiname aktualisiert wird, weil Windows nicht zwischen Gross- und Kleinschreibung unterscheidet.
+Siehe Abschnitt Windowsnutzer (XAMPP oder ähnlich und WB Portable)
+
+Soll nur ein upgrade gemacht werden, braucht der install Ordner nicht mit uebertragen zu werden. Der install Ordner wird nur für eine Neuinstalltion benötigt.
+
+Nach erfolgreichem Kopiervorgang muss die Datei upgrade-script.php manuell im Browser aufgerufen werden. Ist das Upgrade noch nicht erfolgt, wird dies bei der Anmeldung im WebsiteBaker-Backend automatisch gestartet. Nach erfolgreichem Upgrade ist die Datei upgrade-script.php auf dem Server zu loeschen.
+
+Sollte das Upgrade mit einer Fehlermeldung abbrechen, kopiert diese bitte z.b. in eine Textdatei und teilt den exakten Wortlaut im Forum mit.
+In der Datei upgrade-script.php gibt es in Zeile 648 einen sogenannten "Blacklist-Array" mit diesem Code
+$aBlackList = array ( 'guestbook', 'lib_jquery', '' );
+
+Dieser Array beinhaltet die Modulenamen, die beim Upgrade nicht beruecksichtigt werden sollen. Beim Modul guestbook gab es z.b. in einer Vorgaengerversion ein erst spaeter gefundenes Problem in der Modul-Datei upgrade.php. Welches Modul betroffen ist, sollte in der Fehlermeldung beim Abbruch stehen.
+Durch Einfuegen des Modulenamen nach obigem Muster in diesen Blacklist-Array wird dann das betroffene Modul vom Upgrade ausgeschlossen und das System-Upgrade kann abgeschlossen werden.
+Die betroffenen Module koennen dann spaeter ueber ein manuelles Upgrade aktualisiert werden.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Upgrade aelterer WebsiteBaker Versionen vor WB 2.8.3
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+hier gelten die Upgrade-Anweisungen, die im Forum hier zu finden sind.
+
+deutsche Version:
+http://forum.websitebaker.org/index.php/topic,23658.msg160358.html#msg160358
+
+english Version
+http://forum.websitebaker.org/index.php/topic,23412.0.html
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Neu gegenueber Versionen vor WB 2.8.3 SP5
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Die bisherige Klasse SecureForm und die beiden Dateien SecureForm.php und SecureForm.mtab.php wurde entfernt und durch die einzelne Klasse SecureTokens ersetzt. Dadurch wurde auch das Addon 'SecureFormSwitcher' ueberfluessig und kann bzw. sollte deinstalliert werden.
+Die Einstellungen fuer diese SecureForm koennen nur vom SuperAdmin (User-ID==1) in den WB-Optionen  gemacht werden.
+Einstellmoeglichkeiten:
+Token_Fingerprint:      Eingeschaltet / Ausgeschaltet
+Token_Netmask4:        (0-32 // 0 = off / default = 24)
+Token_Netmask6:        (0-128 // 0 = off / default = 64)
+Token_Life_Time:       ( 30min | 45min | 60min[default] | 120min ) 
+
+Das Modul SecureFormSwitcher wird durch das upgrade script deinstalliert
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ ACHTUNG! Windowsnutzer (XAMPP oder ähnlich und WB Portable)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Sollte eine neuere Datei (jetzt Case Sensitiv) vorhanden sein, wird in der alten gleichnamigen und klein geschriebene Datei zwar der Inhalt überschrieben, Jedoch nicht der Dateiname. 
+Aktuell im Ordner Framework alt class.login.php neu class.Login.php
+

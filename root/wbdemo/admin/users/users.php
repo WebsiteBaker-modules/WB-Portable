@@ -17,8 +17,8 @@
 */
 
  // Include config file and admin class file
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $action = 'cancel';
 // Set parameter 'action' as alternative to javascript mechanism
@@ -40,9 +40,14 @@ switch ($action):
                 $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
             }
             // Get existing values
-            $results = $database->query("SELECT * FROM `".TABLE_PREFIX."users` WHERE `user_id` = '".$user_id."'");
-            $user = $results->fetchRow();
 
+            $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'users` ' ;
+            $sql .= 'WHERE user_id != 1 ';
+            $sql .=   'AND user_id = '.$user_id.' ';
+
+            $results = $database->query($sql);
+
+            $user = $results->fetchRow(MYSQLI_ASSOC);
             // Setup template object, parse vars to it, then parse it
             // Create new template object
             $template = new Template(dirname($admin->correct_theme_source('users_form.htt')));
@@ -63,6 +68,7 @@ switch ($action):
                         );
 
             $template->set_var('FTAN', $admin->getFTAN());
+            $template->set_var('READONLY', 'readonly="readonly"' );
             if($user['active'] == 1) {
                 $template->set_var('ACTIVE_CHECKED', ' checked="checked"');
             } else {
@@ -168,7 +174,8 @@ switch ($action):
                                 'TEXT_HOME_FOLDER' => $TEXT['HOME_FOLDER'],
                                 'USERNAME_FIELDNAME' => $username_fieldname,
                                 'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
-                                'HEADING_MODIFY_USER' => $HEADING['MODIFY_USER']
+                                'HEADING_MODIFY_USER' => $HEADING['MODIFY_USER'],
+                                'CANCEL_LINK' => ADMIN_URL.'/users/index.php',
                                 )
                         );
 

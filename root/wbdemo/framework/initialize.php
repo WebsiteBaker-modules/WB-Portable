@@ -119,13 +119,15 @@ if (file_exists(WB_PATH.'/framework/class.database.php')) {
         throw new RuntimeException('no settings found');
     }
     @define('DO_NOT_TRACK', (isset($_SERVER['HTTP_DNT'])));
+
+    if (!defined('DEBUG')){ define('DEBUG', false); };
     $string_file_mode = STRING_FILE_MODE;
     @define('OCTAL_FILE_MODE',(int) octdec($string_file_mode));
     $string_dir_mode = STRING_DIR_MODE;
     @define('OCTAL_DIR_MODE',(int) octdec($string_dir_mode));
-    $sSecMod = (defined('SECURE_FORM_MODULE') && SECURE_FORM_MODULE != '') ? '.'.SECURE_FORM_MODULE : '';
-    $sSecMod = WB_PATH.'/framework/SecureForm'.$sSecMod.'.php';
-    require_once($sSecMod);
+//    $sSecMod = (defined('SECURE_FORM_MODULE') && SECURE_FORM_MODULE != '') ? '.'.SECURE_FORM_MODULE : '';
+//    $sSecMod = WB_PATH.'/framework/SecureForm'.$sSecMod.'.php';
+//    require_once($sSecMod);
     if (!defined("WB_INSTALL_PROCESS")) {
     // get CAPTCHA and ASP settings
         $sql = 'SELECT * FROM `'.TABLE_PREFIX.'mod_captcha_control`';

@@ -2,7 +2,7 @@
 ===
 === !!! ATTENTION:
 ===
-=== !!! This patch is for WB-2.8.3-SP1-SP3 only!!!
+=== !!! This patch is for WB-2.8.3-SP1-SP4 only!!!
 ===
 === !!! NEVER EVER use it in combination with other versions!!!
 ===
@@ -10,4 +10,19 @@ Step 1
 - Upload all the files into the coresponding directories on your Webspace
 =
 === finished
+
+=== CHANGELOG WB283 SP5 r1643 including WB283 SP1 to SP4
+
+Add missing parameter in system permission
+Security fixes news and form modul, don't allow backend access to persons you don't trust  
+Preferences - confirm with current password only by e-mail or password changes
+Add SecureToken (Multitab), remove Single Secureform and Secureform.mtab, Secureform Switcher no longer needed
+SecureToken Settings only by Superadmin in Advanced Settings (Server Settings)
+Updating settings.js Switching linux/Windows  and PhpMail/SMTP
+Modify page, add block-outer border with info-header area, showing if block is active or inactive
+
+
+
+
+
 

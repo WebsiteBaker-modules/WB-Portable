@@ -17,7 +17,7 @@
  */
 
 // Include config file
-require('../../config.php');
+require( dirname(dirname((__dir__))).'/config.php' );
 
 // Make sure people are allowed to access this page
 if(MANAGE_SECTIONS != 'enabled')
@@ -26,12 +26,12 @@ if(MANAGE_SECTIONS != 'enabled')
     exit(0);
 }
 /* */
-$debug = false; // to show position and section_id
-If(!defined('DEBUG')) { define('DEBUG',$debug);}
+$bDebug = false; // to show position and section_id
+If(!defined('PAGE_DEBUG')) { define('PAGE_DEBUG',$bDebug);}
 // Include the WB functions file
-require_once(WB_PATH.'/framework/functions.php');
+if ( !function_exists( 'create_access_file' ) ) { require(WB_PATH.'/framework/functions.php'); }
 // Create new admin object
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages_modify', false);
 
 $action = 'show';
@@ -74,7 +74,7 @@ switch ($action):
                 if($admin_header) { $admin->print_header(); }
                 $admin->print_error($database->get_error(),$backlink);
             }  else {
-                require_once(WB_PATH.'/framework/class.order.php');
+                if ( !class_exists( 'order', false ) ) { require(WB_PATH.'/framework/class.order.php'); }
                 $order = new order(TABLE_PREFIX.'sections', 'position', 'section_id', 'page_id');
                 $order->clean($page_id);
                 $format = $TEXT['SECTION'].' %d  %s %s '.strtolower( $TEXT['DELETED']);
@@ -104,11 +104,11 @@ switch ($action):
         $order = new order(TABLE_PREFIX.'sections', 'position', 'section_id', 'page_id');
         $position = $order->get_new($page_id);
         // Insert module into DB
-        $sql  = 'INSERT INTO `'.TABLE_PREFIX.'sections` SET ';
-        $sql .= '`page_id` = '.(int)$page_id.', ';
-        $sql .= '`module` = \''.$module.'\', ';
-        $sql .= '`position` = '.(int)$position.', ';
-        $sql .= '`block` = 1';
+        $sql  = 'INSERT INTO `'.TABLE_PREFIX.'sections` SET '
+              . '`page_id` = '.(int)$page_id.', '
+              . '`module` = \''.$module.'\', '
+              . '`position` = '.(int)$position.', '
+              . '`block` = 1';
         if($database->query($sql)) {
             // Get the section id
             $section_id = $database->get_one("SELECT LAST_INSERT_ID()");
@@ -131,8 +131,8 @@ switch ($action):
 
         if($admin_header) { $admin->print_header(); }
         // Get perms
-        $sql  = 'SELECT `admin_groups`,`admin_users` FROM `'.TABLE_PREFIX.'pages` ';
-        $sql .= 'WHERE `page_id` = '.$page_id;
+        $sql  = 'SELECT `admin_groups`,`admin_users` FROM `'.TABLE_PREFIX.'pages` '
+              . 'WHERE `page_id` = '.$page_id;
         $results = $database->query($sql);
 
         $results_array = $results->fetchRow();
@@ -153,8 +153,8 @@ switch ($action):
         }
 
         // Get page details
-        $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'pages` ';
-        $sql .= 'WHERE `page_id` = '.$page_id;
+        $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'pages` '
+              . 'WHERE `page_id` = '.$page_id;
         $results = $database->query($sql);
 
         if($database->is_error())
@@ -190,6 +190,15 @@ switch ($action):
         {
             // Make our own menu list
             $block[1] = $TEXT['MAIN'];
+        }
+        // Get display name of person who last modified the page
+        $user=$admin->get_user_details($results_array['modified_by']);
+        // Convert the unix ts for modified_when to human a readable form
+        if($results_array['modified_when'] != 0)
+        {
+            $modified_ts = gmdate(TIME_FORMAT.', '.DATE_FORMAT, $results_array['modified_when']+TIMEZONE);
+        } else {
+            $modified_ts = 'Unknown';
         }
 
         /*-- load css files with jquery --*/
@@ -228,6 +237,12 @@ switch ($action):
                         'TEXT_PUBL_START_DATE' => $TEXT{'PUBL_START_DATE'},
                         'TEXT_PUBL_END_DATE' => $TEXT['PUBL_END_DATE'],
                         'TEXT_ACTIONS' => $TEXT['ACTIONS'],
+                        'TEXT_MODIFY' => $TEXT['MODIFY'],
+                        'TEXT_MODIFY_PAGE' => $HEADING['MODIFY_PAGE'],
+                        'LAST_MODIFIED' => $MESSAGE['PAGES']['LAST_MODIFIED'],
+                        'MODIFIED_BY' => $user['display_name'],
+                        'MODIFIED_BY_USERNAME' => $user['username'],
+                        'MODIFIED_WHEN' => $modified_ts,
                         'ADMIN_URL' => ADMIN_URL,
                         'WB_URL' => WB_URL,
                         'THEME_URL' => THEME_URL
@@ -245,10 +260,9 @@ switch ($action):
                         )
                     );
 
-        $sql  = 'SELECT `section_id`,`module`,`position`,`block`,`publ_start`,`publ_end` ';
-        $sql .= 'FROM `'.TABLE_PREFIX.'sections` ';
-        $sql .= 'WHERE `page_id` = '.$page_id.' ';
-        $sql .= 'ORDER BY `position` ASC';
+        $sql  = 'SELECT `section_id`,`module`,`position`,`block`,`publ_start`,`publ_end` FROM `'.TABLE_PREFIX.'sections` '
+              . 'WHERE `page_id` = '.$page_id.' '
+              . 'ORDER BY `position` ASC';
         $query_sections = $database->query($sql);
 
         if($query_sections->numRows() > 0)
@@ -259,8 +273,8 @@ switch ($action):
                 if(!is_numeric(array_search($section['module'], $module_permissions)))
                 {
                     // Get the modules real name
-                    $sql = 'SELECT `name` FROM `'.TABLE_PREFIX.'addons` ';
-                    $sql .= 'WHERE `directory` = "'.$section['module'].'"';
+                    $sql = 'SELECT `name` FROM `'.TABLE_PREFIX.'addons` '
+                         . 'WHERE `directory` = "'.$section['module'].'"';
                     if(!$database->get_one($sql) || !file_exists(WB_PATH.'/modules/'.$section['module']))
                     {
                         $edit_page = '<span class="module_disabled">'.$section['module'].'</span>';
@@ -390,7 +404,7 @@ switch ($action):
                                     'DEBUG_COLSPAN_SIZE' => 9
                                     )
                                 );
-                if($debug)
+                if($bDebug)
                 {
                     $tpl->set_var(array(
                                     'DISPLAY_DEBUG' => ' style="visibility="visible;"',
@@ -424,8 +438,8 @@ switch ($action):
             while($section = $query_sections->fetchRow())
             {
                 // Get the modules real name
-                $sql  = 'SELECT `name` FROM `'.TABLE_PREFIX.'addons` ';
-                $sql .= 'WHERE `directory` = "'.$section['module'].'"';
+                $sql  = 'SELECT `name` FROM `'.TABLE_PREFIX.'addons` '
+                      . 'WHERE `directory` = "'.$section['module'].'"';
                 $module_name = $database->get_one($sql);
 
                 if(!is_numeric(array_search($section['module'], $module_permissions)))
@@ -459,15 +473,17 @@ switch ($action):
         }
 
         // Work-out if we should show the "Add Section" form
-        $sql  = 'SELECT `section_id` FROM `'.TABLE_PREFIX.'sections` ';
-        $sql .= 'WHERE `page_id` = '.$page_id.' AND `module` = "menu_link"';
+        $sql  = 'SELECT `section_id` FROM `'.TABLE_PREFIX.'sections` '
+              . 'WHERE `page_id` = '.$page_id.' AND `module` = "menu_link"';
         $query_sections = $database->query($sql);
         if($query_sections->numRows() == 0)
         {
             // Modules list
-            $sql  = 'SELECT `name`,`directory`,`type` FROM `'.TABLE_PREFIX.'addons` ';
-            $sql .= 'WHERE `type` = "module" AND `function` = "page" AND `directory` != "menu_link" ';
-            $sql .= 'ORDER BY `name`';
+            $sql  = 'SELECT `name`,`directory`,`type` FROM `'.TABLE_PREFIX.'addons` '
+                  . 'WHERE `type` = "module" '
+                  .   'AND `function` = "page" '
+                  .   'AND `directory` != "menu_link" '
+                  . 'ORDER BY `name`';
             $result = $database->query($sql);
         // if(DEBUG && $database->is_error()) { $admin->print_error($database->get_error()); }
             if($result->numRows() > 0)

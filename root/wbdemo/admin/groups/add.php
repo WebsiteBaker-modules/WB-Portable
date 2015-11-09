@@ -17,8 +17,8 @@
  */
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'groups_add', false);
@@ -45,7 +45,7 @@ $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'groups` '
 if ($database->get_one($sql)) {
     $admin->print_error($MESSAGE['GROUPS_GROUP_NAME_EXISTS'], $js_back);  
 }
-
+$system_permissions = array();
 // Get system and module permissions
 require(ADMIN_PATH.'/groups/get_permissions.php');
 

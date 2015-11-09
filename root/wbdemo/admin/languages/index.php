@@ -18,8 +18,8 @@
  */
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Addons', 'languages');
 
 // Setup template object, parse vars to it, then parse it
@@ -68,11 +68,11 @@ $template->set_var(array(
         );
 // Insert language text and messages
 $template->set_var(array(
-    'URL_MODULES' => $admin->get_permission('modules') ?
-        '<a href="' . ADMIN_URL . '/modules/index.php">' . $MENU['MODULES'] . '</a>' : '',
+    'URL_MODULES' => $admin->get_permission('modules') ? ADMIN_URL . '/modules/index.php' : '#',
+    'URL_TEMPLATES' => $admin->get_permission('templates') ? ADMIN_URL . '/templates/index.php' : '#',
     'URL_ADVANCED' => '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;',
-    'URL_TEMPLATES' => $admin->get_permission('templates') ?
-        '<a href="' . ADMIN_URL . '/templates/index.php">' . $MENU['TEMPLATES'] . '</a>' : '',
+    'MENU_MODULES' => $admin->get_permission('modules') ? $MENU['MODULES'] : '&#160;&#160;&#160;',
+    'MENU_TEMPLATES' => $admin->get_permission('templates') ? $MENU['TEMPLATES'] : '&#160;&#160;&#160;',
     'TEXT_INSTALL' => $TEXT['INSTALL'],
     'TEXT_UNINSTALL' => $TEXT['UNINSTALL'],
     'TEXT_VIEW_DETAILS' => $TEXT['VIEW_DETAILS'],

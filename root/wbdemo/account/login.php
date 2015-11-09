@@ -45,7 +45,7 @@ define('VISIBILITY', 'public');
 // Set the page content include file
 define('PAGE_CONTENT', WB_PATH.'/account/login_form.php');
 
-require_once(WB_PATH.'/framework/class.login.php');
+require_once(WB_PATH.'/framework/class.Login.php');
 require_once(WB_PATH.'/framework/class.frontend.php');
 
 // Create new frontend object

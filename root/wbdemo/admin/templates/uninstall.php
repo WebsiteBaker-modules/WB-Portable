@@ -16,31 +16,34 @@
  *
  */
 
-// Setup admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Addons', 'templates_uninstall', false);
+
+$js_back = ADMIN_URL.'/templates/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
 // Check if user selected template
-if(!isset($_POST['file']) OR $_POST['file'] == "") {
-    header("Location: index.php");
-    exit(0);
+if(!isset($_POST['file']) || $_POST['file'] == false) {
+    $file = '';
+    $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 } else {
     $file = $_POST['file'];
 }
 
 // Extra protection
 if(trim($file) == '') {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 }
 
 // Include the WB functions file
@@ -48,7 +51,7 @@ require_once(WB_PATH.'/framework/functions.php');
 
 // Check if the template exists
 if(!is_dir(WB_PATH.'/templates/'.$file)) {
-    $admin->print_error($MESSAGE['GENERIC']['NOT_INSTALLED']);
+    $admin->print_error($MESSAGE['GENERIC_NOT_INSTALLED'], $js_back );
 }
 
 if (!function_exists("replace_all")) {
@@ -62,18 +65,18 @@ if (!function_exists("replace_all")) {
 *    Check if the template is the standard-template or still in use
 */
 if (!array_key_exists('CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE', $MESSAGE['GENERIC'] ) )
-    $MESSAGE['GENERIC']['CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'] = "Can't uninstall this template <b>{{name}}</b> because it's the standardtemplate!";
+    $MESSAGE['GENERIC_CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'] = "Can't uninstall this template <b>{{name}}</b> because it's the standardtemplate!";
 
 // check whether the template is used as default wb theme
 if($file == DEFAULT_THEME) {
     $temp = array ('name' => $file );
-    $msg = replace_all( $MESSAGE['GENERIC']['CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'], $temp );
+    $msg = replace_all( $MESSAGE['GENERIC_CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'], $temp );
     $admin->print_error( $msg );
 }
 
 if ($file == DEFAULT_TEMPLATE) {
     $temp = array ('name' => $file );
-    $msg = replace_all( $MESSAGE['GENERIC']['CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'], $temp );
+    $msg = replace_all( $MESSAGE['GENERIC_CANNOT_UNINSTALL_IS_DEFAULT_TEMPLATE'], $temp );
     $admin->print_error( $msg );
 
 } else {
@@ -81,7 +84,7 @@ if ($file == DEFAULT_TEMPLATE) {
     /**
     *    Check if the template is still in use by a page ...
     */
-    $info = $database->query("SELECT page_id, page_title FROM ".TABLE_PREFIX."pages WHERE template='".$file."' order by page_title");
+    $info = $database->query("SELECT `page_id`, `page_title` FROM `".TABLE_PREFIX."pages` WHERE `template`='".$file."' order by `page_title`");
     
     if ($info->numRows() > 0) {
         /**

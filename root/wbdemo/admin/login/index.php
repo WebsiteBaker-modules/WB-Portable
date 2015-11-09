@@ -7,17 +7,17 @@
  * @copyright       2009-2011, Website Baker Org. e.V.
  * @link            http://www.websitebaker2.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: index.php 1625 2012-02-29 00:50:57Z Luisehahne $
- * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/admin/login/index.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/admin/login/index.php $
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
 */
 
-require_once("../../config.php");
-require_once(WB_PATH."/framework/class.Login.php");
-require_once(WB_PATH."/framework/class.frontend.php");
+if ( !defined('WB_PATH') ){ require(dirname(dirname(__dir__))."/config.php"); }
+if( !class_exists('Login', false) ){ require(WB_PATH."/framework/class.Login.php"); }
+if( !class_exists('frontend', false) ){ require(WB_PATH."/framework/class.frontend.php"); }
 
 $username_fieldname = 'username';
 $password_fieldname = 'password';

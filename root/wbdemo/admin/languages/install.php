@@ -20,22 +20,25 @@
 // do not display notices and warnings during installation
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
-// Setup admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 $admin = new admin('Addons', 'languages_install', false);
+
+$js_back = ADMIN_URL.'/languages/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
 // Check if user uploaded a file
 if(!isset($_FILES['userfile'])) {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
 }
 
 // Include the WB functions file
@@ -60,18 +63,18 @@ $temp_file = $temp_dir . 'language'.$temp_string;
 // Check if language dir is writable
 if(!is_writable(WB_PATH.'/languages/')) {
     if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
-    $admin->print_error($MESSAGE['GENERIC']['BAD_PERMISSIONS']);
+    $admin->print_error($MESSAGE['GENERIC_BAD_PERMISSIONS']);
 }
 
 // Try to upload the file to the temp dir
 if(!move_uploaded_file($_FILES['userfile']['tmp_name'], $temp_file)) {
     if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
-    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UPLOAD']);
+    $admin->print_error($MESSAGE['GENERIC_CANNOT_UPLOAD']);
 }
 
 // Check if uploaded file is a valid language file (no binary file etc.)
 $content = file_get_contents($temp_file);
-if (strpos($content, '<?php') === false) $admin->print_error($MESSAGE['GENERIC']['INVALID_LANGUAGE_FILE']);
+if (strpos($content, '<?php') === false) $admin->print_error($MESSAGE['GENERIC_INVALID_LANGUAGE_FILE']);
 
 // Remove any vars with name "language_code"
 unset($language_code);
@@ -88,7 +91,7 @@ if(!isset($language_code)) {
     if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
     // Restore to correct language
     require(WB_PATH.'/languages/'.LANGUAGE.'.php');
-    $admin->print_error($MESSAGE['GENERIC']['INVALID_LANGUAGE_FILE']);
+    $admin->print_error($MESSAGE['GENERIC_INVALID_LANGUAGE_FILE']);
 }
 
 // Set destination for language file
@@ -101,7 +104,7 @@ if (file_exists($language_file)) {
     if (versionCompare($language_version, $new_language_version, '>=')) {
         // Restore to correct language
         require(WB_PATH . '/languages/' . LANGUAGE . '.php');
-        $admin->print_error($MESSAGE['GENERIC']['ALREADY_INSTALLED']);
+        $admin->print_error($MESSAGE['GENERIC_ALREADY_INSTALLED']);
     }
     $action="upgrade";
     unlink($language_file);

@@ -732,7 +732,7 @@ function create_access_file($filename,$page_id,$level)
             // can only be dirs
             if(!file_exists($acces_file)) {
                 if(!make_dir($acces_file)) {
-                    $admin->print_error($MESSAGE['PAGES']['CANNOT_CREATE_ACCESS_FILE_FOLDER']);
+                    $admin->print_error($MESSAGE['MEDIA_DIR_NOT_MADE']  );
                 }
             }
         }
@@ -891,6 +891,7 @@ function extract_permission($octal_value, $who, $action)
     if(($who == '') || ($action == '') || (preg_match( '/[^0-7]/', (string)$octal_value ))) {
         return false; // invalid argument, so return false
     }
+
     // convert $octal_value into a decimal-integer to be sure having a valid value
     $right_mask = octdec($octal_value);
     $action_mask = 0;
@@ -913,6 +914,8 @@ function extract_permission($octal_value, $who, $action)
         default:
             return false; // undefined action name, so return false
     }
+//print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.$who[0].'_'.$action[0].' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
+//print_r( $right_mask & $action_mask ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
     // shift action-mask into the right position
     switch($who[0]) { // get who from first char of $who
         case 'u':

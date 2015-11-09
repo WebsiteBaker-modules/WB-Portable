@@ -120,8 +120,8 @@ table.datatable caption  { color: #fff; font-size: 14pt; background-color: #4757
 table.datatable tfoot  { font-size: 10pt; background-color: #546778; padding: 1px }
 table.datatable tr th, table.datatable tr td   { margin: 2px; padding: 3px; border: solid 1px #546778 }
 table.datatable th   { color: #fff; background-color: #394b5f }
-/*
-.langmenu {
+
+#langmenu {
   display: block;
   float: right;
   margin-left: auto;
@@ -131,11 +131,10 @@ table.datatable th   { color: #fff; background-color: #394b5f }
   text-align: center;
   vertical-align: middle;
 }
-*/
-.langmenu a:hover img, .langmenu a.current img {
+#langmenu a:hover img, #langmenu a.current img {
   opacity: 0.3;
 }
-.langmenu img {
+#langmenu img {
   border: 0 none;
   max-width: 100%;
 }

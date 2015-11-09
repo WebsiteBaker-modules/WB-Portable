@@ -16,8 +16,8 @@
  *
  */
 
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Addons', 'addons');
 
 // Setup template object, parse vars to it, then parse it
@@ -46,11 +46,11 @@ $template->set_block('main_block', "reload_block", "reload");
  *    Insert permission values into the template object
  *    Obsolete as we are using blocks ... see "parsing the blocks" section
  */
-$display_none = "style=\"display: none;\"";
-if($admin->get_permission('modules') != true)     $template->set_var('DISPLAY_MODULES', $display_none);    
-if($admin->get_permission('templates') != true)    $template->set_var('DISPLAY_TEMPLATES', $display_none);
-if($admin->get_permission('languages') != true)    $template->set_var('DISPLAY_LANGUAGES', $display_none);
-if($admin->get_permission('admintools') != true)    $template->set_var('DISPLAY_ADVANCED', $display_none);
+$display_none = 'style="display: none;"';
+if($admin->get_permission('modules') != true)   { $template->set_var('DISPLAY_MODULES', $display_none); }
+if($admin->get_permission('templates') != true) { $template->set_var('DISPLAY_TEMPLATES', $display_none); }
+if($admin->get_permission('languages') != true) { $template->set_var('DISPLAY_LANGUAGES', $display_none); }
+if($admin->get_permission('admintools') != true){ $template->set_var('DISPLAY_ADVANCED', $display_none); }
 
 if(!isset($_GET['advanced']) || $admin->get_permission('admintools') != true)
     $template->set_var('DISPLAY_RELOAD', $display_none);
@@ -70,8 +70,7 @@ $template->set_var(array(
     'MESSAGE_RELOAD_ADDONS' => $MESSAGE['ADDON']['RELOAD'],
     'TEXT_RELOAD' => $TEXT['RELOAD'],
     'RELOAD_URL' => ADMIN_URL . '/addons/reload.php',
-    'URL_ADVANCED' => $admin->get_permission('admintools')
-                ? '<a href="' . ADMIN_URL . '/addons/index.php?advanced">' . $TEXT['ADVANCED'] . '</a>' : '',
+    'URL_ADVANCED' => $admin->get_permission('admintools')? ADMIN_URL . '/addons/index.php?advanced' : '',
     'ADVANCED_URL' => $admin->get_permission('admintools') ? ADMIN_URL . '/addons/index.php' : '',
     'TEXT_ADVANCED' => $TEXT['ADVANCED'],
     'FTAN'            => $admin->getFTAN()

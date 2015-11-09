@@ -45,18 +45,23 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
                          ? ${$requestMethod}['section_id'] 
                          : (isset($section_id) ? $section_id : 0)
                   );
+
 $module_dir = basename( dirname($_SERVER["SCRIPT_NAME"]) );
 
 // Create js back link
+// $js_back = 'javascript: history.go(-1);';
 $js_back = ADMIN_URL.'/pages/sections.php?page_id='.$page_id;
+
 // Get perms
 // unset($admin_header);
-
 if( !is_numeric( $page_id ) ) {
         $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
 } elseif ($page_id > 0) {
       $page = $admin->get_page_details($page_id, ADMIN_URL.'/pages/index.php' );
+} else {
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS'], ADMIN_URL );
 }
+
 $old_admin_groups = explode(',', str_replace('_', '', $page['admin_groups']));
 $old_admin_users = explode(',', str_replace('_', '', $page['admin_users']));
 
@@ -70,7 +75,7 @@ foreach($admin->get_groups_id() as $cur_gid){
 if((!$in_group) && !is_numeric(array_search($admin->get_user_id(), $old_admin_users))) {
     print $admin->get_group_id().$admin->get_user_id();
     // print_r ($old_admin_groups);
-    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']  );
 }
 
 // some additional security checks:

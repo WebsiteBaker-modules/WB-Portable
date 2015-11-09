@@ -18,7 +18,11 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(!defined('WB_PATH')) {
+
+    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
+}
 /* -------------------------------------------------------- */
 
 $table_name = TABLE_PREFIX .'mod_droplets';

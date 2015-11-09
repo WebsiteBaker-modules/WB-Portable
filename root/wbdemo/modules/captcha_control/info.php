@@ -17,14 +17,13 @@
 
 // prevent this file from being accessed directly
 /* -------------------------------------------------------- */
-if(defined('WB_PATH') == false)
-{
-	// Stop this file being access directly
-		die('<head><title>Access denied</title></head><body><h2 style="color:red;margin:3em auto;text-align:center;">Cannot access this file directly</h2></body></html>');
+if(!defined('WB_PATH')) {
+    require_once (dirname(dirname(dirname(__file__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
 }
 /* -------------------------------------------------------- */
-$module_directory 	= 'captcha_control';
-$module_name        = 'Captcha and Advanced-Spam-Protection (ASP) Control';
+$module_directory   = 'captcha_control';
+$module_name        = 'Captcha and Spam-Protection (ASP) Control';
 $module_function    = 'tool';
 $module_version     = '1.2.0';
 $module_platform    = '2.7 | 2.8.x';

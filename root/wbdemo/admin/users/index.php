@@ -14,10 +14,11 @@
  * @filesource      $HeadURL: https://localhost:8443/svn/wb283Sp4/SP4/branches/wb/admin/users/index.php $
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
-*/
+ */
 
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 $admin = new admin('Access', 'users');
 
 $iUserStatus = 1;
@@ -47,10 +48,9 @@ $template->set_var('STATUS_ICON', ( ($iUserStatus==0) ? $UserStatusActive : $Use
 // Get existing value from database
 $sql  = 'SELECT `user_id`, `username`, `display_name`, `active` FROM `'.TABLE_PREFIX.'users` ' ;
 $sql .= 'WHERE user_id != 1 ';
-$sql .=     'AND active = '.$iUserStatus.' ';
+$sql .=   'AND active = '.$iUserStatus.' ';
 $sql .= 'ORDER BY `display_name`,`username`';
 
-$query = "SELECT user_id, username, display_name, active FROM ".TABLE_PREFIX."users WHERE user_id != '1' ORDER BY display_name,username";
 $results = $database->query($sql);
 if($database->is_error()) {
     $admin->print_error($database->get_error(), 'index.php');
@@ -128,6 +128,9 @@ $template->set_var('ACTIVE_CHECKED', ' checked="checked"');
 $template->set_var('ACTION_URL', ADMIN_URL.'/users/add.php');
 $template->set_var('SUBMIT_TITLE', $TEXT['ADD']);
 $template->set_var('FTAN', $admin->getFTAN());
+// {READONLY}
+$template->set_var('READONLY', '' );
+
 // insert urls
 $template->set_var(array(
         'ADMIN_URL' => ADMIN_URL,
@@ -135,6 +138,7 @@ $template->set_var(array(
         'THEME_URL' => THEME_URL
         )
 );
+$template->set_var('USERNAME', '');
 
 // Add groups to list
 $template->set_block('main_block', 'group_list_block', 'group_list');
@@ -166,7 +170,8 @@ if(in_array(1, $admin->get_groups_id())) {
     }
 }
 
-// Insert permissions values
+// Insert permissions values                
+
 if($admin->get_permission('users_add') != true) {
     $template->set_var('DISPLAY_ADD', 'hide');
 }
@@ -216,7 +221,8 @@ $template->set_var(array(
             'TEXT_NONE' => $TEXT['NONE'],
             'TEXT_HOME_FOLDER' => $TEXT['HOME_FOLDER'],
             'USERNAME_FIELDNAME' => $username_fieldname,
-            'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD']
+            'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
+             'CANCEL_LINK' => ADMIN_URL.'/access/index.php',
             )
     );
 

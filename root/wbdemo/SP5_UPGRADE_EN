@@ -1,0 +1,56 @@
+Instructions for the installation of the service stack 5 (Rev 1643)
+
+This service stack contain all fixed for the WebsiteBaker version 2.8.3 and is able to come about all already published WB 2.8.3-Versionen versions or without installed service stack are installed.
+
+For the installation it is only necessary to carry the files contained in SP5 to the server or to copy to the local folder. Important The settings in the FTP program must be chosen so the files can be overwritten with an older date.
+
+Who prepares his installations locally, can put these settings also in the respective stack program (e.g., 7Zip, Winzip, Winrar).
+It is recommended to extinguish the file / framework / class.login.php in the available installation by hand. This is substituted with the file / framework / class. Login.php which is a component of the service stack 5. Depending on the approach it can be possible under Windows which is not headlined this file or, indeed, the contents, however, not the file name are updated because Windows does not make a distinction between capitalization and use of small letters.
+See segment Windows User (XAMPP or similarly and WB Portable)
+
+Should only one be done upgrade, the install folder with does not need to be transferred. The install folder is required only for a new installtion.
+
+After successful copy process the file upgrade-script.php must be called by hand in the browser. If the Upgrade has not occurred yet, this is automatically begun with the registration in WebsiteBaker baking. To successful Upgrade the file upgrade-script.php on the server is to be extinguished.
+
+Should the Upgrade breaks off with an error message, copies these please e.g. in a text file and informs of the exact text in the forum.
+In the file upgrade-script.php there is in line 648 a so-called 'Blacklist-Array' with this code
+$aBlackList array ('guestbook', 'lib_jquery', ");
+
+This array contain the module names which should not be taken into consideration with the Upgrade. With the module guestbook there was z.b. in a predecessor's version an only later found problem in the module file upgrade.php. Which module is concerned, should stand in the error message by the demolition.
+Then the affected module of the Upgrade is excluded by insertion of the module name after the above pattern in this Blacklist-Array and the System-Upgrade can be concluded.
+Then the affected modules can be updated later about a manual Upgrade.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Upgrade older WebsiteBaker versions before WB 2.8.3
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Therefor pls read the Upgrade instructions which are to be found in the forum here.
+
+deutsche Version:
+http://forum.websitebaker.org/index.php/topic,23658.msg160358.html#msg160358
+
+english Version
+http://forum.websitebaker.org/index.php/topic,23412.0.html
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Important changes since versions before WB 2.8.3 SP5
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The present class SecureForm and both files SecureForm.php and SecureForm.mtab.php was removed and substituted with the single class SecureTokens. The Addon 'SecureFormSwitcher' thereby also became superfluous and can or should be uninstalled.
+The settings for this SecureForm can be done only by the SuperAdmin (User-ID 1) in the WB options.
+Set possibilities:
+
+Token_Fingerprint:      Eingeschaltet / Ausgeschaltet
+Token_Netmask4:        (0-32 // 0 = off / default = 24)
+Token_Netmask6:        (0-128 // 0 = off / default = 64)
+Token_Life_Time:       ( 30min | 45min | 60min[default] | 120min ) 
+
+The module SecureFormSwitcher is uninstalled by upgrade script
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ ATTENTION Windows user (XAMPP or similarly and WB Portable)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Should a newer file (now Case sensitively) exist, the contents are headlined in the old of the same name and written with a small letter file, indeed, However, not the file name. 
+Topically in the folder Framework old class.login.php anew class.Login.php
+

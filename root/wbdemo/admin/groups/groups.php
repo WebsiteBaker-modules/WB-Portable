@@ -17,19 +17,18 @@
  */
 
 // Include config file and admin class file
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
-
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Set parameter 'action' as alternative to javascript mechanism
 $action = 'cancel';
 // Set parameter 'action' as alternative to javascript mechanism
-$action = (isset($_POST['action']) && ($_POST['action'] ='modify')   ? 'modify' : $action );
+$action = (isset($_POST['action']) && ($_POST['action'] ='modify') ? 'modify' : $action );
 $action = (isset($_POST['modify']) ? 'modify' : $action );
 $action = (isset($_POST['delete']) ? 'delete' : $action );
 
 switch ($action):
-    case 'modify' :
 
+    case 'modify' :
             // Create new admin object
             $admin = new admin('Access', 'groups_modify' );
             // Check if group group_id is a valid number and doesnt equal 1
@@ -46,7 +45,7 @@ switch ($action):
             // Get existing values
             $sql = 'SELECT * FROM  `'.TABLE_PREFIX.'groups` WHERE `group_id` =  '.$group_id;
             $results = $database->query($sql);
-            $group = $results->fetchRow();
+            $group = $results->fetchRow(MYSQLI_ASSOC);
             // Setup template object, parse vars to it, then parse it
             // Create new template object
             $template = new Template(dirname($admin->correct_theme_source('groups_form.htt')));
@@ -54,12 +53,16 @@ switch ($action):
             $template->set_file('page', 'groups_form.htt');
             $template->set_block('page', 'main_block', 'main');
             $template->set_var(    array(
-                                    'ACTION_URL' => ADMIN_URL.'/groups/save.php',
-                                    'SUBMIT_TITLE' => $TEXT['SAVE'],
-                                    'GROUP_ID' => $admin->getIDKEY($group['group_id']),
-                                    'GROUP_NAME' => $group['name'],
-                                    'ADVANCED_LINK' => 'groups.php',
-                                    'FTAN' => $admin->getFTAN()
+                                'ADMIN_URL' => ADMIN_URL,
+                                'WB_URL' => WB_URL,
+                                'THEME_URL' => THEME_URL,
+                                'ACTION_URL' => ADMIN_URL.'/groups/save.php',
+                                'SUBMIT_TITLE' => $TEXT['SAVE'],
+                                'GROUP_ID' => $admin->getIDKEY($group['group_id']),
+                                'GROUP_NAME' => $group['name'],
+                                'ADVANCED_LINK' => ADMIN_URL.'/groups/groups.php',
+                                'CANCEL_LINK' => ADMIN_URL.'/groups/index.php',
+                                'FTAN' => $admin->getFTAN(),
                                 ));
             // Tell the browser whether or not to show advanced options
             if( true == (isset( $_POST['advanced']) AND ( strpos( $_POST['advanced'], ">>") > 0 ) ) ) {
@@ -98,7 +101,7 @@ switch ($action):
 
             if($result->numRows() > 0) {
                 $i=0;
-                while($addon = $result->fetchRow()) {
+                while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
                     $template->set_var('VALUE', $addon['directory']);
                     $template->set_var('NAME', $addon['name']);
                     if(!is_numeric(array_search($addon['directory'], $module_permissions))) {
@@ -117,7 +120,7 @@ switch ($action):
             $template->set_block('main_block', 'template_list_block', 'template_list');
             $result = $database->query('SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "template" ORDER BY `name`');
             if($result->numRows() > 0) {
-                while($addon = $result->fetchRow()) {
+                while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
                     $template->set_var('VALUE', $addon['directory']);
                     $template->set_var('NAME', $addon['name']);
                     if(!is_numeric(array_search($addon['directory'], $template_permissions))) {
@@ -131,6 +134,7 @@ switch ($action):
 
             // Insert language text and messages
             $template->set_var(array(
+                        'TEXT_CANCEL' => $TEXT['CANCEL'],
                         'TEXT_RESET' => $TEXT['RESET'],
                         'TEXT_ACTIVE' => $TEXT['ACTIVE'],
                         'TEXT_DISABLED' => $TEXT['DISABLED'],
@@ -141,6 +145,7 @@ switch ($action):
                         'TEXT_DISPLAY_NAME' => $TEXT['DISPLAY_NAME'],
                         'TEXT_EMAIL' => $TEXT['EMAIL'],
                         'TEXT_GROUP' => $TEXT['GROUP'],
+                        'TEXT_GROUPS' => $MENU['GROUPS'],
                         'TEXT_SYSTEM_PERMISSIONS' => $TEXT['SYSTEM_PERMISSIONS'],
                         'TEXT_MODULE_PERMISSIONS' => $TEXT['MODULE_PERMISSIONS'],
                         'TEXT_TEMPLATE_PERMISSIONS' => $TEXT['TEMPLATE_PERMISSIONS'],
@@ -168,6 +173,7 @@ switch ($action):
                         'TEXT_BASIC' => $TEXT['BASIC'],
                         'TEXT_ADVANCED' => $TEXT['ADVANCED'],
                         'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
+                        'DISPLAY_EXTRA' => 'display:block;',
                         'HEADING_MODIFY_GROUP' => $HEADING['MODIFY_GROUP'],
                     ));
 
@@ -178,33 +184,34 @@ switch ($action):
             $admin->print_footer();            break;
         case 'delete' :
             // Create new admin object
-            $admin = new admin('Access', 'groups_delete');
+            $admin = new admin('Access', 'groups_delete', false);
             $group_id = intval($admin->checkIDKEY('group_id', 0, $_SERVER['REQUEST_METHOD']));
             if($group_id == 0){
-                $admin->print_error($MESSAGE['USERS_NO_GROUP'] );
+                $admin->print_header();
+                $admin->print_error($MESSAGE['USERS_NO_GROUP'] );  //  GENERIC_CANNOT_UNINSTALL
             }
             // Check if user id is a valid number and doesnt equal 1
             if( ($group_id < 2 ) )
             {
-                // if($admin_header) { $admin->print_header(); }
+                $admin->print_header();
                 $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
             }
             // Print header
             $admin->print_header();
-            // Delete the group
-            $database->query("DELETE FROM `".TABLE_PREFIX."groups` WHERE `group_id` = '".$group_id."' LIMIT 1");
-            if($database->is_error()) {
-                $admin->print_error($database->get_error());
-            } else {
-                // Delete users in the group
-                $database->query("DELETE FROM `".TABLE_PREFIX."users` WHERE `group_id` = '".$group_id."'");
+            $query = "SELECT `name` FROM `".TABLE_PREFIX."groups` WHERE `group_id` = ".$group_id;
+            if ( ($group_name = $database->get_one($query)) ) { }
+            $query = "SELECT COUNT(*) FROM `".TABLE_PREFIX."users` WHERE `groups_id` like '%".$group_id."%'";
+            if ( $database->get_one($query) == 0 ) {
+                // Delete the group
+                $database->query("DELETE FROM `".TABLE_PREFIX."groups` WHERE `group_id` = '".$group_id."' LIMIT 1");
                 if($database->is_error()) {
                     $admin->print_error($database->get_error());
                 } else {
-                    $admin->print_success($MESSAGE['GROUPS']['DELETED']);
+                        $admin->print_success($MESSAGE['GROUPS_DELETED']);
                 }
+            } else {
+              $admin->print_error('('.$TEXT['GROUP'].' '.$group_name.') '.$MESSAGE['GENERIC_CANNOT_UNINSTALL'] );  //  
             }
-            // Print admin footer
             $admin->print_footer();
             break;
     default:

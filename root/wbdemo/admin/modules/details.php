@@ -15,36 +15,33 @@
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
  */
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
-// Include the config file
-require('../../config.php');
 require_once(WB_PATH .'/framework/functions.php');
-require_once(WB_PATH.'/framework/class.admin.php');
 // No print admin header
 $admin = new admin('Addons', 'modules_view', false);
+
+$js_back = ADMIN_URL.'/modules/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
-// After check print the header
 $admin->print_header();
 
 // Get module name
-if(!isset($_POST['file']) OR $_POST['file'] == "")
-{
-    header("Location: index.php");
-    exit(0);
-}
-else
-{
+if(!isset($_POST['file']) OR $_POST['file'] == "") {
+    $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
+} else {
     $file = preg_replace('/[^a-z0-9_-]/i', "", $_POST['file']);  // fix secunia 2010-92-1
 }
 
 // Check if the module exists
 if(!file_exists(WB_PATH.'/modules/'.$file)) {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_NOT_INSTALLED'], $js_back );
 }
 
 // Setup template object, parse vars to it, then parse it
@@ -54,10 +51,13 @@ $template = new Template(dirname($admin->correct_theme_source('modules_details.h
 $template->set_file('page', 'modules_details.htt');
 $template->set_block('page', 'main_block', 'main');
 
+
 // Insert values
-$result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'module' AND directory = '$file'");
-if($result->numRows() > 0) {
-    $module = $result->fetchRow();
+$sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+.'WHERE `type` = \'module\' '
+.'AND `directory` = \''.$file.'\'';
+if($result = $database->query($sql)) {
+    $module = $result->fetchRow(MYSQLI_ASSOC);
 }
 
 // check if a module description exists for the displayed backend language

@@ -26,18 +26,18 @@ require_once(WB_PATH.'/framework/class.database.php');
 // Include new wbmailer class (subclass of PHPmailer)
 require_once(WB_PATH."/framework/class.wbmailer.php");
 
-//require_once(WB_PATH."/framework/SecureForm.php");
+require_once(WB_PATH . '/framework/SecureTokens.php');
 
-class wb extends SecureForm
+class wb extends SecureTokens
 {
 
      public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
     // performed when frontend or backend is loaded.
 
-    public function  __construct($mode = SecureForm::FRONTEND) {
+//    public function  __construct($mode = SecureForm::FRONTEND) {
+    public function  __construct($mode = 0) {
         parent::__construct($mode);
     }
-
   /**
    * Created parse_url utf-8 compatible function
    * 

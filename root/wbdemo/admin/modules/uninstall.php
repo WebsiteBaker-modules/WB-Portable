@@ -16,30 +16,32 @@
  *
  */
 
-// Setup admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 $admin = new admin('Addons', 'modules_uninstall', false);
+
+$js_back = ADMIN_URL.'/modules/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
 // Check if user selected module
 if(!isset($_POST['file']) OR $_POST['file'] == "") {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 } else {
     $file = $admin->add_slashes($_POST['file']);
 }
 
 // Extra protection
 if(trim($file) == '') {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
 }
 
 // Include the WB functions file
@@ -47,7 +49,7 @@ require_once(WB_PATH.'/framework/functions.php');
 
 // Check if the module exists
 if(!is_dir(WB_PATH.'/modules/'.$file)) {
-    $admin->print_error($MESSAGE['GENERIC']['NOT_INSTALLED']);
+    $admin->print_error($MESSAGE['GENERIC_NOT_INSTALLED'], $js_back );
 }
 
 if (!function_exists("replace_all")) {

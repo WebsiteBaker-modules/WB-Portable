@@ -17,8 +17,8 @@
  */
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'users_modify', false);
 
@@ -28,46 +28,53 @@ $js_back = ADMIN_URL.'/users/index.php';
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
+$aInputs = array();
+
+$aInputs = array_merge( $_POST );
+
 // Check if user id is a valid number and doesnt equal 1
-if(!isset($_POST['user_id']) OR !is_numeric($_POST['user_id']) OR $_POST['user_id'] == 1) {
+if(!isset($aInputs['user_id']) OR !is_numeric($aInputs['user_id']) OR $aInputs['user_id'] == 1) {
     header("Location: index.php");
     exit(0);
 } else {
-    $user_id = $_POST['user_id'];
+    $user_id = intval($aInputs['user_id']);
 }
 
 // Gather details entered
-$groups_id = (isset($_POST['groups'])) ? implode(",", $admin->add_slashes($_POST['groups'])) : '';
-$active = $admin->add_slashes($_POST['active'][0]);
+$groups_id = ( isset($aInputs['groups']) ? implode(",", $aInputs['groups']) : '');
+$active = intval( is_array($aInputs['active'])  ?($aInputs['active'][0]):$aInputs['active']);
+
 $username_fieldname = $admin->get_post_escaped('username_fieldname');
 $username = strtolower($admin->get_post_escaped($username_fieldname));
+
 $password = $admin->get_post('password');
 $password2 = $admin->get_post('password2');
 $display_name = $admin->get_post_escaped('display_name');
 $email = $admin->get_post_escaped('email');
 $home_folder = $admin->get_post_escaped('home_folder');
-
 // Check values
 if($groups_id == "") {
-    $admin->print_error($MESSAGE['USERS']['NO_GROUP'], $js_back);
+    $admin->print_error($MESSAGE['USERS_NO_GROUP'], $js_back);
 }
+
 if(!preg_match('/^[a-z]{1}[a-z0-9_-]{2,}$/i', $username)) {
-    $admin->print_error( $MESSAGE['USERS_NAME_INVALID_CHARS'].' / '.
-                      $MESSAGE['USERS_USERNAME_TOO_SHORT'], $js_back);
+    $admin->print_error( $MESSAGE['USERS_NAME_INVALID_CHARS'], $js_back);
 }
+
 if($password != "") {
     if(strlen($password) < 2) {
-        $admin->print_error($MESSAGE['USERS']['PASSWORD_TOO_SHORT'], $js_back);
+        $admin->print_error($MESSAGE['USERS_PASSWORD_TOO_SHORT'], $js_back);
     }
     if($password != $password2) {
-        $admin->print_error($MESSAGE['USERS']['PASSWORD_MISMATCH'], $js_back);
+        $admin->print_error($MESSAGE['USERS_PASSWORD_MISMATCH'], $js_back);
     }
 }
+    $md5_password =  md5($password);
 
 if($email != "")
 {
@@ -80,14 +87,18 @@ if($email != "")
 }
 
 // Check if the email already exists
-$results = $database->query("SELECT user_id FROM ".TABLE_PREFIX."users WHERE email = '".$admin->add_slashes($_POST['email'])."' AND user_id <> '".$user_id."' ");
+$sql  = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` '
+      . 'WHERE `email` = \''.$email.'\' '
+      .   'AND `user_id` <> '.$user_id;
+
+$results = $database->query($sql);
 if($results->numRows() > 0)
 {
     if(isset($MESSAGE['USERS']['EMAIL_TAKEN']))
     {
-        $admin->print_error($MESSAGE['USERS']['EMAIL_TAKEN'], $js_back);
+        $admin->print_error($MESSAGE['USERS_EMAIL_TAKEN'], $js_back);
     } else {
-        $admin->print_error($MESSAGE['USERS']['INVALID_EMAIL'], $js_back);
+        $admin->print_error($MESSAGE['USERS_INVALID_EMAIL'], $js_back);
     }
 }
 
@@ -99,14 +110,18 @@ if($username != 'admin') {
 }
 
 // Update the database
-if($password == "") {
-    $query = "UPDATE ".TABLE_PREFIX."users SET groups_id = '$groups_id', active = '$active'$username_code, display_name = '$display_name', home_folder = '$home_folder', email = '$email' WHERE user_id = '$user_id'";
-} else {
-    // MD5 supplied password
-    $md5_password = md5($password);
-    $query = "UPDATE ".TABLE_PREFIX."users SET groups_id = '$groups_id', active = '$active'$username_code, display_name = '$display_name', home_folder = '$home_folder', email = '$email', password = '$md5_password' WHERE user_id = '$user_id'";
-}
-$database->query($query);
+
+$sql  = 'UPDATE `'.TABLE_PREFIX.'users` SET '
+      . '`groups_id` = \''.$groups_id.'\', '
+      . '`active` = '.$active.', '
+      . ( ($username != 'admin') ? '`username` = \''.$username.'\', ':' ' )
+      . '`display_name` = \''.$display_name.'\', '
+      . '`home_folder` = \''.$home_folder.'\', '
+      . '`email` = \''.$email.'\''
+      . ( ($password == "") ? ' ': ', `password` = \''.$md5_password.'\' ' )
+      . 'WHERE `user_id` = '.$user_id;
+
+$database->query($sql);
 if($database->is_error()) {
     $admin->print_error($database->get_error(),$js_back);
 } else {

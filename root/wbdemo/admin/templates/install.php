@@ -19,23 +19,26 @@
 // do not display notices and warnings during installation
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
-// Setup admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+// Include config file and admin class file
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Addons', 'templates_install', false);
+
+$js_back = ADMIN_URL.'/templates/index.php';
+
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
 // Check if user uploaded a file
 if(!isset($_FILES['userfile'])) {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_error($MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
 }
 
 // Include the WB functions file
@@ -48,7 +51,7 @@ $temp_unzip = WB_PATH.'/temp/unzip/';
 
 // Try to upload the file to the temp dir
 if(!move_uploaded_file($_FILES['userfile']['tmp_name'], $temp_file)) {
-    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UPLOAD']);
+    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UPLOAD'], $js_back );
 }
 
 // Include the PclZip class file (thanks to 

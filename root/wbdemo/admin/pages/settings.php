@@ -19,21 +19,22 @@
 /*
 */
 // Create new admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages_settings');
 // Include the WB functions file
-require_once(WB_PATH.'/framework/functions-utf8.php');
 
 // Get page id
 if(!isset($_GET['page_id']) || !is_numeric($_GET['page_id']))
 {
-    header("Location: index.php");
-    exit(0);
+    $admin->print_header();
+    $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
 } else {
     $page_id = $_GET['page_id'];
 }
 
+//if ( !function_exists( 'create_access_file' ) ) { require(WB_PATH.'/framework/functions.php'); }
+if ( !function_exists( 'entities_to_7bit' ) ) { require(WB_PATH.'/framework/functions-utf8.php'); }
 /*
 if( (!($page_id = $admin->checkIDKEY('page_id', 0, $_SERVER['REQUEST_METHOD']))) )
 {
@@ -43,7 +44,7 @@ if( (!($page_id = $admin->checkIDKEY('page_id', 0, $_SERVER['REQUEST_METHOD'])))
 */
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$page_id;
 $results = $database->query($sql);
-$results_array = $results->fetchRow();
+$results_array = $results->fetchRow(MYSQLI_ASSOC);
 
 $old_admin_groups = explode(',', $results_array['admin_groups']);
 $old_admin_users = explode(',', $results_array['admin_users']);
@@ -61,7 +62,7 @@ foreach($admin->get_groups_id() as $cur_gid)
 }
 if((!$in_old_group) && !is_numeric(array_search($admin->get_user_id(), $old_admin_users)))
 {
-    $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }
 
 // Get page details
@@ -76,7 +77,7 @@ if($results->numRows() == 0) {
     $admin->print_header();
     $admin->print_error($MESSAGE['PAGES']['NOT_FOUND']);
 }
-$results_array = $results->fetchRow();
+$results_array = $results->fetchRow(MYSQLI_ASSOC);
 
 // Get display name of person who last modified the page
 $user=$admin->get_user_details($results_array['modified_by']);
@@ -147,7 +148,7 @@ if($results_array['visibility'] == 'public') {
 
     $template->set_block('main_block', 'group_list_block', 'group_list');
     // Insert admin group and current group first
-    $admin_group_name = $get_groups->fetchRow();
+    $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
     $template->set_var(array(
                                     'ID' => 1,
                                     'TOGGLE' => '',
@@ -159,7 +160,7 @@ if($results_array['visibility'] == 'public') {
                                     )
                             );
     $template->parse('group_list', 'group_list_block', true);
-    while($group = $get_groups->fetchRow()) {
+    while($group = $get_groups->fetchRow(MYSQLI_ASSOC)) {
         // check if the user is a member of this group
         $flag_disabled = '';
         $flag_checked =  '';
@@ -202,7 +203,7 @@ if($results_array['visibility'] == 'public') {
 
     $template->set_block('main_block', 'group_list_block2', 'group_list2');
     // Insert admin group and current group first
-    $admin_group_name = $get_groups->fetchRow();
+    $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
     $template->set_var(array(
                                     'ID' => 1,
                                     'TOGGLE' => '',
@@ -215,7 +216,7 @@ if($results_array['visibility'] == 'public') {
                             );
     $template->parse('group_list2', 'group_list_block2', true);
 
-    while($group = $get_groups->fetchRow())
+    while($group = $get_groups->fetchRow(MYSQLI_ASSOC))
     {
         // check if the user is a member of this group
         $flag_disabled = '';
@@ -283,7 +284,7 @@ if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB
         $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent.' AND `language` = "'.$default_language.'" ORDER BY `position` ASC';
         $get_pages = $database->query($sql);
 
-        while($page = $get_pages->fetchRow())
+        while($page = $get_pages->fetchRow(MYSQLI_ASSOC))
         {
             if(($admin->page_is_visible($page)==false) && ($page['visibility'] <> 'none') ) { continue; }
 
@@ -374,7 +375,7 @@ function parent_list($parent)
     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent.' ORDER BY `position` ASC';
     $get_pages = $database->query($sql);
 
-    while($page = $get_pages->fetchRow())
+    while($page = $get_pages->fetchRow(MYSQLI_ASSOC))
     {
         if($admin->page_is_visible($page)==false)
         {
@@ -390,7 +391,7 @@ function parent_list($parent)
         // If the current page cannot be parent, then its children neither
         $list_next_level = true;
         // Stop users from adding pages with a level of more than the set page level limit
-        if($page['level']+1 < PAGE_LEVEL_LIMIT)
+        if( $page['level']+1 < PAGE_LEVEL_LIMIT +1 )
         {
             // Get user perms
             $admin_groups = explode(',', str_replace('_', '', $page['admin_groups']));
@@ -473,7 +474,7 @@ $template->set_block('main_block', 'template_list_block', 'template_list');
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "template" AND `function` = "template" order by `name`';
 if( ($res_templates = $database->query($sql)) )
 {
-    while($rec_template = $res_templates->fetchRow())
+    while($rec_template = $res_templates->fetchRow(MYSQLI_ASSOC))
     {
         // Check if the user has perms to use this template
         if($rec_template['directory'] == $results_array['template'] OR $admin->get_permission($rec_template['directory'], 'template') == true)
@@ -534,7 +535,7 @@ $template->set_block('main_block', 'language_list_block', 'language_list');
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "language" ORDER BY `name`';
 if( ($res_languages = $database->query($sql)) )
 {
-    while($rec_language = $res_languages->fetchRow())
+    while($rec_language = $res_languages->fetchRow(MYSQLI_ASSOC))
     {
         $l_codes[$rec_language['name']] = $rec_language['directory'];
         $l_names[$rec_language['name']] = entities_to_7bit($rec_language['name']); // sorting-problem workaround

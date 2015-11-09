@@ -24,13 +24,13 @@
         <div id="bars">
             
             <div class="breadcrumb_bar">
-            <?php if($title != 'START - WebsiteBaker CMS Portable') { ?>
-                <div class="langmenu">
-                    <a href="en.php" target="_self" title="EN" class="<?php echo $aCurrent['en']; ?>"><img class="flag_icon" src="EN.png" alt="EN" /></a>
+            <?php if($title != 'START - WebsiteBaker CMS Portable') { ?>    
+                <div>
+                    <a href="en.php" target="_self" title="EN"><img class="flag_icon" src="EN.png" alt="EN" /></a>
                         &nbsp;
-                    <a href="de.php" target="_self" title="DE" class="<?php echo $aCurrent['de']; ?>"><img class="flag_icon" src="DE.png" alt="DE" /></a>
+                    <a href="de.php" target="_self" title="DE"><img class="flag_icon" src="DE.png" alt="DE" /></a>
                         &nbsp;
-                    <a href="nl.php" target="_self" title="NL" class="<?php echo $aCurrent['nl']; ?>"><img class="flag_icon" src="NL.png" alt="NL" /></a>
+                    <a href="nl.php" target="_self" title="NL"><img class="flag_icon" src="NL.png" alt="NL" /></a>
                         &nbsp;
                 </div>            
                 <div class="breadcrumb"><strong><?php echo $crumb; ?>:</strong><span class="arrow">&nbsp;</span><span><?php echo $title; ?></span>
@@ -78,6 +78,10 @@
                     </a>
                 </div>
             </div>
+            <!--<div id="copyright">
+                <h3>Copyright &copy; 2013 <br /><br /><a href="http://www.websitebaker-portable.com/" target="_blank" >WebsiteBaker Portable Project</a></h3>    
+                <p>Text and images of this page are licensed under a <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank">Creative Commons Attribution-NonCommercial-No Derivative 3.0</a> Licence. You are free to copy and distribute this work for noncommercial purposes as long as no changes are applied and this copyright notice and a backlink to <a href="http://www.websitebaker.org">WebsiteBaker.org</a> are provided.</p>
+            </div>-->
         </div>
         <div id="content">
         <?php // here begins your content 

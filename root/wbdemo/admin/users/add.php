@@ -17,8 +17,8 @@
  */
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'users_add',false);
 
@@ -28,12 +28,16 @@ $js_back = ADMIN_URL.'/users/index.php';
 if( !$admin->checkFTAN() )
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // After check print the header
 $admin->print_header();
 
-// Get details entered
+$aInputs = array();
+
+$aInputs = array_merge( $_POST );
+/**
+ * 
 $groups_id = (isset($_POST['groups'])) ? implode(",", $admin->add_slashes($_POST['groups'])) : ''; //should check permissions
 $groups_id = trim($groups_id, ','); // there will be an additional ',' when "Please Choose" was selected, too
 $active = $admin->add_slashes($_POST['active'][0]);
@@ -44,7 +48,20 @@ $password2 = $admin->get_post('password2');
 $display_name = $admin->get_post_escaped('display_name');
 $email = $admin->get_post_escaped('email');
 $home_folder = $admin->get_post_escaped('home_folder');
+ */
+
+// Get details entered
+$groups_id = ( isset($aInputs['groups']) ? implode(",", $aInputs['groups']) : '');
+$active = intval( is_array($aInputs['active'])  ?($aInputs['active'][0]):$aInputs['active']);
+$username_fieldname = $admin->get_post_escaped('username_fieldname');
+$username = strtolower($admin->get_post_escaped($username_fieldname));
+$password = $admin->get_post('password');
+$password2 = $admin->get_post('password2');
+$display_name = $admin->get_post_escaped('display_name');
+$email = $admin->get_post_escaped('email');
+$home_folder = $admin->get_post_escaped('home_folder');
 $default_language = DEFAULT_LANGUAGE;
+$default_timezone = DEFAULT_TIMEZONE;
 
 // Check values
 if($groups_id == '') {
@@ -77,13 +94,19 @@ else $group_id = $gid_tmp[0]; // else just get the first one
 unset($gid_tmp);
 
 // Check if username already exists
-$results = $database->query("SELECT user_id FROM ".TABLE_PREFIX."users WHERE username = '$username'");
+$sql  = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` '
+      . 'WHERE `username` = \''.$username.'\' ';
+
+$results = $database->query($sql);
 if($results->numRows() > 0) {
     $admin->print_error($MESSAGE['USERS']['USERNAME_TAKEN'], $js_back);
 }
 
 // Check if the email already exists
-$results = $database->query("SELECT user_id FROM ".TABLE_PREFIX."users WHERE email = '".$admin->add_slashes($_POST['email'])."'");
+$sql  = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` '
+      . 'WHERE `email` = \''.$email.'\' ';
+
+$results = $database->query($sql);
 if($results->numRows() > 0)
 {
     if(isset($MESSAGE['USERS']['EMAIL_TAKEN']))
@@ -98,8 +121,20 @@ if($results->numRows() > 0)
 $md5_password = md5($password);
 
 // Inser the user into the database
-$query = "INSERT INTO ".TABLE_PREFIX."users (group_id,groups_id,active,username,password,display_name,home_folder,email,timezone, language) VALUES ('$group_id', '$groups_id', '$active', '$username','$md5_password','$display_name','$home_folder','$email','-72000', '$default_language')";
-$database->query($query);
+
+$sql  = 'INSERT INTO `'.TABLE_PREFIX.'users` SET '
+      . '`group_id` = '.$group_id.', '
+      . '`groups_id` = \''.$groups_id.'\', '
+      . '`active` = '.$active.', '
+      . '`username` = \''.$username.'\', '
+      . '`password` = \''.$md5_password.'\', '
+      . '`display_name` = \''.$display_name.'\', '
+      . '`home_folder` = \''.$home_folder.'\', '
+      . '`email` = \''.$email.'\', '
+      . '`timezone` = \''.$default_timezone.'\', '
+      . '`language` = \''.$default_language.'\''
+      .'';
+$database->query($sql);
 if($database->is_error()) {
     $admin->print_error($database->get_error());
 } else {

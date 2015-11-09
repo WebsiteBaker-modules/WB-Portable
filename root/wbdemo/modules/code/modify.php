@@ -17,7 +17,7 @@
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
 /* -------------------------------------------------------- */
 $sModulName = basename(__DIR__);
 if( !$admin->get_permission($sModulName,'module' ) ) {

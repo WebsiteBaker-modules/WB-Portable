@@ -293,7 +293,7 @@ if (!function_exists('page_content')) {
                 if($query_sections->numRows() == 0) { return; }
             }
             // Loop through them and include their module file
-            while($section = $query_sections->fetchRow()) {
+            while($section = $query_sections->fetchRow(MYSQLI_ASSOC)) {
                 // skip this section if it is out of publication-date
                 $now = time();
                 if( !(($now<=$section['publ_end'] || $section['publ_end']==0) && ($now>=$section['publ_start'] || $section['publ_start']==0)) ) {

@@ -68,11 +68,11 @@ $template->set_var(array(
             );
 // Insert language text and messages
 $template->set_var(array(
-    'URL_MODULES' => $admin->get_permission('modules') ? 
-        '<a href="' . ADMIN_URL . '/modules/index.php">' . $MENU['MODULES'] . '</a>' : '',
-    'URL_LANGUAGES' => $admin->get_permission('languages') ?
-        '<a href="' . ADMIN_URL . '/languages/index.php">' . $MENU['LANGUAGES'] . '</a>' : '',
+    'URL_MODULES' => $admin->get_permission('modules') ? ADMIN_URL . '/modules/index.php'  : '',
+    'URL_LANGUAGES' => $admin->get_permission('languages') ? ADMIN_URL . '/languages/index.php'  : '',
     'URL_ADVANCED' => '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;',
+    'MENU_LANGUAGES' => $admin->get_permission('languages') ? $MENU['LANGUAGES'] : '&#160;&#160;&#160;',
+    'MENU_MODULES' => $admin->get_permission('modules') ? $MENU['MODULES'] : '&#160;&#160;&#160;',
     'TEXT_INSTALL' => $TEXT['INSTALL'],
     'TEXT_UNINSTALL' => $TEXT['UNINSTALL'],
     'TEXT_VIEW_DETAILS' => $TEXT['VIEW_DETAILS'],

@@ -18,8 +18,9 @@
 
 
 // Print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+
+require( dirname(dirname((__dir__))).'/config.php' );
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Preferences','start', false);
 
@@ -28,6 +29,8 @@ function save_preferences( &$admin, &$database)
     global $MESSAGE;
     $err_msg = array();
     $iMinPassLength = 6;
+    $bPassRequest = false;
+    $bMailHasChanged = false;
 // first check form-tan
     if(!$admin->checkFTAN()){ $err_msg[] = $MESSAGE['GENERIC_SECURITY_ACCESS']; }
 // Get entered values and validate all
@@ -69,11 +72,17 @@ function save_preferences( &$admin, &$database)
         $err_msg[] = $MESSAGE['USERS_INVALID_EMAIL'];
     }else {
         if($email != '') {
+            $sql = 'SELECT `email` FROM `'.TABLE_PREFIX.'users` '
+                 . 'WHERE `user_id` = '.(int)$admin->get_user_id().' AND `email` LIKE \''.$email.'\'';
+            $IsOldMail = $database->get_one($sql);
         // check that email is unique in whoole system
-            $email = $admin->add_slashes($email);
-            $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
-            $sql .= 'WHERE `user_id` <> '.(int)$admin->get_user_id().' AND `email` LIKE "'.$email.'"';
-            if( $database->get_one($sql) > 0 ){ $err_msg[] = $MESSAGE['USERS_EMAIL_TAKEN']; }
+                $email = $admin->add_slashes($email);
+                $sql = 'SELECT `email` FROM `'.TABLE_PREFIX.'users` '
+                     . 'WHERE `user_id` <> '.(int)$admin->get_user_id().' AND `email` LIKE \''.$email.'\'';
+                $checkMail = $database->get_one($sql);
+
+                if( $checkMail == $email ){ $err_msg[] = $MESSAGE['USERS_EMAIL_TAKEN']; }
+                $bMailHasChanged = ($email != $IsOldMail);
         }
     }
 // receive password vars and calculate needed action
@@ -83,11 +92,19 @@ function save_preferences( &$admin, &$database)
     $sNewPassword = (is_null($sNewPassword) ? '' : $sNewPassword);
     $sNewPasswordRetyped = $admin->get_post('new_password_2');
     $sNewPasswordRetyped= (is_null($sNewPasswordRetyped) ? '' : $sNewPasswordRetyped);
+
+    if($bMailHasChanged == true)
+    {
+        $bPassRequest = $bMailHasChanged;
+    } else {
+        $bPassRequest = ( ( $sCurrentPassword != '') || ($sNewPassword != '') || ($sNewPasswordRetyped != '') ) ? true : false;
+    }
+
 // Check existing password
     $sql  = 'SELECT `password` ';
     $sql .= 'FROM `'.TABLE_PREFIX.'users` ';
     $sql .= 'WHERE `user_id` = '.$admin->get_user_id();
-    if (md5($sCurrentPassword) != $database->get_one($sql)) {
+    if ( $bPassRequest && md5($sCurrentPassword) != $database->get_one($sql)) {
 // access denied
         $err_msg[] = $MESSAGE['PREFERENCES_CURRENT_PASSWORD_INCORRECT'];
     }else {
