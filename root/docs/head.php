@@ -10,7 +10,7 @@
 <div id="framers_framer">    
         <div id="header">
             <div class="logo">
-                <a href="http://127.0.0.1:4001/docs/"><img src="1x1.gif" alt="" width="567" height="159" border="0" /></a></div>            
+                <a href="http://localhost:4001/docs/"><img src="1x1.gif" alt="" width="567" height="159" border="0" /></a></div>            
             <div class="print_logo" style="display: none;">
                 <img src="1x1.gif" alt="" width="477" height="229" border="0" />
                 <p>WebsiteBaker CMS - Portable Edition</p>

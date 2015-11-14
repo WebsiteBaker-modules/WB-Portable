@@ -1,6 +1,5 @@
 //:Display one defined WYSIWYG section
-//:Use [[ShowWysiwyg?section=10]]
-global $database, $section_id, $module;
+//:Use [[ShowWysiwyg?section=10]]global $database, $section_id, $module;
     $content = '';
     $section = isset($section) ? intval($section) : 0;
     if ($section) {

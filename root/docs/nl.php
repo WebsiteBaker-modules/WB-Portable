@@ -50,8 +50,8 @@ include ("head.php");
         <fieldset>
         <legend>WebsiteBaker Portable</legend>
         <ul>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/"><strong>Directe toegang tot de frontend </strong></a>(voor bezoekers)</li>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/"><strong>Directe toegang tot de backend</strong></a>(administratie)<br /><br />
+        <li><a target="_blank" href="http://localhost:4001/wbdemo/"><strong>Directe toegang tot de frontend </strong></a>(voor bezoekers)</li>
+        <li><a target="_blank" href="http://localhost:4001/wbdemo/admin/"><strong>Directe toegang tot de backend</strong></a>(administratie)<br /><br />
              <b>Loginname:</b> admin<br />
              <b>Password: </b>admin</li>
         </ul>        
@@ -60,10 +60,10 @@ include ("head.php");
         <hr />
         <br />
         <h2>About USBWebserver8</h2>
-        <p>You can display the USBWebserver8 WAMP Infos (e.g. phpinfo) <a href="http://127.0.0.1:4001/docs/usbw-info/" target="_blank">by clicking here!</a><br />
+        <p>You can display the USBWebserver8 WAMP Infos (e.g. phpinfo) <a href="http://localhost:4001/docs/usbw-info/" target="_blank">by clicking here!</a><br />
         USBWebserver-handleiding: <a href="http://www.usbwebserver.net/downloads/handleiding.pdf" target="_blank" title="USBWebserver8 handleiding">Click!</a><br />
-        Access to database via <b>MySQLDumper</b>: <a href="http://127.0.0.1:4001/mysqldumper" target="_blank">Click!</a><br />
-        Access to database via <b>phpMyAdmin</b>: <a href="http://127.0.0.1:4001/phpmyadmin" target="_blank">Click!</a><br /><br /></p>        
+        Access to database via <b>MySQLDumper</b>: <a href="http://localhost:4001/mysqldumper" target="_blank">Click!</a><br />
+        Access to database via <b>phpMyAdmin</b>: <a href="http://localhost:4001/phpmyadmin" target="_blank">Click!</a><br /><br /></p>        
         <hr />
         <br />
         <h2>Dank aan</h2>

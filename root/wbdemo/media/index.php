@@ -5,5 +5,5 @@
 // *** WB will rebuild this file from time to time!!
 // *************************************************
 	header('HTTP/1.1 301 Moved Permanently');
-	header('Location: http://127.0.0.1:4001/wbdemo/index.php');
+	header('Location: http://localhost:4001/wbdemo/index.php');
 // *************************************************

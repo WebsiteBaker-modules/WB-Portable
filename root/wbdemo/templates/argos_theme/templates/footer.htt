@@ -15,6 +15,7 @@
   </tr>
 </table>
 </div>
+<script src="{THEME_URL}/jquery/jquery-plugins.js" type="text/javascript"></script>
 {BACKEND_BODY_MODULE_JS}
 </body>
 </html>

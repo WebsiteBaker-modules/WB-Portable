@@ -4,6 +4,6 @@
 // *** Do not modify this file manually
 // *** WB will rebuild this file from time to time!!
 // *************************************************
-	$page_id    = 2;
+	$page_id    = 1;
 	require('../index.php');
 // *************************************************

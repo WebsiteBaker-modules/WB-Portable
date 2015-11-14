@@ -93,7 +93,20 @@
     </td>
 </tr>
 </table>
-
+<script type="text/javascript">
+<!--
+    elm = document.getElementsByTagName('form');
+    console.info(elm);
+      for (i=0; elm[i]; i++) {
+        if ( (elm[i].className.indexOf('autocomplete') == -1) ) {
+            elm[i].setAttribute('autocomplete', 'off');
+        }
+        if ( (elm[i].className.indexOf('accept-charset') == -1) ) {
+            elm[i].setAttribute('accept-charset', 'utf-8');
+        }
+      }
+-->
+</script>
 </body>
 </html>
 <!-- END mainBlock -->

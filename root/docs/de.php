@@ -52,8 +52,8 @@ include ("head.php");
         <fieldset>
         <legend>WebsiteBaker Portable</legend>
         <ul>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/"><strong>Direktzugang zum Frontend </strong></a>(Besucherbereich)</li>
-        <li><a target="_blank" href="http://127.0.0.1:4001/wbdemo/admin/"><strong>Direktzugang zum Backend </strong></a>(Administrationsbereich)<br /><br />
+        <li><a target="_blank" href="http://localhost:4001/wbdemo/"><strong>Direktzugang zum Frontend </strong></a>(Besucherbereich)</li>
+        <li><a target="_blank" href="http://localhost:4001/wbdemo/admin/"><strong>Direktzugang zum Backend </strong></a>(Administrationsbereich)<br /><br />
              <b>Loginname: </b>admin<br />
              <b>Passwort: </b>admin</li>
         </ul>        
@@ -62,10 +62,10 @@ include ("head.php");
         <hr />
         <br />
         <h2>&Uuml;ber USBWebserver8</h2>
-        <p>Alle Infos zu USBWebserver8 WAMP auf einen Blick (z.B. phpinfo) <a target="_blank" href="http://127.0.0.1:4001/docs/usbw-info/">gibt es Hier!</a><br />
+        <p>Alle Infos zu USBWebserver8 WAMP auf einen Blick (z.B. phpinfo) <a target="_blank" href="http://localhost:4001/docs/usbw-info/">gibt es Hier!</a><br />
         Eine Anleitung in englisch: <a href="http://www.usbwebserver.net/downloads/manual.pdf" target="_blank" title="USBWebserver8 Anleitung">Klick!</a><br />
-        Zugriff auf die Datenbank per <b>MySQLDumper</b>: <a target="_blank" href="http://127.0.0.1:4001/mysqldumper/">Klick!</a><br />
-        Zugriff auf die Datenbank per <b>phpMyAdmin</b>: <a target="_blank" href="http://127.0.0.1:4001/phpmyadmin/">Klick!</a><br /><br /></p>    
+        Zugriff auf die Datenbank per <b>MySQLDumper</b>: <a target="_blank" href="http://localhost:4001/mysqldumper/">Klick!</a><br />
+        Zugriff auf die Datenbank per <b>phpMyAdmin</b>: <a target="_blank" href="http://localhost:4001/phpmyadmin/">Klick!</a><br /><br /></p>    
         <hr />
         <br />
         <h2>Dank an:</h2>

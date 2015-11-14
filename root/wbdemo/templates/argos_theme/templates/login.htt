@@ -11,13 +11,13 @@
 </head>
 <body onload="document.login.{USERNAME_FIELDNAME}.focus();">
 <div style="text-align:left;font-size:20px;color:#fff;padding:15px 0 0 50px;height:100px;">
-	<!-- <img src="{THEME_URL}/images/logo.png" alt="Logo" /> -->
-	{TEXT_LOGIN}
+    <!-- <img src="{THEME_URL}/images/logo.png" alt="Logo" /> -->
+    {TEXT_LOGIN}
 </div> 
 <table class="container" summary="" cellpadding="0" cellspacing="0" border="0" width="770" align="center" style="margin-top: 30px;">
   <tr>
     <td class="content">
-      <form name="login" class="login" action="{ACTION_URL}" method="post">
+      <form name="login" class="login" action="{ACTION_URL}" method="post" >
         <input type="hidden" name="url" value="{URL}" />
         <input type="hidden" name="username_fieldname" value="{USERNAME_FIELDNAME}" />
         <input type="hidden" name="password_fieldname" value="{PASSWORD_FIELDNAME}" />
@@ -60,7 +60,7 @@
       </form>
       <center>
         <a href="{FORGOTTEN_DETAILS_APP}">{TEXT_FORGOTTEN_DETAILS}</a> 
-		<br />
+    <br />
         <br />
         <br />
         <a href="{WB_URL}/">{TEXT_HOME}</a>
@@ -78,6 +78,20 @@
     </td>
   </tr>
 </table>
+<script type="text/javascript">
+<!--
+    elm = document.getElementsByTagName('form');
+    console.info(elm);
+      for (i=0; elm[i]; i++) {
+        if ( (elm[i].className.indexOf('autocomplete') == -1) ) {
+            elm[i].setAttribute('autocomplete', 'off');
+        }
+        if ( (elm[i].className.indexOf('accept-charset') == -1) ) {
+            elm[i].setAttribute('accept-charset', 'utf-8');
+        }
+      }
+-->
+</script>
 </body>
 </html>
 <!-- END mainBlock -->

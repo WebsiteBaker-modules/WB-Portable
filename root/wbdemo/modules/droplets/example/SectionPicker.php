@@ -1,6 +1,5 @@
 //:Load the view.php from any other section-module
-//:Use [[SectionPicker?sid=123]]
-global $database, $wb, $TEXT, $DGTEXT,$section_id,$page_id;
+//:Use [[SectionPicker?sid=123]]global $database, $wb, $TEXT, $DGTEXT,$section_id,$page_id;
 $content = '';
 $sid = isset($sid) ? intval($sid) : 0;
 if( $sid ) {

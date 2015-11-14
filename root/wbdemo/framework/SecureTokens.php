@@ -203,9 +203,10 @@ class SecureTokens
         // get the POST/GET arguments
         $aArguments = (strtoupper($mMode) == 'POST' ? $_POST : $_GET);
         // encode the value of all matching tokens
+       $oThis = $this;
         $aMatchingTokens = array_map(
-            function ($aToken) {
-                return $this->encode64(md5($aToken['value'].$this->sFingerprint));
+            function ($aToken) use ($oThis) {
+                return $oThis->encode64(md5($aToken['value'].$oThis->sFingerprint));
             },
             // extract all matching tokens from $this->aTokens
             array_intersect_key($this->aTokens, $aArguments)
@@ -259,7 +260,7 @@ class SecureTokens
             default:
                 $sTokenName = $sFieldname;
         }
-        if (preg_match('/[0-9a-f]{16}$/i', $sTokenName)) {
+         if (preg_match('/^[0-9a-f]{16}$/i', $sTokenName)) {
         // key must be a 16-digit hexvalue
             if (array_key_exists($sTokenName, $this->aTokens)) {
             // check if key is stored in IDKEYs-list

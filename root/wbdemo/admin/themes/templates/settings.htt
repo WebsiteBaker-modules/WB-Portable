@@ -651,5 +651,5 @@
 <button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
 <br />
 <font class="{DISPLAY_ADVANCED_BUTTON}">{MODE_SWITCH_WARNING}</font>
-<script src="{ADMIN_URL}/settings/setting.js" type="text/javascript"></script>
+<script src="{THEME_URL}/js/setting.js" type="text/javascript"></script>
 <!-- END main_block -->

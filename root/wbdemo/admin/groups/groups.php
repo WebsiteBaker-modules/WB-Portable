@@ -94,16 +94,20 @@ switch ($action):
 
             $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
                   .'WHERE `type` = \'module\' '
-                  .'AND (`function` = \'page\' OR `function` = \'tool\' ) ORDER BY `name`';
-            
+                  .'AND (`function` = \'page\' OR `function` = \'tool\' ) ORDER BY `function`, `name`';
+
             $result = $database->query($sql);
             $aCheckedList = array();
 
+            $ChangeFunction = 'page';
             if($result->numRows() > 0) {
                 $i=0;
                 while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
+                    if( $addon['function']!=$ChangeFunction ){
+                        $ChangeFunction = $addon['function'];
+                    }
                     $template->set_var('VALUE', $addon['directory']);
-                    $template->set_var('NAME', $addon['name']);
+                    $template->set_var('NAME', (($addon['function'] == 'page') ? $addon['name'].'':' (A) '.$addon['name'])   );
                     if(!is_numeric(array_search($addon['directory'], $module_permissions))) {
                         $template->set_var('CHECKED', ' checked="checked"');
                         $aCheckedList[$i]['directory'] = $addon['directory'];
@@ -181,7 +185,8 @@ switch ($action):
             $template->parse('main', 'main_block', false);
             $template->pparse('output', 'page');
             // Print admin footer
-            $admin->print_footer();            break;
+            $admin->print_footer();
+            break;
         case 'delete' :
             // Create new admin object
             $admin = new admin('Access', 'groups_delete', false);

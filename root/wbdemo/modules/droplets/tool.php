@@ -65,7 +65,6 @@ if( !$database->get_one($sql) ) {
     include('install.php');
 }
 ?><br />
-<div class="droplets">
 <table summary="" cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr>
     <td valign="bottom" width="50%">
@@ -95,7 +94,7 @@ $query_droplets = $database->query($sql);
 $num_droplets = $query_droplets->numRows();
 if($num_droplets > 0) {
     ?>
-    <table class="droplets" summary="" class="row_a" border="0" cellspacing="0" cellpadding="3" width="100%">
+    <table summary="" class="row_a" border="0" cellspacing="0" cellpadding="3" width="100%">
     <thead>
         <tr>
             <td width="3%"></td>
@@ -108,7 +107,6 @@ if($num_droplets > 0) {
     <?php
     $row = 'a';
     while($droplet = $query_droplets->fetchRow()) {
-
         $get_modified_user = $database->query("SELECT display_name,username, user_id FROM ".TABLE_PREFIX."users WHERE user_id = '".$droplet['modified_by']."' LIMIT 1");
         if($get_modified_user->numRows() > 0) {
             $fetch_modified_user = $get_modified_user->fetchRow();
@@ -164,8 +162,6 @@ if($num_droplets > 0) {
     }
     ?>
     </table>
-</div>
-
     <?php
 }
 

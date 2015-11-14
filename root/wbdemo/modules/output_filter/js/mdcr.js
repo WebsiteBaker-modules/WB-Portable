@@ -5,7 +5,7 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: mdcr.js 1634 2012-03-09 02:20:16Z Luisehahne $
+ * @version         $Id: mdcr.js 1643 2015-11-12 11:20:16Z Luisehahne $
  * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/output_filter/js/mdcr.js $
  * @lastmodified    $Date: 2015-09-30 03:20:16 +0100 (Fr, 09. Sep 2015) $
  * @description

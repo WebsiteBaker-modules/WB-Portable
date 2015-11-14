@@ -129,23 +129,27 @@ $template->set_block('main_block', 'module_list_block', 'module_list');
 
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
       .'WHERE `type` = \'module\' '
-      .'AND (`function` = \'page\' OR `function` = \'tool\' ) ORDER BY `name`';
+      .'AND (`function` = \'page\' OR `function` = \'tool\' ) ORDER BY `function`, `name`';
 
 $result = $database->query($sql);
+$ChangeFunction = 'page';
 if($result->numRows() > 0) {
     while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
+        if( $addon['function']!=$ChangeFunction ){
+            $ChangeFunction = $addon['function'];
+        }
         $template->set_var('VALUE', $addon['directory']);
-        $template->set_var('NAME', $addon['name']);
+        $template->set_var('NAME', (($addon['function'] == 'page') ? $addon['name'].'':' (A) '.$addon['name'])   );
         $template->parse('module_list', 'module_list_block', true);
     }
 }
 // Insert values into template list
 $template->set_block('main_block', 'template_list_block', 'template_list');
-$result = $database->query('SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "template" ORDER BY `name`');
+$result = $database->query('SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "template" ORDER BY `function`, `name`');
 if($result->numRows() > 0) {
     while( $addon = $result->fetchRow(MYSQLI_ASSOC)) {
         $template->set_var('VALUE', $addon['directory']);
-        $template->set_var('NAME', $addon['name']);
+        $template->set_var('NAME', $addon['name']   );
         $template->parse('template_list', 'template_list_block', true);
     }
 }

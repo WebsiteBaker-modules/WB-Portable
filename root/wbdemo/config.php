@@ -7,7 +7,7 @@ define('DB_USERNAME', 'admin');
 define('DB_PASSWORD', 'wbdemo');
 define('TABLE_PREFIX', 'wb_');
 
-define('WB_URL', 'http://127.0.0.1:4001/wbdemo');
+define('WB_URL', 'http://localhost:4001/wbdemo');
 define('ADMIN_DIRECTORY', 'admin'); // no leading/trailing slash or backslash!! A simple directory only!!
 
 require_once(dirname(__FILE__).'/framework/initialize.php');

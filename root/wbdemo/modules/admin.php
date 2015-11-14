@@ -200,5 +200,5 @@ if(isset($print_info_banner) && $print_info_banner == true) {
 
 // Work-out if the developer wants us to update the timestamp for when the page was last modified
 if(isset($update_when_modified) && $update_when_modified == true) {
-    $database->query("UPDATE ".TABLE_PREFIX."pages SET modified_when = '".time()."', modified_by = '".$admin->get_user_id()."' WHERE page_id = '$page_id'");
+    $database->query("UPDATE `".TABLE_PREFIX."pages` SET `modified_when` = '".time()."', `modified_by` = '".$admin->get_user_id()."' WHERE `page_id` = '$page_id'");
 }
