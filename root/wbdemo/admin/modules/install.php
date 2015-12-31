@@ -20,7 +20,7 @@
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
 // Include config file and admin class file
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('Addons', 'modules_install', false);
@@ -90,7 +90,7 @@ $archive = new PclZip($temp_file);
 $list = $archive->extract(PCLZIP_OPT_PATH, $temp_unzip);
 
 // Check if uploaded file is a valid Add-On zip file
-if (!($list && file_exists($temp_unzip . 'index.php')))
+if (!($list && file_exists($temp_unzip . 'info.php')))
 {
   $admin->print_error($MESSAGE['GENERIC_INVALID_ADDON_FILE']);
 }

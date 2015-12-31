@@ -13,16 +13,16 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-	.mod_preferences_error {
-		background-color:#ffb0b0;
-		padding:5px;
-		border:dotted 1px #ff0000;
-		color:#ff0000;
-	}
-	.mod_preferences_success {
-		background-color:#b0ffb0;
-		padding:5px;
-		border:dotted 1px #303030;
-		color:#303030;
-	}
+    .mod_preferences_error {
+        background-color:#ffb0b0;
+        padding:5px;
+        border:dotted 1px #ff0000;
+        color:#ff0000;
+    }
+    .mod_preferences_success {
+        background-color:#b0ffb0;
+        padding:5px;
+        border:dotted 1px #303030;
+        color:#303030;
+    }
 /* ]]> */

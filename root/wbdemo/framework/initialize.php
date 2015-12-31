@@ -29,6 +29,7 @@ if (version_compare(PHP_VERSION, '5.3.6', '<')) {
 function SanitizeHttpReferer($sWbUrl = WB_URL) {
     $sTmpReferer = '';
     if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != '') {
+        define('ORG_REFERER', ($_SERVER['HTTP_REFERER'] ?: ''));
         $aRefUrl = parse_url($_SERVER['HTTP_REFERER']);
         if ($aRefUrl !== false) {
             $aRefUrl['host'] = isset($aRefUrl['host']) ? $aRefUrl['host'] : '';

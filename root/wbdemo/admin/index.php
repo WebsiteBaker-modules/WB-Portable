@@ -25,12 +25,12 @@
 
 // Include config file
 if(!defined('WB_URL') && file_exists(realpath('../config.php'))) {
-	require('../config.php');
+    require('../config.php');
 }
 
 // Check if the config file has been set-up
 if(!defined('WB_PATH')) {
-	header("Location: ../install/index.php");
+    header("Location: ../install/index.php");
 } else {
-	header('Location: '.ADMIN_URL.'/start/index.php');
+    header('Location: '.ADMIN_URL.'/start/index.php');
 }

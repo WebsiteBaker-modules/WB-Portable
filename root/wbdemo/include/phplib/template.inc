@@ -659,15 +659,15 @@ class Template
     if ($this->debug & 4) {
       echo "<p><b>pparse:</b> passing parameters to parse...</p>\n";
     }
-		if(!$clear) {
-			$unknowns = $this->unknowns;
-			$this->set_unknowns('keep');
-			print $this->finish($this->parse($target, $varname, $append));
-			$this->set_unknowns($unknowns);
-		} else {
-			print $this->finish($this->parse($target, $varname, $append));
-		}
-		return false;
+        if(!$clear) {
+            $unknowns = $this->unknowns;
+            $this->set_unknowns('keep');
+            print $this->finish($this->parse($target, $varname, $append));
+            $this->set_unknowns($unknowns);
+        } else {
+            print $this->finish($this->parse($target, $varname, $append));
+        }
+        return false;
   }
 
 

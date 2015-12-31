@@ -1,2 +1,10 @@
 # Example .htaccess wich allows to parse .html as php
-AddType application/x-httpd-php .html
+# AddType application/x-httpd-php .html
+# 
+# 
+ErrorDocument 404 http://www.domain.de/index.php
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^([^.]+).(de)
+RewriteRule ^(.*) http://www.%1.%2/$1 [R=301,L]
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.(html?|php)\ HTTP/
+RewriteRule ^index\.(html?|php)$ http://www.domain.de/ [R=301,L]

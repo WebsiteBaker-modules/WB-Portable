@@ -24,7 +24,7 @@
 */
 
 //Modul Description
-$template_description 	= 'Geavanceerde admin-template voor Website Baker 2.8.';
+$template_description     = 'Geavanceerde admin-template voor Website Baker 2.8.';
 
 //Texts
 $TEXT['ADMIN_ONLY'] = 'Instellingen alleen beschikbaar voor administrator';

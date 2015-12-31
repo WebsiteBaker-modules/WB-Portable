@@ -6,12 +6,12 @@
  * @author          WebsiteBaker Project
  * @copyright       2004-2009, Ryan Djurovich
  * @copyright       2009-2011, Website Baker Org. e.V.
- * @link			http://www.websitebaker2.org/
+ * @link            http://www.websitebaker2.org/
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
  * @version         $Id: SK.php 1374 2011-01-10 12:21:47Z Luisehahne $
- * @filesource		$HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/captcha_control/languages/SK.php $
+ * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/captcha_control/languages/SK.php $
  * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10. Jan 2011) $
  *
 */
@@ -19,7 +19,7 @@
 // Headings and text outputs
 $MOD_CAPTCHA_CONTROL['HEADING']           = 'Captcha a ASP kontrola';
 $MOD_CAPTCHA_CONTROL['HOWTO']             = 'Tu m&ocirc;&#382;ete ovplyvni&#357; spr&aacute;vanie "CAPTCHA" a "Advanced Spam Protection" (ASP).
-						Ak chcete pou&#382;&iacute;va&#357; ASP pr&aacute;cu s dan&yacute;m modulom, tento &#353;peci&aacute;lny modul, mus&iacute; by&#357; upraven&yacute; pre vyu&#382;itie ASP.';
+                        Ak chcete pou&#382;&iacute;va&#357; ASP pr&aacute;cu s dan&yacute;m modulom, tento &#353;peci&aacute;lny modul, mus&iacute; by&#357; upraven&yacute; pre vyu&#382;itie ASP.';
 
 // Text and captions of form elements
 $MOD_CAPTCHA_CONTROL['CAPTCHA_CONF']      = 'CAPTCHA Konfigur&aacute;cia';

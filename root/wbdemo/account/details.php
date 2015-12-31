@@ -41,7 +41,7 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
         $_SESSION['DISPLAY_NAME'] = $display_name;
         $_SESSION['LANGUAGE'] = $language;
         $_SESSION['TIMEZONE'] = $timezone;
-        $_SESSION['HTTP_REFERER'] = (($_SESSION['LANGUAGE']== LANGUAGE) ? $_SESSION['HTTP_REFERER'] : WB_URL);
+//        $_SESSION['HTTP_REFERER'] = (($_SESSION['LANGUAGE']== LANGUAGE) ? $_SESSION['HTTP_REFERER'] : WB_URL);
 // Update date format
         if($date_format != '') {
             $_SESSION['DATE_FORMAT'] = $date_format;

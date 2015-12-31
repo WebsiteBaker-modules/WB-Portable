@@ -16,7 +16,7 @@
 */
 
 // Include the configuration file
-if ( !defined('WB_PATH') ){ require(dirname(dirname(dirname(__dir__)))."/config.php"); }
+if ( !defined('WB_PATH') ){ require(dirname(dirname(dirname(__DIR__)))."/config.php"); }
 // Include the language file
 require(WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
 // Include the database class file and initiate an object

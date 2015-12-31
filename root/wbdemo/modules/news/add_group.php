@@ -41,16 +41,26 @@ $order = new order(TABLE_PREFIX.'mod_news_groups', 'position', 'group_id', 'sect
 $position = $order->get_new($section_id);
 
 // Insert new row into database
-$database->query("INSERT INTO ".TABLE_PREFIX."mod_news_groups (section_id,page_id,position,active) VALUES ('$section_id','$page_id','$position','1')");
+
+    // Insert new row into database
+    $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_groups` SET '
+    . '`section_id` = '.$section_id.', '
+    . '`page_id` = '.$page_id.', '
+    . '`position` = '.$position.', '
+    . '`active` = 1, '
+    . '`title` = \'\' ';
+    $database->query($sql);
+
+$database->query($sql);
 
 // Get the id
-$group_id = $admin->getIDKEY($database->get_one("SELECT LAST_INSERT_ID()"));
+$group_id = $admin->getIDKEY(intval($database->getLastInsertId()));
 
 // Say that a new record has been added, then redirect to modify page
 if($database->is_error()) {
-   $admin->print_error($database->get_error(), WB_URL.'/modules/news/modify_group.php?page_id='.$page_id.'&section_id='.$section_id.'&group_id='.$group_id);
+   $admin->print_error($database->get_error(), ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
 } else {
-   $admin->print_success($TEXT['SUCCESS'],     WB_URL.'/modules/news/modify_group.php?page_id='.$page_id.'&section_id='.$section_id.'&group_id='.$group_id);
+   $admin->print_success($TEXT['SUCCESS'], WB_URL.'/modules/'.basename(__DIR__).'/modify_group.php?page_id='.$page_id.'&section_id='.$section_id.'&group_id='.$group_id);
 }
 
 // Print admin footer

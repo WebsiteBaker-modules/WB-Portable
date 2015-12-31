@@ -24,7 +24,7 @@
 */
 
 //Modul Description
-$template_description 	= 'Standard design mal for Admin sidene i Website Baker 2.8.';
+$template_description     = 'Standard design mal for Admin sidene i Website Baker 2.8.';
 
 //Texts
 $TEXT['ADMIN_ONLY'] = 'Settings for administrator only';

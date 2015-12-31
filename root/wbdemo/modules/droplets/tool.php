@@ -18,31 +18,29 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_URL') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
 $msg = array();
-
-// check if backend.css file needs to be included into the <body></body>
-if(!method_exists($admin, 'register_backend_modfiles') && file_exists(WB_PATH .'/modules/droplets/backend.css')) {
-    echo '<style type="text/css">';
-    include(WB_PATH .'/modules/droplets/backend.css');
-    echo "\n</style>\n";
-}
-// Load Language file
-if(LANGUAGE_LOADED) {
-    if(!file_exists(WB_PATH.'/modules/droplets/languages/'.LANGUAGE.'.php')) {
-        require_once(WB_PATH.'/modules/droplets/languages/EN.php');
-    } else {
-        require_once(WB_PATH.'/modules/droplets/languages/'.LANGUAGE.'.php');
-    }
-}
 $sModulName = basename(__DIR__);
+$ModuleRel = '/modules/'.basename(__DIR__).'/';
+$ModuleUrl = WB_URL.'/modules/'.basename(__DIR__).'/';
+$ModulePath = WB_PATH.'/modules/'.basename(__DIR__).'/';
 $js_back = ADMIN_URL.'/admintools/tool.php';
 $ToolUrl = ADMIN_URL.'/admintools/tool.php?tool=droplets';
+
+// Load Language file
+if(LANGUAGE_LOADED) {
+    if(!file_exists($ModulePath.'languages/'.LANGUAGE.'.php')) {
+        require_once($ModulePath.'languages/EN.php');
+    } else {
+        require_once($ModulePath.'languages/'.LANGUAGE.'.php');
+    }
+}
+
 if( !$admin->get_permission($sModulName,'module' ) ) {
-//      die($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES']);
     $admin->print_error($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES'], $js_back);
+    exit();
 }
 
 // Get userid for showing admin only droplets or not
@@ -52,10 +50,9 @@ $admin_user = ( ($admin->get_home_folder() == '') && ($admin->ami_group_member('
 
 // And... action
 $admintool_url = ADMIN_URL .'/admintools/index.php';
-
 //removes empty entries from the table so they will not be displayed
-$sql = 'DELETE FROM `'.TABLE_PREFIX.'mod_droplets` ';
-$sql .= 'WHERE name = \'\' ';
+$sql = 'DELETE FROM `'.TABLE_PREFIX.'mod_droplets` '
+     . 'WHERE name = \'\' ';
 if( !$database->query($sql) ) {
     $msg[] = $database->get_error();
 }
@@ -65,104 +62,171 @@ if( !$database->get_one($sql) ) {
     include('install.php');
 }
 ?><br />
-<table summary="" cellpadding="0" cellspacing="0" border="0" width="100%">
-<tr>
-    <td valign="bottom" width="50%">
-        <button class="add" type="button" name="add_droplet" onclick="javascript: window.location = '<?php echo WB_URL; ?>/modules/droplets/add_droplet.php';"><?php echo $TEXT['ADD'].' '.$DR_TEXT['DROPLETS']; ?></button>
-    </td>
-    <!-- commentet out the droplets logo for a more similar backend design with other admin tools
-    <td align="center"><img src="<?php /*echo WB_URL;*/ ?>/modules/droplets/img/droplets_logo.png" border="1" alt=""/></td>
-    -->
-    <td valign="top" width="50%" align="right">
-        <a href="#" onclick="javascript: window.open('<?php echo WB_URL; ?>/modules/droplets/readme/<?php echo $DR_TEXT['README']; ?>','helpwindow','width=700,height=550,directories=no,location=no,menubar=no,scrollbars=yes,status=no,toolbar=no,resizable=yes');"><?php echo $DR_TEXT['HELP']; ?></a>
-        <br /><br />
-        <a href="#" onclick="javascript: window.location = '<?php echo WB_URL; ?>/modules/droplets/backup_droplets.php?id=<?php echo $admin->getIDKEY(999); ?>'"><?php echo $DR_TEXT['BACKUP']; ?></a>
-    </td>
-</tr>
-</table>
-<br />
+<div id="openModal" class="modalDialog" draggable="true">
+    <div>    <a href="#close" title="Close" class="close">X</a>
+       <header class="modal-label"><h2>Droplet <?php echo $DR_TEXT['HELP']; ?></h2></header>
+          <div class="modal-inner">
+              <iframe  src="<?php echo $ModuleUrl; ?>readme/readme.html" style="width: 100%;"></iframe>
+          </div>
+        <footer class="modal-label">
+<!--
+            <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+            <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+-->
+        </footer>
+    </div>
+</div>
+
+<div class="droplets" id="cb-droplets" >
+<form action="<?php echo $ModuleUrl; ?>index.php" method="post" name="droplets_form"  enctype="multipart/form-data" >
+    <?php echo $admin->getFTAN(); ?>
+    <table class="droplets">
+    <tr>
+        <td >
+            <button class="btn" type="submit" name="command" value="add_droplet"><?php echo $TEXT['ADD'].' '.$DR_TEXT['DROPLETS']; ?></button>
+            <a class="btn" href="#import"><?php echo $DR_TEXT['IMPORT']; ?></a>
+       </td>
+        <td style="float: right;">
+            <button class="btn" type="button" onclick="window.location='#openModal'" class="modal-header_btn modal-trigger btn-fixed">Droplet <?php echo $DR_TEXT['HELP']; ?></button>
+            <button class="btn" type="submit" name="command" value="backup_droplets"><?php echo $DR_TEXT['BACKUP']; ?></button>
+        </td>
+    </tr>
+    </table>
+    <br />
 
 <h2><?php echo $TEXT['MODIFY'].'/'.$TEXT['DELETE'].' '.$DR_TEXT['DROPLETS']; ?></h2>
 <?php
-
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'mod_droplets` ';
 if (!$admin_user) {
     $sql .= 'WHERE `admin_view` <> 1 ';
 }
 $sql .= 'ORDER BY `modified_when` DESC';
-$query_droplets = $database->query($sql);
-$num_droplets = $query_droplets->numRows();
+$oDroplets = $database->query($sql);
+$num_droplets = $oDroplets->numRows();
 if($num_droplets > 0) {
-    ?>
-    <table summary="" class="row_a" border="0" cellspacing="0" cellpadding="3" width="100%">
+//print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
+//print_r( $oDroplets ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
+?>
+<script src="<?php echo $ModuleUrl; ?>js/wz_tooltip.js"></script>
+<script src="<?php echo $ModuleUrl; ?>js/tip_balloon.js"></script>    <table class="droplets_data" >
     <thead>
         <tr>
-            <td width="3%"></td>
-            <td width="21%"><?php echo $TEXT['NAME']; ?></td>
-            <td width="68%"><?php echo $TEXT['DESCRIPTION']; ?></td>
-            <td width="4%"><?php echo $TEXT['ACTIVE']; ?></td>
-            <td width="3%"></td>
+            <th style="width: 3%;" >
+      <label>
+          <input name="select_all" id="select_all" type="checkbox" value="1"  />
+      </label>
+            </th>
+            <th style="width: 3%;" ></th>
+            <th style="width: 3%;" ></th>
+            <th style="width: 3%;" ></th>
+            <th style="width: 21%;"><?php echo $TEXT['NAME']; ?></th>
+            <th style="width: 65%;"><?php echo $TEXT['DESCRIPTION']; ?></th>
+            <th style="width: 4%;"><?php echo $TEXT['ACTIVE']; ?></th>
+            <th style="width: 3%;"></th>
         </tr>
     </thead>
+    <tbody>
     <?php
-    $row = 'a';
-    while($droplet = $query_droplets->fetchRow()) {
-        $get_modified_user = $database->query("SELECT display_name,username, user_id FROM ".TABLE_PREFIX."users WHERE user_id = '".$droplet['modified_by']."' LIMIT 1");
+    while($aDroplets = $oDroplets->fetchRow(MYSQLI_ASSOC)) {
+        $aComment =  array();
+//        $aDroplets['code'] = 'return false;';
+        $modified_user = $TEXT['UNKNOWN'];
+        $modified_userid = 0;
+
+        $sql = 'SELECT `display_name`,`username`, `user_id` FROM `'.TABLE_PREFIX.'users` '
+        .'WHERE `user_id` = '.$aDroplets['modified_by'];
+        $get_modified_user = $database->query($sql);
         if($get_modified_user->numRows() > 0) {
-            $fetch_modified_user = $get_modified_user->fetchRow();
+            $fetch_modified_user = $get_modified_user->fetchRow(MYSQLI_ASSOC);
             $modified_user = $fetch_modified_user['username'];
             $modified_userid = $fetch_modified_user['user_id'];
-        } else {
-            $modified_user = $TEXT['UNKNOWN'];
-            $modified_userid = 0;
         }
-        $iDropletIdKey = $admin->getIDKEY($droplet['id']);
-        $comments = str_replace(array("\r\n", "\n", "\r"), '<br />', $droplet['comments']);
-        if (!strpos($comments,"[[")) $comments = "Use: [[".$droplet['name']."]]<br />".$comments;
-        $comments = str_replace(array("[[", "]]"), array('<b>[[',']]</b>'), $comments);
-        $valid_code = check_syntax($droplet['code']);
-        if (!$valid_code === true) $comments = '<font color=\'red\'><strong>'.$DR_TEXT['INVALIDCODE'].'</strong></font><br /><br />'.$comments;
-        $unique_droplet = check_unique ($droplet['name']);
-        if ($unique_droplet === false ) {$comments = '<font color=\'red\'><strong>'.$DR_TEXT['NOTUNIQUE'].'</strong></font><br /><br />'.$comments;}
-        $comments = '<span>'.$comments.'</span>';
-        ?>
 
-        <tr class="row_<?php echo $row; ?>" >
+        $iDropletIdKey = $aDroplets['id'];
+        $iDropletIdKey = $admin->getIDKEY($aDroplets['id']);
+        $comments = '';
+//        $comments = str_replace(array("\r\n", "\n", "\r"), '<br >', $aDroplets['comments']);
+
+        if (!strpos($comments,"[[")) $comments = "Use: [[".$aDroplets['name']."]]<br />".$comments;
+        $comments = str_replace(array("[[", "]]"), array('<b>[[',']]</b>'), $comments);
+        $valid_code = true;
+        $valid_code = check_syntax($aDroplets['code']);
+        if (!$valid_code === true) $comments = '<span color=\'red\'><strong>'.$DR_TEXT['INVALIDCODE'].'</strong></span><br />'.$comments;
+        $unique_droplet = check_unique ($aDroplets['name']);
+        if ($unique_droplet === false ) {$comments = '<span color=\'red\'><strong>'.$DR_TEXT['NOTUNIQUE'].'</strong></span><br />'.$comments;}
+//        $comments = '<span>'.$comments.'</span>';
+?><tr >
             <td >
-                <a href="<?php echo WB_URL; ?>/modules/droplets/modify_droplet.php?droplet_id=<?php echo $iDropletIdKey; ?>" title="<?php echo $TEXT['MODIFY']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/modify_16.png" border="0" alt="Modify" />
-                </a>
+               <input type="checkbox" name="cb[<?php echo $aDroplets['id']; ?>]" id="L<?php echo $aDroplets['id']; ?>cb" value="<?php echo $aDroplets['name']; ?>" />
             </td>
             <td >
-                <a href="<?php echo WB_URL; ?>/modules/droplets/modify_droplet.php?droplet_id=<?php echo $iDropletIdKey; ?>" class="tooltip">
-                            <?php if ($valid_code && $unique_droplet) { ?><img src="<?php echo WB_URL; ?>/modules/droplets/img/droplet.png" border="0" alt=""/>
-                            <?php } else {  ?><img src="<?php echo WB_URL; ?>/modules/droplets/img/invalid.gif" border="0" title="" alt=""/><?php }  ?>
-                    <?php echo $droplet['name']; ?><?php echo $comments; ?>
-                </a>
+                <button name="command" type="submit" class="noButton"  value="copy_droplets?droplet_id=<?php echo $iDropletIdKey; ?>" title="<?php echo $DR_TEXT['COPY']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/plus_16.png"  alt="Modify" />
+                </button>
+            </td>
+            <td style="cursor: pointer;">
+                <button name="command" type="submit" class="noButton"  value="modify_droplet?droplet_id=<?php echo $iDropletIdKey; ?>" title="<?php echo $TEXT['MODIFY']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/modify_16.png"  alt="Modify" />
+                </button>
+            </td>
+            <td style="cursor: pointer;">
+                <button name="command" type="submit" class="noButton"  value="modify_droplet?droplet_id=<?php echo $iDropletIdKey; ?>">
+                        <?php if ($valid_code && $unique_droplet) { ?><img src="<?php echo $ModuleUrl; ?>img/droplet.png" alt=""/>
+                        <?php } else {  ?><img src="<?php echo $ModuleUrl; ?>img/invalid.gif"  alt=""/><?php }  ?>
+                </button>
+            </td>
+            <td onmouseover="TagToTip('tooltip_<?php echo $aDroplets['id']; ?>', BGCOLOR, '#F2F0A3', BALLOON, true, FONTSIZE, '10pt', HEIGHT,'0', BALLOONIMGPATH, '<?php echo $ModuleUrl; ?>img/tip_balloon/', BALLOONIMGEXT, 'gif' )" onmouseout="UnTip()">
+                <button  class=" noButton" name="command" type="submit" class="noButton" value="modify_droplet?droplet_id=<?php echo $iDropletIdKey; ?>">
+                    <?php echo $aDroplets['name']; ?>
+                <span id="tooltip_<?php echo $aDroplets['id']; ?>"><?php echo trim($comments); ?></span></button>
+            </td>
+            <td onmouseover="TagToTip('tooltip_<?php echo $aDroplets['id']; ?>', BGCOLOR, '#F2F0A3', BALLOON, true, FONTSIZE, '10pt', BALLOONIMGPATH, '<?php echo $ModuleUrl; ?>img/tip_balloon/', BALLOONIMGEXT, 'gif' )" onmouseout="UnTip()">
+                <?php echo substr($aDroplets['description'],0,90); ?>
             </td>
             <td >
-                <small><?php echo substr($droplet['description'],0,90); ?></small>
+                <b><?php if($aDroplets['active'] == 1){ echo '<span style="color: green;">'. $TEXT['YES']. '</span>'; } else { echo '<span style="color: red;">'.$TEXT['NO'].'</span>';  } ?></b>
             </td>
-            <td >
-                <b><?php if($droplet['active'] == 1){ echo '<span style="color: green;">'. $TEXT['YES']. '</span>'; } else { echo '<span style="color: red;">'.$TEXT['NO'].'</span>';  } ?></b>
-            </td>
-            <td >
-                <a href="javascript: confirm_link('<?php echo $TEXT['ARE_YOU_SURE']; ?>', '<?php echo WB_URL; ?>/modules/droplets/delete_droplet.php?droplet_id=<?php echo $iDropletIdKey; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/delete_16.png" border="0" alt="X" />
-                </a>
+            <td style="cursor: pointer;">
+                <button name="command" type="submit" class="noButton" style="width: auto;" value="delete_droplet?droplet_id=<?php echo $iDropletIdKey; ?>" title="<?php echo $TEXT['DELETE']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
+                </button>
             </td>
         </tr>
-        <?php
-        // Alternate row color
-        if($row == 'a') {
-            $row = 'b';
-        } else {
-            $row = 'a';
-        }
-    }
-    ?>
+<?php 
+//unset($aDroplets);
+} ?>
+      </tbody>
     </table>
-    <?php
+<?php
+$sBackupDir = $ModuleRel.'data/archiv/';
+$aZipFiles = glob(WB_PATH.$ModuleRel.'data/archiv/*.zip', GLOB_NOSORT); 
+?>
+        <div class="droplet-import" id="import">
+            <span ><?php echo $DR_TEXT['RESTORE']; ?></span>
+            <span style="text-align: left; padding: 0.525em 0;">
+                <select size="1" name="zipFiles" style="width: 30%;" >
+                    <option style=" padding: 0.225em 0.455em;" value=""><?php echo $TEXT['PLEASE_SELECT']; ?></option>
+<?php
+foreach( $aZipFiles as $files ) {
+      $value =  basename($files);
+      $files = str_replace(WB_PATH, '', $files );
+ ?>
+                  <option style=" padding: 0.225em 0.455em;" value="<?php echo $files; ?>"><?php echo $value; ?></option>
+<?php } ?></select>
+                <button class="btn" type="submit" name="command" value="import_droplets"><?php echo $DR_TEXT['IMPORT']; ?></button>
+                <button class="btn" type="submit" name="command" value="delete_archiv"><?php echo $TEXT['DELETE']; ?></button>
+            </span>
+          <div> 
+              <span style="margin-left: 21%;"> </span>
+              <span style="text-align: left; padding: 0.525em 0; display: inline-block; width: 63.5%;">
+                  <input name="zipFiles" type="file" accept=".zip">
+                  <button class="btn" name="command" value="import_droplets" type="submit"><?php echo $Droplet_Message['GENERIC_LOCAL_UPLOAD']; ?></button>
+              </span>
+          </div>
+        </div>
+</form>
+</div>
+<?php
 }
 
 function check_syntax($code) {

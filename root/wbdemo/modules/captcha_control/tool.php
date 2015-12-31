@@ -18,7 +18,7 @@
 // prevent this file from being accessed directly
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 // check if module language file exists for the language set by the user (e.g. DE, EN)
 if(!file_exists(WB_PATH .'/modules/captcha_control/languages/'.LANGUAGE .'.php')) {
@@ -45,7 +45,7 @@ if(isset($_POST['save_settings'])) {
 //        if(!$admin_header) { $admin->print_header(); }
         $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
     }
-    
+
     // get configuration settings
     $enabled_captcha = ($_POST['enabled_captcha'] == '1') ? '1' : '0';
     $enabled_asp = ($_POST['enabled_asp'] == '1') ? '1' : '0';
@@ -56,19 +56,18 @@ if(isset($_POST['save_settings'])) {
 
     if($captcha_type == 'text') { // ct_text
         $text_qa = isset($_POST['text_qa']) ? $_POST['text_qa'] :'calc_text';
-        if(!preg_match('/### .*? ###/', $text_qa)) {
-            $sql_captcha = ', `ct_text` = \''.$database->escapeString($text_qa).'\', ';
+        if(!preg_match('/### .*? ###/isU', $text_qa)) {
+            $sql_captcha = ', `ct_text` = \''.$database->escapeString($text_qa).'\' ';
         }
     }
 
-    $sql = 'UPDATE `'.TABLE_PREFIX.'mod_captcha_control` SET '
-    .'`enabled_captcha` = '.$enabled_captcha.', '
-    .'`enabled_asp` = '.$enabled_asp.', '
-    .'`captcha_type` = \''.$database->escapeString($captcha_type).'\' '
-    .$sql_captcha;
-
+        $sql = 'UPDATE `'.TABLE_PREFIX.'mod_captcha_control` SET '
+             .'`enabled_captcha` = '.$enabled_captcha.', '
+             .'`enabled_asp` = '.$enabled_asp.', '
+             .'`captcha_type` = \''.$database->escapeString($captcha_type).'\' '
+             .$sql_captcha;
     $database->query($sql);
-    
+
     // check if there is a database error, otherwise say successful
     if(!$admin_header) { $admin->print_header(); }
     if($database->is_error()) {
@@ -79,14 +78,14 @@ if(isset($_POST['save_settings'])) {
 
 } else {
 }
-    
+
     // include captcha-file
     require_once(WB_PATH .'/include/captcha/captcha.php');
 
     // load text-captchas
     $text_qa='';
-    if($query = $database->query("SELECT ct_text FROM $table")) {
-        $data = $query->fetchRow();
+    if($query = $database->query("SELECT `ct_text` FROM `$table`")) {
+        $data = $query->fetchRow(MYSQLI_ASSOC);
         $text_qa = $data['ct_text'];
     }
     if($text_qa == '')

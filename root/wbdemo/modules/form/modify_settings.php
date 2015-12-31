@@ -96,7 +96,7 @@ if(function_exists('edit_module_css')) { edit_module_css('form'); }
 <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
 <?php echo $admin->getFTAN(); ?>
 
-<table summary="" class="row_a" style="width: 100%;">
+<table style="width: 100%;">
     <tr>
         <td colspan="2"><strong><?php echo $HEADING['GENERAL_SETTINGS']; ?></strong></td>
     </tr>
@@ -141,7 +141,7 @@ if(function_exists('edit_module_css')) { edit_module_css('form'); }
     </tr>
 </table>    
 <!-- E-Mail Optionen -->
-<table summary="<?php echo $TEXT['EMAIL'].' '.$TEXT['SETTINGS']; ?>" class="row_a" cellpadding="2" cellspacing="0" border="0" width="100%" style="margin-top: 3px;">
+<table  style="margin-top: 3px; width: 100%;">
     <tr>
         <td colspan="2"><strong><?php echo $TEXT['EMAIL'].' '.$TEXT['SETTINGS']; ?></strong></td>
     </tr>
@@ -155,7 +155,7 @@ if(function_exists('edit_module_css')) { edit_module_css('form'); }
     <tr>
         <td class="frm-setting_name"><?php echo $TEXT['DISPLAY_NAME']; ?>:</td>
         <td class="frm-setting_value">
-            <input type="text" name="email_fromname" id="email_fromname" style="width: 98%;  ?>;" maxlength="255" value="<?php  echo $setting['success_email_fromname'];  ?>" />
+            <input type="text" name="email_fromname" id="email_fromname" style="width: 98%;" maxlength="255" value="<?php  echo $setting['success_email_fromname'];  ?>" />
         </td>
     </tr>
     <tr>
@@ -164,10 +164,10 @@ if(function_exists('edit_module_css')) { edit_module_css('form'); }
             <input type="text" name="email_subject" style="width: 98%;" maxlength="255" value="<?php echo str_replace($raw, $friendly, ($setting['email_subject'])); ?>" />
         </td>
     </tr>
-    <tr><td>&nbsp;</td></tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
 </table>
 <!-- Erfolgreich Optionen -->
-<table class="row_a"  style="margin-top: 3px;">
+<table  style="margin-top: 3px; width: 100%;">
     <thead>
     <tr>
         <th colspan="2"><strong><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['CONFIRM']; ?></strong></th>

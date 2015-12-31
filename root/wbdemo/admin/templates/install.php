@@ -20,7 +20,7 @@
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
 // Include config file and admin class file
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 // suppress to print the header, so no new FTAN will be set
@@ -67,7 +67,7 @@ $archive = new PclZip($temp_file);
 $list = $archive->extract(PCLZIP_OPT_PATH, $temp_unzip);
 
 // Check if uploaded file is a valid Add-On zip file
-if (!($list && file_exists($temp_unzip . 'index.php'))) $admin->print_error($MESSAGE['GENERIC']['INVALID_ADDON_FILE']);
+if (!($list && file_exists($temp_unzip . 'info.php'))) $admin->print_error($MESSAGE['GENERIC']['INVALID_ADDON_FILE']);
 
 // Include the templates info file
 require($temp_unzip.'info.php');

@@ -27,7 +27,7 @@
 */
 
 // Headings and text outputs
-$MOD_MENU_LINK['TEXT']				= 'Click HERE to go to the main page';
+$MOD_MENU_LINK['TEXT']                = 'Click HERE to go to the main page';
 $MOD_MENU_LINK['EXTERNAL_LINK'] = 'External Link';
 $MOD_MENU_LINK['R_TYPE'] = 'Redirect-Type';
 

@@ -11,4 +11,4 @@
 .frm-email { font-size :12px; width : 90%; }
 /*** Don't remove the class nixhier, this is required for ASP ***/
 .frm-nixhier { display :none; }
-.frm-submission { margin :0 auto; position :relative; width :auto; }		
+.frm-submission { margin :0 auto; position :relative; width :auto; }        

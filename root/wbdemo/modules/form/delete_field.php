@@ -4,18 +4,18 @@
  * @category        module
  * @package         Form
  * @author          WebsiteBaker Project
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link			http://www.websitebaker2.org/
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: delete_field.php 1553 2011-12-31 15:03:03Z Luisehahne $
- * @filesource		$HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/form/delete_field.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/form/delete_field.php $
  * @lastmodified    $Date: 2011-12-31 16:03:03 +0100 (Sa, 31. Dez 2011) $
  * @description     
  */
 
-require('../../config.php');
+require( dirname(dirname((__DIR__))).'/config.php' );
 
 // Include WB admin wrapper script
 $update_when_modified = true; // Tells script to update when this page was last updated
@@ -39,9 +39,9 @@ require(WB_PATH.'/framework/class.order.php');
 $order = new order(TABLE_PREFIX.'mod_form_fields', 'position', 'field_id', 'section_id');
 
 if(!$order->clean($section_id)) {
-	$admin->print_error($database->get_error(), ADMIN_URL.'/pages/modify.php?page_id='.$page_id.$sec_anchor);
+    $admin->print_error($database->get_error(), ADMIN_URL.'/pages/modify.php?page_id='.$page_id.$sec_anchor);
 } else {
-	$admin->print_success($TEXT['SUCCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id.$sec_anchor);
+    $admin->print_success($TEXT['SUCCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id.$sec_anchor);
 }
 
 // Print admin footer

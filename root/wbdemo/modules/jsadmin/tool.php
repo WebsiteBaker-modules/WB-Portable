@@ -17,7 +17,7 @@
 
 // prevent this file from being accessed directly
 /* -------------------------------------------------------- */
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
 // check if module language file exists for the language set by the user (e.g. DE, EN)
@@ -32,42 +32,29 @@ $sModulName = basename(__DIR__);
 $js_back = ADMIN_URL.'/admintools/tool.php';
 $ToolUrl = ADMIN_URL.'/admintools/tool.php?tool=jsadmin';
 if( !$admin->get_permission($sModulName,'module' ) ) {
-//      die($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES']);
     $admin->print_error($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES'], $js_back);
 }
-
-/*
-// check if backend.css file needs to be included into the <body></body>
-if(!method_exists($admin, 'register_backend_modfiles') && file_exists(WB_PATH .'/modules/jsadmin/backend.css')) {
-    echo '<style type="text/css">';
-    include(WB_PATH .'/modules/jsadmin/backend.css');
-    echo "\n</style>\n";
-}
-*/
-require_once(WB_PATH.'/modules/jsadmin/jsadmin.php');
+if( !function_exists( 'get_setting' ) )  {  require(WB_PATH.'/modules/'.basename(__DIR__).'/jsadmin.php');  }
 
 // Check if user selected what add-ons to reload
 if(isset($_POST['save_settings']))  {
-
     if (!$admin->checkFTAN())
     {
         if(!$admin_header) { $admin->print_header(); }
         $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'],$_SERVER['REQUEST_URI']);
     }
+    $aSql = array();
 
-    // Include functions file
-    require_once(WB_PATH.'/framework/functions.php');
-    save_setting('mod_jsadmin_persist_order', isset($_POST['persist_order']));
-    save_setting('mod_jsadmin_ajax_order_pages', isset($_POST['ajax_order_pages']));
-    save_setting('mod_jsadmin_ajax_order_sections', isset($_POST['ajax_order_sections']));
-   //     echo '<div style="border: solid 2px #9c9; background: #ffd; padding: 0.5em; margin-top: 1em">'.$MESSAGE['SETTINGS']['SAVED'].'</div>';
-    // check if there is a database error, otherwise say successful
+    $aSql[] = save_setting('mod_jsadmin_persist_order', intval(isset($_POST['persist_order'])) );
+    $aSql[] = save_setting('mod_jsadmin_ajax_order_pages', intval(isset($_POST['ajax_order_pages'])) );
+    $aSql[] = save_setting('mod_jsadmin_ajax_order_sections', intval(isset($_POST['ajax_order_sections'])) );
+
+    // check if there is a database error, otherwise say successful implode('<br />',$aSql ). 
     if(!$admin_header) { $admin->print_header(); }
     if($database->is_error()) {
         $admin->print_error($database->get_error(), $js_back);
     } else {
-
-        $admin->print_success($MESSAGE['PAGES']['SAVED'], $ToolUrl);
+        $admin->print_success( $MESSAGE['PAGES_SAVED'], $ToolUrl);
     }
 
 } else {
@@ -75,9 +62,9 @@ if(isset($_POST['save_settings']))  {
 }
 
 // Display form
-    $persist_order = get_setting('mod_jsadmin_persist_order', true) ? 'checked="checked"' : '';
-    $ajax_order_pages = get_setting('mod_jsadmin_ajax_order_pages', true) ? 'checked="checked"' : '';
-    $ajax_order_sections = get_setting('mod_jsadmin_ajax_order_sections', true) ? 'checked="checked"' : '';
+    $persist_order = get_setting('mod_jsadmin_persist_order' ) ? 'checked="checked"' : '';
+    $ajax_order_pages = get_setting('mod_jsadmin_ajax_order_pages'  ) ? 'checked="checked"' : '';
+    $ajax_order_sections = get_setting('mod_jsadmin_ajax_order_sections' ) ? 'checked="checked"' : '';
 
 // THIS ROUTINE CHECKS THE EXISTING OFF ALL NEEDED YUI FILES
   $YUI_ERROR=false; // ist there an Error
@@ -104,7 +91,7 @@ if(isset($_POST['save_settings']))  {
   ?>
    <form id="jsadmin_form" name="store_settings" style="margin-top: 1em; display: true;" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
     <?php echo $admin->getFTAN(); ?>
-   <table cellpadding="4" cellspacing="0" border="0">
+   <table >
    <tr>
          <td colspan="2"><?php echo $MOD_JSADMIN['TXT_HEADING_B']; ?>:</td>
    </tr>

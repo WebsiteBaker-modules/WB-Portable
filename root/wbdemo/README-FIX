@@ -13,15 +13,16 @@ Step 1
 
 === CHANGELOG WB283 SP5 r1643 including WB283 SP1 to SP4
 
-Add missing parameter in system permission
-Security fixes news and form modul, don't allow backend access to persons you don't trust  
+Add missing parameter in system permission (group management)
+Not possible to delete groups who are in use.
+Security fixes news and form modul (Don't allow backend access to persons you don't trust)!
 Preferences - confirm with current password only by e-mail or password changes
 Add SecureToken (Multitab), remove Single Secureform and Secureform.mtab, Secureform Switcher no longer needed
-SecureToken Settings only by Superadmin in Advanced Settings (Server Settings)
+SecureToken Settings by Superadmin in advanced settings (Server Settings)
 Updating settings.js Switching linux/Windows  and PhpMail/SMTP
 Modify page, add block-outer border with info-header area, showing if block is active or inactive
-
-
-
+Sanitize HttpReferer - Value will be first save in ORG_REFERER to use in statistic scripts  
+upgrade-script deleting protected files in some folder, you don't needed them
+Droplet add new features 
 
 

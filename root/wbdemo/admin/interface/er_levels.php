@@ -21,13 +21,13 @@
  */
 
 if(!defined('WB_URL')) {
-	header('Location: ../index.php');
-	exit(0);
+    header('Location: ../index.php');
+    exit(0);
 }
 
 // Define that this file is loaded
 if(!defined('ERROR_REPORTING_LEVELS_LOADED')) {
-	define('ERROR_REPORTING_LEVELS_LOADED', true);
+    define('ERROR_REPORTING_LEVELS_LOADED', true);
 }
 
 // Create array
@@ -35,9 +35,9 @@ $ER_LEVELS = array();
 
 // Add values to list
 if(isset($TEXT['SYSTEM_DEFAULT'])) {
-	$ER_LEVELS[''] = $TEXT['SYSTEM_DEFAULT'];
+    $ER_LEVELS[''] = $TEXT['SYSTEM_DEFAULT'];
 } else {
-	$ER_LEVELS[''] = 'System Default';
+    $ER_LEVELS[''] = 'System Default';
 }
 $ER_LEVELS['6135'] = 'E_ALL^E_NOTICE'; // standard: E_ALL without E_NOTICE
 $ER_LEVELS['0'] = 'E_NONE';

@@ -26,7 +26,7 @@ if(defined('WB_PATH') == false)
 $module_directory = 'form';
 $module_name = 'Form';
 $module_function = 'page';
-$module_version = '2.8.5';
+$module_version = '2.8.6';
 $module_platform = '2.8.x';
 $module_author = 'Ryan Djurovich & Rudolph Lartey - additions John Maats - PCWacht';
 $module_license = 'GNU General Public License';

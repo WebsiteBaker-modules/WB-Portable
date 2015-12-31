@@ -35,11 +35,7 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
                       ? ${$requestMethod}['page_id'] 
                       : (isset($page_id) ? $page_id : 0)
                );
-//    if( ($page_id == 0)) {
-//        header("Location: index.php");
-//        exit(0);
-//    }
-// Get section id if there is one (on error section_id == 0)
+
     $requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
     $section_id = intval(isset(${$requestMethod}['section_id']) 
                          ? ${$requestMethod}['section_id'] 
@@ -49,7 +45,6 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 $module_dir = basename( dirname($_SERVER["SCRIPT_NAME"]) );
 
 // Create js back link
-// $js_back = 'javascript: history.go(-1);';
 $js_back = ADMIN_URL.'/pages/sections.php?page_id='.$page_id;
 
 // Get perms
@@ -195,7 +190,7 @@ if(isset($print_info_banner) && $print_info_banner == true) {
                           . $section['module'].'<b>  ID: </b>'.$section_id.'</div>'.PHP_EOL;
         echo $sSectionInfoLine;
     }
-
+//print '<pre>';print_r( $aTokens = unserialize($_SESSION['TOKENS']) );print '</pre>';
 } //
 
 // Work-out if the developer wants us to update the timestamp for when the page was last modified

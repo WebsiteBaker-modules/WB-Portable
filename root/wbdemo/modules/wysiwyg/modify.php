@@ -17,7 +17,7 @@
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
 $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
@@ -46,7 +46,7 @@ if(!isset($wysiwyg_editor_loaded)) {
         $sql  = 'SELECT `section_id` FROM `'.TABLE_PREFIX.'sections` ';
         $sql .= 'WHERE `page_id`='.(int)$page_id.' AND `module`=\'wysiwyg\'';
         if (($query_wysiwyg = $database->query($sql))) {
-            while($wysiwyg_section = $query_wysiwyg->fetchRow()) {
+            while($wysiwyg_section = $query_wysiwyg->fetchRow( MYSQLI_ASSOC )) {
                 $entry='content'.$wysiwyg_section['section_id'];
                 $id_list[] = $entry;
             }
@@ -60,7 +60,8 @@ if(!isset($wysiwyg_editor_loaded)) {
     <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
 <?php
 echo $admin->getFTAN()."\n"; 
-show_wysiwyg_editor('content'.$section_id,'content'.$section_id,$content,'100%','350');
+
+show_wysiwyg_editor('content'.$section_id,'content'.$section_id,$content,'100%','350', false);
 ?>
     <table  style="padding-bottom: 10px; width: 100%;">
         <tr>

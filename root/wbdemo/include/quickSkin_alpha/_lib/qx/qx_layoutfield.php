@@ -12,8 +12,8 @@
   */
   function qx_layoutfield( $db_string ) {
   // Set raw html <'s and >'s to be replaced by friendly html code to be used in Layout Fields
-	$raw = array('<', '>');
-	$friendly = array('&lt;', '&gt;');
-	
+    $raw = array('<', '>');
+    $friendly = array('&lt;', '&gt;');
+    
     return str_replace( $raw, $friendly, $db_string );
   }

@@ -55,7 +55,7 @@ Examples:
     <img style="...; title="captcha" src="http://www.example.org/include/captcha/captchas/captcha.php?t=46784246" />
     or
     <span style="...; title="captcha">4 add 6</span>
-	call_captcha('image');
+    call_captcha('image');
     <img src="http://www.example.org/include/captcha/captchas/captcha.php?t=46784246" />
     or
     4 add 6
@@ -68,9 +68,9 @@ call_captcha('input', $style); will output the input-field:
 
 call_captcha('text', $style); will output a short "what to do"-text
   call_captcha('text', 'style="...;"');
-	  <span style="...;">Fill in the result</span>
+      <span style="...;">Fill in the result</span>
   call_captcha('text');
-	  Fill in the result
+      Fill in the result
 
 
 

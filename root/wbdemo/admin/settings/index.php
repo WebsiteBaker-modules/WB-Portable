@@ -15,7 +15,7 @@
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
  */
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 if(isset($_GET['advanced']) && $_GET['advanced'] == 'yes') {
@@ -175,10 +175,10 @@ if($is_advanced)
                      ));
 
     // Insert language values
-    $result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'language' ORDER BY directory");
+    $result = $database->query("SELECT * FROM `".TABLE_PREFIX."addons` WHERE `type` = 'language' ORDER BY `directory`");
     if($result->numRows() > 0)
     {
-        while($addon = $result->fetchRow()) {
+        while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
             $langIcons = (empty($addon['directory'])) ? 'none' : strtolower($addon['directory']);
 
             $template->set_var('CODE',        $addon['directory']);
@@ -197,11 +197,7 @@ if($is_advanced)
         if($hour_offset != '-20') {
             $template->set_var('VALUE', $hour_offset);
             $template->set_var('NAME', $title);
-            if(DEFAULT_TIMEZONE == $hour_offset*60*60) {
-                $template->set_var('SELECTED', ' selected="selected"');
-            } else {
-                $template->set_var('SELECTED', '');
-            }
+            $template->set_var('SELECTED', ( (DEFAULT_TIMEZONE == $hour_offset*60*60)?' selected="selected"':'' ) );
             $template->parse('timezone_list', 'timezone_list_block', true);
         }
     }
@@ -211,11 +207,7 @@ if($is_advanced)
     foreach($CHARSETS AS $code => $title) {
         $template->set_var('VALUE', $code);
         $template->set_var('NAME', $title);
-        if(DEFAULT_CHARSET == $code) {
-            $template->set_var('SELECTED', ' selected="selected"');
-        } else {
-            $template->set_var('SELECTED', '');
-        }
+        $template->set_var('SELECTED', ( (DEFAULT_CHARSET == $code)?' selected="selected"':'' ) );
         $template->parse('charset_list', 'charset_list_block', true);
     }
 
@@ -230,11 +222,7 @@ if($is_advanced)
             $template->set_var('VALUE', '');
         }
         $template->set_var('NAME', $title);
-        if(DEFAULT_DATE_FORMAT == $format) {
-            $template->set_var('SELECTED', ' selected="selected"');
-        } else {
-            $template->set_var('SELECTED', '');
-        }
+        $template->set_var('SELECTED', ( (DEFAULT_DATE_FORMAT == $format)?' selected="selected"':'' ) );
         $template->parse('date_format_list', 'date_format_list_block', true);
     }
 
@@ -248,34 +236,28 @@ if($is_advanced)
             $template->set_var('VALUE', '');
         }
         $template->set_var('NAME', $title);
-        if(DEFAULT_TIME_FORMAT == $format) {
-            $template->set_var('SELECTED', ' selected="selected"');
-        } else {
-            $template->set_var('SELECTED', '');
-        }
+        $template->set_var('SELECTED', ( (DEFAULT_TIME_FORMAT == $format)?' selected="selected"':'' ) );
         $template->parse('time_format_list', 'time_format_list_block', true);
     }
 
     // Insert templates
-    $result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'template' AND function != 'theme' ORDER BY name");
+    $result = $database->query("SELECT * FROM `".TABLE_PREFIX."addons` WHERE `type` = 'template' AND `function` != 'theme' ORDER BY `name`");
     if($result->numRows() > 0) {
-        while($addon = $result->fetchRow()) {
+        while($addon = $result->fetchRow( MYSQLI_ASSOC )) {
             $template->set_var('FILE', $addon['directory']);
             $template->set_var('NAME', $addon['name']);
-            if(($addon['directory'] == DEFAULT_TEMPLATE) ? $selected = ' selected="selected"' : $selected = '');
-            $template->set_var('SELECTED', $selected);
+            $template->set_var('SELECTED', (($addon['directory'] == DEFAULT_TEMPLATE)?' selected="selected"':'') );
             $template->parse('template_list', 'template_list_block', true);
         }
     }
 
     // Insert backend theme
-    $result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'template' AND function = 'theme' ORDER BY name");
+    $result = $database->query("SELECT * FROM `".TABLE_PREFIX."addons` WHERE `type` = 'template' AND `function` = 'theme' ORDER BY `name`");
     if($result->numRows() > 0) {
-        while($addon = $result->fetchRow()) {
+        while($addon = $result->fetchRow( MYSQLI_ASSOC )) {
             $template->set_var('FILE', $addon['directory']);
             $template->set_var('NAME', $addon['name']);
-            if(($addon['directory'] == DEFAULT_THEME) ? $selected = ' selected="selected"' : $selected = '');
-            $template->set_var('SELECTED', $selected);
+            $template->set_var('SELECTED', (($addon['directory'] == DEFAULT_THEME)?' selected="selected"':'') );
             $template->parse('theme_list', 'theme_list_block', true);
         }
     }
@@ -285,25 +267,23 @@ if($is_advanced)
     $module_name=$TEXT['NONE'];
     $template->set_var('FILE', $file);
     $template->set_var('NAME', $module_name);
-    $selected = (!defined('WYSIWYG_EDITOR') || $file == WYSIWYG_EDITOR) ? ' selected="selected"' : '';
-    $template->set_var('SELECTED', $selected);
+    $template->set_var('SELECTED', ((!defined('WYSIWYG_EDITOR') || $file == WYSIWYG_EDITOR) ? ' selected="selected"' : '') );
     $template->parse('editor_list', 'editor_list_block', true);
     $result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'module' AND function = 'wysiwyg' ORDER BY name");
     if($result->numRows() > 0)
     {
-        while($addon = $result->fetchRow())
+        while($addon = $result->fetchRow( MYSQLI_ASSOC ))
         {
             $template->set_var('FILE', $addon['directory']);
             $template->set_var('NAME', $addon['name']);
-            $selected = (!defined('WYSIWYG_EDITOR') || $addon['directory'] == WYSIWYG_EDITOR) ? ' selected="selected"' : '';
-            $template->set_var('SELECTED', $selected);
+            $template->set_var('SELECTED', ((!defined('WYSIWYG_EDITOR') || $addon['directory'] == WYSIWYG_EDITOR) ? ' selected="selected"' : '') );
             $template->parse('editor_list', 'editor_list_block', true);
         }
     }
 
 // Insert templates for search settings
     $search_template = ( ($search_template == DEFAULT_TEMPLATE) || ($search_template == '') ) ? '' : $search_template;
-    $selected = ( ($search_template != DEFAULT_TEMPLATE) ) ?  ' selected="selected"' : $selected = '';
+    $selected = ( ($search_template != DEFAULT_TEMPLATE) ) ?  ' selected="selected"' : '';
 
     $template->set_var(array(
             'FILE' => '',
@@ -312,15 +292,14 @@ if($is_advanced)
         ));
     $template->parse('search_template_list', 'search_template_list_block', true);
 
-    $result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'template' AND function = 'template' ORDER BY name");
+    $result = $database->query("SELECT * FROM `".TABLE_PREFIX."addons` WHERE `type` = 'template' AND `function` = 'template' ORDER BY `name`");
     if($result->numRows() > 0)
     {
-        while($addon = $result->fetchRow())
+        while($addon = $result->fetchRow( MYSQLI_ASSOC ))
         {
             $template->set_var('FILE', $addon['directory']);
             $template->set_var('NAME', $addon['name']);
-            $selected = ($addon['directory'] == $search_template) ? ' selected="selected"' :  $selected = '';
-            $template->set_var('SELECTED', $selected);
+            $template->set_var('SELECTED', (($addon['directory'] == $search_template) ? ' selected="selected"' :  '') );
             $template->parse('search_template_list', 'search_template_list_block', true);
 
         }
@@ -332,8 +311,7 @@ if($is_advanced)
     {
         $template->set_var('VALUE', $value);
         $template->set_var('NAME', $title);
-        $selected = (ER_LEVEL == $value) ? ' selected="selected"' : '';
-        $template->set_var('SELECTED', $selected);
+        $template->set_var('SELECTED', ((ER_LEVEL == $value) ? ' selected="selected"' : '') );
         $template->parse('error_reporting_list', 'error_reporting_list_block', true);
     }
 
@@ -349,12 +327,7 @@ if($is_advanced)
     for($i = 1; $i <= 10; $i++)
     {
         $template->set_var('NUMBER', $i);
-        if(PAGE_LEVEL_LIMIT == $i)
-        {
-            $template->set_var('SELECTED', ' selected="selected"');
-        } else {
-            $template->set_var('SELECTED', '');
-        }
+        $template->set_var('SELECTED', ((PAGE_LEVEL_LIMIT == $i) ? ' selected="selected"' : '') );
         $template->parse('page_level_limit_list', 'page_level_limit_list_block', true);
     }
 
@@ -413,9 +386,6 @@ if($is_advanced)
     } else {
         $template->set_var('HOMEPAGE_REDIRECTION_DISABLED', ' checked="checked"');
     }
-/**
- * 
- */
     // Work-out if debug mode feature is enabled
     if(defined('DEBUG') && DEBUG == true)
     {
@@ -478,22 +448,6 @@ if($is_advanced)
         $template->set_var('SMTP_VISIBILITY', '');
         $template->set_var('SMTP_VISIBILITY_AUTH', '');
     }
-/* deprecated
-    // Work-out if SMTP authentification should be checked
-    if(WBMAILER_SMTP_AUTH)
-    {
-        $template->set_var('SMTP_AUTH_SELECTED', ' checked="checked"');
-        if(WBMAILER_ROUTINE == 'smtp')
-        {
-            $template->set_var('SMTP_VISIBILITY_AUTH', '');
-
-        } else {
-            $template->set_var('SMTP_VISIBILITY_AUTH', ' style="display: none;"');
-        }
-    } else {
-        $template->set_var('SMTP_VISIBILITY_AUTH', ' style="display: none;"');
-    }
-*/
     // Work-out if intro feature is enabled
     if(INTRO_PAGE)
     {
@@ -532,7 +486,6 @@ if($is_advanced)
     } else {
         $template->set_var('HOME_FOLDERS_DISABLED', ' checked="checked"');
     }
-
     // Insert search select
     if(SEARCH == 'private')
     {
@@ -640,16 +593,11 @@ if($is_advanced)
     $results = $database->query("SELECT `group_id`, `name` FROM `".TABLE_PREFIX."groups` WHERE `group_id` != '1'");
     if($results->numRows() > 0)
     {
-        while($group = $results->fetchRow())
+        while($group = $results->fetchRow(MYSQLI_ASSOC))
         {
             $template->set_var('ID', $group['group_id']);
             $template->set_var('NAME', $group['name']);
-            if(FRONTEND_SIGNUP == $group['group_id'])
-            {
-                $template->set_var('SELECTED', ' selected="selected"');
-            } else {
-                $template->set_var('SELECTED', '');
-            }
+            $template->set_var('SELECTED', ((FRONTEND_SIGNUP == $group['group_id']) ? ' selected="selected"' : '') );
             $template->parse('group_list', 'group_list_block', true);
         }
     } else {

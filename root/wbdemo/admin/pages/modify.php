@@ -18,7 +18,7 @@
 /*
 */
 // Create new admin object
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('Pages', 'pages_modify');
@@ -127,10 +127,6 @@ if (SECTION_BLOCKS)
          . 'WHERE `page_id`='.(int)$page_id;
     if (($sTemplate = $database->get_one($sql)) !== null) {
         $page_template = ($sTemplate == '') ? DEFAULT_TEMPLATE : $sTemplate;
-//    $result = $database->query($sql);
-//    if ($result && $result->numRows() == 1) {
-//        $row = $result->fetchRow();
-//        $page_template = ($row['template'] == '') ? DEFAULT_TEMPLATE : $row['template'];
         // include template info file if exists
         if (is_readable(WB_PATH.'/templates/'.$page_template.'/info.php')) {
             include_once(WB_PATH.'/templates/'.$page_template.'/info.php');

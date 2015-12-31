@@ -27,7 +27,7 @@
 */
 
 // Deutsche Modulbeschreibung
-$module_description 	= 'Admin-Tool um das Verhalten von CAPTCHA und ASP zu kontrollieren';
+$module_description     = 'Admin-Tool um das Verhalten von CAPTCHA und ASP zu kontrollieren';
 
 // Ueberschriften und Textausgaben
 $MOD_CAPTCHA_CONTROL['HEADING']           = 'Captcha- und ASP Steuerung';

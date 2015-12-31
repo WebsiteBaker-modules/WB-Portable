@@ -4,18 +4,18 @@
  * @category        modules
  * @package         news
  * @author          WebsiteBaker Project
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: modify_settings.php 1538 2011-12-10 15:06:15Z Luisehahne $
  * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/news/modify_settings.php $
  * @lastmodified    $Date: 2011-12-10 16:06:15 +0100 (Sa, 10. Dez 2011) $
  *
  */
 
-require('../../config.php');
+require( dirname(dirname((__DIR__))).'/config.php' );
 
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
@@ -116,7 +116,7 @@ if(function_exists('edit_module_css'))
          <td class="setting_name"><?php echo $TEXT['POSTS_PER_PAGE']; ?>:</td>
          <td class="setting_value">
             <select name="posts_per_page" style="width: 98%;">
-               <option value=""><?php echo $TEXT['UNLIMITED']; ?></option>
+               <option value="0"><?php echo $TEXT['UNLIMITED']; ?></option>
                <?php
                for($i = 1; $i <= 20; $i++) {
                   if($fetch_content['posts_per_page'] == ($i*5)) { $selected = ' selected="selected"'; } else { $selected = ''; }
@@ -155,7 +155,7 @@ if(function_exists('edit_module_css'))
          <td class="setting_name"><?php echo $TEXT['RESIZE_IMAGE_TO']; ?>:</td>
          <td class="setting_value">
             <select name="resize" style="width: 98%;">
-               <option value=""><?php echo $TEXT['NONE']; ?></option>
+               <option value="0"><?php echo $TEXT['NONE']; ?></option>
                <?php
                $SIZES['50'] = '50x50px';
                $SIZES['75'] = '75x75px';

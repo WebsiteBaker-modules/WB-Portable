@@ -24,7 +24,7 @@
 */
 
 //Modul Description
-$template_description 	= 'Ein erweitertes Backend-Theme f&uuml;r Websitebaker 2.8';
+$template_description     = 'Ein erweitertes Backend-Theme f&uuml;r Websitebaker 2.8';
 
 //Texts
 $TEXT['ADMIN_ONLY'] = 'diese Optionen nur Administratoren zug&auml;nglich machen';

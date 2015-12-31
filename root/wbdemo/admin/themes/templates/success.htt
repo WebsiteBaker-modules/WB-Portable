@@ -1,6 +1,6 @@
 <!-- BEGIN main_block -->
 <div class="msg-box rounded">
-	<p>{MESSAGE}</p>
+    <p>{MESSAGE}</p>
 <!-- BEGIN show_redirect_block -->
  <script type="text/javascript">
   setTimeout("location.href='{REDIRECT}'", {REDIRECT_TIMER});

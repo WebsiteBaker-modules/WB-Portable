@@ -4,24 +4,20 @@
  * @category        modules
  * @package         wysiwyg
  * @author          WebsiteBaker Project
- * @copyright       2009-2012, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
- * @version          $Id: upgrade.php 1576 2012-01-16 17:29:11Z darkviper $
- * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/wysiwyg/upgrade.php $
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
+ * @version         $Id: upgrade.php 1576 2012-01-16 17:29:11Z darkviper $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/wysiwyg/upgrade.php $
  * @lastmodified    $Date: 2012-01-16 18:29:11 +0100 (Mo, 16. Jan 2012) $
  *
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(!defined('WB_PATH')) {
-    require_once(dirname(dirname(__FILE__)).'/framework/globalExceptionHandler.php');
-    throw new IllegalFileException();
-}
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
-
 $msg = '';
 $sTable = TABLE_PREFIX.'mod_wysiwyg';
 if(($sOldType = $database->getTableEngine($sTable))) {

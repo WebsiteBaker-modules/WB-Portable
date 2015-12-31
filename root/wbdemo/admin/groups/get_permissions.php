@@ -16,7 +16,7 @@
  *
  */
 
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 
 $system_permissions = array_flip($system_permissions);
 // Get system permissions

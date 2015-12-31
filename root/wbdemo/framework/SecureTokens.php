@@ -197,19 +197,19 @@ class SecureTokens
  * requirements: an active session must be available
  * this check will prevent from multiple sending a form. history.back() also will never work
  */
-    final public function checkFTAN($mMode = 'POST')
-    {
+final public function checkFTAN($mMode = 'POST')
+{
         $bRetval = false;
         // get the POST/GET arguments
         $aArguments = (strtoupper($mMode) == 'POST' ? $_POST : $_GET);
         // encode the value of all matching tokens
-       $oThis = $this;
         $aMatchingTokens = array_map(
-            function ($aToken) use ($oThis) {
-                return $oThis->encode64(md5($aToken['value'].$oThis->sFingerprint));
-            },
-            // extract all matching tokens from $this->aTokens
-            array_intersect_key($this->aTokens, $aArguments)
+            array($this, 'checkFtanCallback'),
+    //            function ($aToken) {
+    //                return $this->encode64(md5($aToken['value'].$this->sFingerprint));
+    //            },
+                // extract all matching tokens from $this->aTokens
+                array_intersect_key($this->aTokens, $aArguments)
         );
         // extract all matching arguments from $aArguments
         $aMatchingArguments = array_intersect_key($aArguments, $this->aTokens);
@@ -234,7 +234,7 @@ class SecureTokens
         }
         // crypt value with salt into md5-hash and return a 16-digit block from random start position
         $sTokenName = $this->addToken(
-            substr(md5($this->sSalt.(string)$mValue), rand(0,15), 16),
+            substr(md5($this->sSalt.(string)$mValue), mt_rand(0,15), 16),
             $mValue
         );
         return $sTokenName;
@@ -255,7 +255,7 @@ class SecureTokens
         switch ($sRequest) {
             case 'POST':
             case 'GET':
-                $sTokenName = @$GLOBALS['_'.$sRequest][$sFieldname] ?: $sFieldname;
+                $sTokenName = $GLOBALS['_'.$sRequest][$sFieldname] ?: $sFieldname;
                 break;
             default:
                 $sTokenName = $sFieldname;
@@ -326,19 +326,25 @@ class SecureTokens
  */
     private function addToken($sTokenName, $sValue)
     {
+        // limit TokenName to 16 digits
         $sTokenName = substr($sTokenName, 0, 16);
+        // make sure, first digit is a alpha char [a-f]
         $sTokenName[0] = dechex(10 + (hexdec($sTokenName[0]) % 5));
+        // loop as long the generated TokenName already exists in list
         while (isset($this->aTokens[$sTokenName])) {
-            $sTokenName = sprintf('%16x', hexdec($sTokenName)+1);
+            $aTmp = str_split($sTokenName, 8);
+            // increment lower word of Tokenname
+            $aTmp[1] = sprintf('%08x', hexdec($aTmp[1])+1);
+            $sTokenName = implode('', $aTmp);
         }
+        // store Token in list
         $this->aTokens[$sTokenName] = array(
             'value'    => $sValue,
             'expire'   => $this->iExpireTime,
             'instance' => $this->sCurrentInstance
         );
         return $sTokenName;
-    }
-
+     }
 /**
  * remove the token, called sTokenName from list
  * @param type $sTokenName
@@ -387,21 +393,25 @@ class SecureTokens
  */
     private function buildFingerprint()
     {
-        if (!$this->bUseFingerprint) { return md5('dummy'); }
+        if (!$this->bUseFingerprint) { return md5('this_is_a_dummy_only'); }
         $sClientIp = '127.0.0.1';
         if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)){
-            $sClientIp = array_pop(preg_split('/\s*?,\s*?/', $_SERVER['HTTP_X_FORWARDED_FOR'], null, PREG_SPLIT_NO_EMPTY));
+            $aTmp = preg_split('/\s*?,\s*?/', $_SERVER['HTTP_X_FORWARDED_FOR'], null, PREG_SPLIT_NO_EMPTY);
+            $sClientIp = array_pop($aTmp);
         }else if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
             $sClientIp = $_SERVER['REMOTE_ADDR'];
         }else if (array_key_exists('HTTP_CLIENT_IP', $_SERVER)) {
             $sClientIp = $_SERVER['HTTP_CLIENT_IP'];
         }
-        $sFingerprint = __FILE__.PHP_VERSION
-                      . isset($_SERVER['SERVER_SIGNATURE']) ? $_SERVER['SERVER_SIGNATURE'] : 'unknown'
-                      . isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'AGENT'
-                      . $this->calcClientIpHash($sClientIp);
-        return md5($sFingerprint);
+        $aSelfTest = array_chunk(stat(__FILE__), 11);
+        unset($aSelfTest[0][8]);
+        return md5(
+            __FILE__ . PHP_VERSION . implode('', $aSelfTest[0])
+            . (array_key_exists('HTTP_USER_AGENT', $_SERVER) ? $_SERVER['HTTP_USER_AGENT'] : 'AGENT')
+            . $this->calcClientIpHash($sClientIp)
+        );
     }
+
 
 /**
  * mask IPv4 as well IPv6 addresses with netmask and make a md5 hash from
@@ -467,6 +477,12 @@ class SecureTokens
     private function encode64($sMd5Hash)
     {
         return rtrim(base64_encode(pack('h*',$sMd5Hash)), '+-= ');
+    }
+
+// callback method, needed for PHP-5.3.x only    
+   private function checkFtanCallback($aToken)
+    {
+        return $this->encode64(md5($aToken['value'].$this->sFingerprint));
     }
 
 /**

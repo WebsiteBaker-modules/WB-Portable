@@ -1,6 +1,6 @@
 <?php
 
-// $Id: index.php 991 2009-06-15 15:55:20Z Ruebenwurzel $
+// $Id: INDEX.php 991 2009-06-15 15:55:20Z Ruebenwurzel $
 
 /*
 

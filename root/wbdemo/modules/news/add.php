@@ -17,7 +17,7 @@
 
 // Must include code to stop this file being access directly
 /* -------------------------------------------------------- */
-if(defined('WB_URL') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
 $header = '<table class=\"loop-header\">'."\n";

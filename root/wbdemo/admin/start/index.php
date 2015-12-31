@@ -117,7 +117,6 @@ if($admin->get_permission('admintools') != true)
 {
     $template->set_var('DISPLAY_ADMINTOOLS', 'display:none;');
 }
-
 $msg .= (file_exists(WB_PATH.'/install/')) ?  $MESSAGE['START']['INSTALL_DIR_EXISTS'] : '';
 
 // Check if installation directory still exists

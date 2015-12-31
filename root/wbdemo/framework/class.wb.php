@@ -31,7 +31,8 @@ require_once(WB_PATH . '/framework/SecureTokens.php');
 class wb extends SecureTokens
 {
 
-     public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
+//     public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
+     public $password_chars = '[\w!#$%&*+\-.:=?@\|]';    // General initialization function
     // performed when frontend or backend is loaded.
 
 //    public function  __construct($mode = SecureForm::FRONTEND) {
@@ -326,7 +327,7 @@ class wb extends SecureTokens
       //            array_walk( $aDebugBacktrace, create_function( '$a,$b', 'print "<br /><b>". basename( $a[\'file\'] ). "</b> &nbsp; <font color=\"red\">{$a[\'line\']}</font> &nbsp; <font color=\"green\">{$a[\'function\']} ()</font> &nbsp; -- ". dirname( $a[\'file\'] ). "/";' ) );
       $msg = "<div style=\"text-align:center;\"><h2>An error has occurred</h2><p>The <strong>Redirect</strong> could not be start automatically.\n".
         "Please click <a style=\"font-weight:bold;\" "."href=\"".$location."\">on this link</a> to continue!</p></div>\n";
-      throw new AppException( $msg);
+      throw new Exception( $msg);
     }
   }
 

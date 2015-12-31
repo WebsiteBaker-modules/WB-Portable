@@ -43,14 +43,12 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
     $error = array();
     $success = array();
     $template = new Template(WB_PATH .'/account','remove');
-
     switch($wb->get_post('action')):
         case 'details':
             require_once(WB_PATH .'/account/details.php');
             break;
         case 'email':
             require_once(WB_PATH .'/account/email.php');
-
             break;
         case 'password':
             require_once(WB_PATH .'/account/password.php');
@@ -58,26 +56,24 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
         default:
             // do nothing
     endswitch; // switch
-
 // show template
     $template->set_file('page', 'template.html');
     $template->set_block('page', 'main_block', 'main');
 // get existing values from database
-    $sql = "SELECT display_name,email FROM ".TABLE_PREFIX."users WHERE user_id = '".$wb->get_user_id()."'";
+    $sql = "SELECT `display_name`,`email` FROM `".TABLE_PREFIX."users` WHERE `user_id` = '".$wb->get_user_id()."'";
     $rowset = $database->query($sql);
     if($database->is_error()) $error[] = $database->get_error();
-    $row = $rowset->fetchRow();
+    $row = $rowset->fetchRow(MYSQLI_ASSOC);
 // insert values into form
     $template->set_var('DISPLAY_NAME', $row['display_name']);
     $template->set_var('EMAIL', $row['email']);
-
 // read available languages from table addons and assign it to the template
     $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` ';
     $sql .= 'WHERE `type` = \'language\' ORDER BY `directory`';
     if( $res_lang = $database->query($sql) )
     {
         $template->set_block('main_block', 'language_list_block', 'language_list');
-        while( $rec_lang = $res_lang->fetchRow() )
+        while( $rec_lang = $res_lang->fetchRow(MYSQLI_ASSOC) )
         {
             $langIcons = (empty($rec_lang['directory'])) ? 'none' : strtolower($rec_lang['directory']);
             $template->set_var('CODE',        $rec_lang['directory']);
@@ -99,7 +95,6 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
         }
         $template->parse('timezone_list', 'timezone_list_block', true);
     }
-
 // Insert date format list
     $template->set_block('main_block', 'date_format_list_block', 'date_format_list');
     foreach($DATE_FORMATS AS $format => $title) {
@@ -119,7 +114,6 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
         }
         $template->parse('date_format_list', 'date_format_list_block', true);
     }
-
 // Insert time format list
     $template->set_block('main_block', 'time_format_list_block', 'time_format_list');
     foreach($TIME_FORMATS AS $format => $title) {
@@ -163,7 +157,6 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
                                 'TEXT_RETYPE_NEW_PASSWORD' => $TEXT['RETYPE_NEW_PASSWORD']
                                 )
                         );
-
 // Insert module releated language text and messages
     $template->set_var(array(
                                 'MOD_PREFERENCE_PLEASE_SELECT'    => $MOD_PREFERENCE['PLEASE_SELECT'],
@@ -180,7 +173,6 @@ $_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_
             $template->parse('error_list', 'error_block', true);
         }
     }
-
     $template->set_block('main_block', 'success_block', 'success_list');
     if(sizeof($success)!=0){
         foreach($success AS $value){

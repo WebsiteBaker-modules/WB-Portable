@@ -14,9 +14,9 @@
  * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10 Jan 2011) $
  *
  */
-// Must include code to stop this file being access directly
 /* -------------------------------------------------------- */
-if (! defined('WB_PATH')) { die('Cannot access this file directly'); }
+// Must include code to stop this file being accessed directly
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 // Insert an extra row into the database
 $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_wysiwyg` '

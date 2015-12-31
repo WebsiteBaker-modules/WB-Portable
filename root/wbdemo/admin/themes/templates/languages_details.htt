@@ -4,24 +4,24 @@
 
 <table summary="" cellpadding="5" cellspacing="0" border="0">
 <tr>
-	<td width="100">{TEXT_NAME}:</td>
-	<td>{NAME}</td>
+    <td width="100">{TEXT_NAME}:</td>
+    <td>{NAME}</td>
 </tr>
 <tr>
-	<td>{TEXT_CODE}:</td>
-	<td>{CODE}</td>
+    <td>{TEXT_CODE}:</td>
+    <td>{CODE}</td>
 </tr>
 <tr>
-	<td>{TEXT_AUTHOR}:</td>
-	<td>{AUTHOR}</td>
+    <td>{TEXT_AUTHOR}:</td>
+    <td>{AUTHOR}</td>
 </tr>
 <tr>
-	<td>{TEXT_VERSION}:</td>
-	<td>{VERSION}</td>
+    <td>{TEXT_VERSION}:</td>
+    <td>{VERSION}</td>
 </tr>
 <tr>
-	<td>{TEXT_DESIGNED_FOR}:</td>
-	<td>Website Baker {DESIGNED_FOR}</td>
+    <td>{TEXT_DESIGNED_FOR}:</td>
+    <td>Website Baker {DESIGNED_FOR}</td>
 </tr>
 </table>
 

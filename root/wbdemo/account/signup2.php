@@ -111,8 +111,21 @@ $md5_password = md5($new_pass);
 
 // Inser the user into the database
 $sql = '';
-$query = "INSERT INTO ".TABLE_PREFIX."users (group_id,groups_id,active,username,password,display_name,email) VALUES ('$groups_id', '$groups_id', '$active', '$username','$md5_password','$display_name','$email')";
-$database->query($query);
+
+$sql  = 'INSERT INTO `'.TABLE_PREFIX.'users` SET '
+      . '`group_id` = '.$groups_id.', '
+      . '`groups_id` = \''.$groups_id.'\', '
+      . '`active` = '.$active.', '
+      . '`username` = \''.$username.'\', '
+      . '`password` = \''.$md5_password.'\', '
+      . '`display_name` = \''.$display_name.'\', '
+      . '`home_folder` = \'\', '
+      . '`email` = \''.$email.'\', '
+      . '`timezone` = \''.DEFAULT_TIMEZONE.'\', '
+      . '`language` = \''.DEFAULT_LANGUAGE.'\''
+      .'';
+
+$database->query($sql);
 
 if($database->is_error()) {
     // Error updating database
@@ -132,7 +145,7 @@ if($database->is_error()) {
         $display_form = false;
         $success[] = $MESSAGE['FORGOT_PASS_PASSWORD_RESET'];
     } else {
-        $database->query("DELETE FROM ".TABLE_PREFIX."users WHERE username = '$username'");
+        $database->query("DELETE FROM `".TABLE_PREFIX."users` WHERE `username` = '$username'");
         $error[] = $MESSAGE['FORGOT_PASS_CANNOT_EMAIL']."\n";
     }
 }

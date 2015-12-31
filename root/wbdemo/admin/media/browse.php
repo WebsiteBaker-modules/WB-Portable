@@ -17,7 +17,7 @@
  */
 
 // Create admin object
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 

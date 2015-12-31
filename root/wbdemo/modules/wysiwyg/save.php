@@ -5,7 +5,7 @@
  * @package         wysiwyg
  * @author          WebsiteBaker Project
  * @copyright       WebsiteBaker Org. e.V.
- * @link            http://www.websitebaker.org/
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
@@ -15,7 +15,7 @@
  *
 */
 
-require('../../config.php');
+require( dirname(dirname((__DIR__))).'/config.php' );
 
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;

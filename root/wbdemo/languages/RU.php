@@ -2,16 +2,16 @@
 /**
  *
  * @category        framework
- * @package         language
+ * @package         languages
  * @author          WebsiteBaker Project
- * @copyright       2004-2009, Ryan Djurovich
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link			http://www.websitebaker2.org/
+ * @copyright       Ryan Djurovich
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
  * @version         $Id: RU.php 1636 2012-03-09 14:30:29Z Luisehahne $
- * @filesource		$HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/languages/RU.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/languages/RU.php $
  * @lastmodified    $Date: 2012-03-09 15:30:29 +0100 (Fr, 09. Mrz 2012) $
  *
  */
@@ -26,7 +26,7 @@ define('LANGUAGE_LOADED', true);
 
 // Set the language information
 $language_code = 'RU';
-$language_name = 'Russian';
+$language_name = 'Русский'; // Russian
 $language_version = '2.8';
 $language_platform = '2.8.x';
 $language_author = 'Kirill Karakulko (kirill@nadosoft.com)';
@@ -680,5 +680,5 @@ $OVERVIEW['VIEW'] = '&#1055;&#1088;&#1086;&#1089;&#1084;&#1086;&#1090;&#1088;&#1
 /* include old languages format */
 if(file_exists(WB_PATH.'/languages/old.format.inc.php'))
 {
-	include(WB_PATH.'/languages/old.format.inc.php');
+    include(WB_PATH.'/languages/old.format.inc.php');
 }

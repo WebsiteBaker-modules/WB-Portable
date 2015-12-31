@@ -4,7 +4,7 @@ Release 1.2
  On Sourcecode of
 (C) Copyright 2006 Stepan Riha (www.nonplus.net)
 * -----------------------------------------------------------------------------------------
-*	MODIFICATION HISTORY:
+*    MODIFICATION HISTORY:
 *   by Swen Uth; 01/24/2008
 *   + Update to 1.2
 *   + Update to Website Baker (include/yui)-> YUI to Version 2.4.1
@@ -30,8 +30,8 @@ improve some of the UI interactions.
 Portions of this module use scripts from the Yahoo! UI Library
 You can find it in the WB/include folder
 
-	http://developer.yahoo.com/yui/
-	
+    http://developer.yahoo.com/yui/
+    
 ______________________________________________________________
 
 REQUIREMENTS
@@ -44,22 +44,22 @@ INSTALLATION
 
 The module includes the following files:
 
-	!!! footer.php is canceled -> renamed to jsadmin_backend_include.php
-	images/busy.gif
-	images/failure.gif
-	images/success.gif
-	index.php
-	info.php
-	js/dragdrop.js
-	js/jsadmin.js
-	js/restore_pages.js
-	js/tool.js
- 	+ languages/EN.php
-	+ languages/DE.php
-	jsadmin.php
-	move_to.php
-	README.txt
-	tool.php
+    !!! footer.php is canceled -> renamed to jsadmin_backend_include.php
+    images/busy.gif
+    images/failure.gif
+    images/success.gif
+    index.php
+    info.php
+    js/dragdrop.js
+    js/jsadmin.js
+    js/restore_pages.js
+    js/tool.js
+     + languages/EN.php
+    + languages/DE.php
+    jsadmin.php
+    move_to.php
+    README.txt
+    tool.php
 
 ______________________________________________________________
 

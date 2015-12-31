@@ -21,31 +21,36 @@
 // Must include code to stop this file being accessed directly
 if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 /* -------------------------------------------------------- */
+
 //overwrite php.ini on Apache servers for valid SESSION ID Separator
-if(function_exists('ini_set')) {
-    ini_set('arg_separator.output', '&amp;');
-}
+$sQuerySep = ini_get('arg_separator.output');
+//if(function_exists('ini_set')) {
+//    ini_set('arg_separator.output', '&amp;');
+//}
+
+$sModulName = basename(__DIR__);
+$ModuleRel = '/modules/'.basename(__DIR__).'/';
+$ModuleUrl = WB_URL.'/modules/'.basename(__DIR__).'/';
+$ModulePath = WB_PATH.'/modules/'.basename(__DIR__).'/';
 
 // load module language file
 $lang = (dirname(__FILE__)) . '/languages/' . LANGUAGE . '.php';
 require_once(!file_exists($lang) ? (dirname(__FILE__)) . '/languages/EN.php' : $lang );
 
-include_once(WB_PATH.'/framework/functions.php');
+if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.php');  }
 
 $sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR.$section['section_id'] : '' );
 
 //Delete all form fields with no title
-$sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_form_fields` ';
-$sql .= 'WHERE page_id = '.(int)$page_id.' ';
-$sql .=   'AND section_id = 0 ';
-$sql .=   'AND title=\'\' ';
+$sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_form_fields` '
+      . 'WHERE title = \'\' ';
 if( !$database->query($sql) ) {  }
 $FTAN = $admin->getFTAN('');
-?>
-<table style="width: 100%;" class="mod_form">
+?><table class="mod_form">
+<tbody>
 <tr>
     <td >
-        <form action="<?php echo WB_URL; ?>/modules/form/add_field.php" method="get" >
+        <form action="<?php echo $ModuleUrl; ?>add_field.php" method="get" class="mod_form" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
             <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
@@ -53,14 +58,23 @@ $FTAN = $admin->getFTAN('');
         </form>
     </td>
     <td >
-        <form action="<?php echo WB_URL; ?>/modules/form/modify_settings.php" method="get" >
+        <form action="<?php echo $ModuleUrl; ?>modify_settings.php" method="get" class="mod_form" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
             <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
             <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
         </form>
     </td>
+    <td >
+        <form action="<?php echo WB_URL; ?>/modules/form/reorgPosition.php" method="get" class="mod_form" >
+            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+            <input type="submit" value="Reorg Position" style="width: 100%;" />
+        </form>
+    </td>
 </tr>
+</tbody>
 </table>
 
 <br />
@@ -72,122 +86,144 @@ $module_dir = basename(__DIR__);
 $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_fields` ';
 $sql .= 'WHERE `section_id` = '.(int)$section_id.' ';
 $sql .= 'ORDER BY `position` ASC';
-if($query_fields = $database->query($sql)) {
-    if($query_fields->numRows() > 0) {
-        $num_fields = $query_fields->numRows();
-        $row = 'a';
-        ?>
-        <div class="jsadmin hide"></div>
+if($oFields = $database->query($sql)) {
+    $num_fields = $oFields->numRows();
+    if($num_fields) {
+?><div class="jsadmin hide"></div>
         <table class="mod_form" >
         <thead>
-            <tr style="background-color: #dddddd; font-weight: bold;">
-                <th width="20" style="padding-left: 5px;">&nbsp;</th>
-                <th width="30" style="text-align: right;">ID</th>
-                <th width="400"><?php print $TEXT['FIELD']; ?></th>
-                <th width="175"><?php print $TEXT['TYPE']; ?></th>
-                <th width="100"><?php print $TEXT['REQUIRED']; ?></th>
-                <th width="175">
+            <tr >
+                <th style="padding-left: 5px; width: 3%;">&nbsp;</th>
+                <th style="text-align: right; width: 3%;">ID</th>
+                <th style=" width: 40%;"><?php print $TEXT['FIELD']; ?></th>
+                <th style=" width: 20%;"><?php print $TEXT['TYPE']; ?></th>
+                <th style=" width: 5%;"><?php print $TEXT['REQUIRED']; ?></th>
+                <th style=" width: 5%;">
                 <?php
                     echo $TEXT['MULTISELECT'];
                 ?>
                 </th>
-                <th width="175" colspan="3">
+                <th style=" width: 10%;" colspan="3">
                 <?php
                     echo $TEXT['ACTIONS'];
                 ?>
-                <th >POS</th>
+                <th style=" width: 3%;">POS</th>
                 </th>
             </tr>
         </thead>
         <tbody>
-        <?php
-        while($field = $query_fields->fetchRow(MYSQL_ASSOC)) {
-            ?>
-            <tr class="row_<?php echo $row; ?> sectionrow">
+<?php
+        while($aFields = $oFields->fetchRow(MYSQL_ASSOC)) {
+          $sFielIdkey = $admin->getIDKEY($aFields['field_id']);
+?><tr class=" sectionrow">
                 <td style="padding-left: 5px;">
-                    <a href="<?php echo WB_URL; ?>/modules/form/modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>" title="<?php echo $TEXT['MODIFY']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/modify_16.png" border="0" alt="^" />
+                    <a href="<?php echo $ModuleUrl; ?>modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>" title="<?php echo $TEXT['MODIFY']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/modify_16.png" alt="^" />
                     </a>
                 </td>
                 <td style="text-align: right;">
-                    <a href="<?php echo WB_URL; ?>/modules/form/modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>">
-                        <?php echo $field['field_id']; ?>
+                    <a style=" font-weight: normal;" href="<?php echo $ModuleUrl; ?>modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>">
+                        <?php echo $aFields['field_id']; ?>
                     </a>
                 </td>
                 <td>
-                    <a href="<?php echo WB_URL; ?>/modules/form/modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>">
-                        <?php echo $field['title']; ?>
+                    <a href="<?php echo $ModuleUrl; ?>modify_field.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>">
+                        <?php echo $aFields['title']; ?>
                     </a>
                 </td>
                 <td>
-                    <?php
-                    if($field['type'] == 'textfield') {
+<?php
+                    $key = $aFields['type'];
+                    switch ($key):
+                        case 'textfield':
+                            $sTitle = $TEXT['SHORT_TEXT'];
+                            break;
+                        case 'textarea':
+                            $sTitle = $TEXT['LONG_TEXT'];
+                            break;
+                        case 'heading':
+                            $sTitle = $TEXT['HEADING'];
+                            break;
+                        case 'select':
+                            $sTitle = $TEXT['SELECT_BOX'];
+                            break;
+                        case 'checkbox':
+                            $sTitle = $TEXT['CHECKBOX_GROUP'];
+                            break;
+                        case 'radio':
+                            $sTitle = $TEXT['RADIO_BUTTON_GROUP'];
+                            break;
+                        case 'email':
+                            $sTitle = $TEXT['EMAIL_ADDRESS'];
+                            break;
+                        default:
+                        break;
+                    endswitch;
+                    echo $sTitle;
+/**
+ * 
+                    if($aFields['type'] == 'textfield') {
                         echo $TEXT['SHORT_TEXT'];
-                    } elseif($field['type'] == 'textarea') {
+                    } elseif($aFields['type'] == 'textarea') {
                         echo $TEXT['LONG_TEXT'];
-                    } elseif($field['type'] == 'heading') {
+                    } elseif($aFields['type'] == 'heading') {
                         echo $TEXT['HEADING'];
-                    } elseif($field['type'] == 'select') {
+                    } elseif($aFields['type'] == 'select') {
                         echo $TEXT['SELECT_BOX'];
-                    } elseif($field['type'] == 'checkbox') {
+                    } elseif($aFields['type'] == 'checkbox') {
                         echo $TEXT['CHECKBOX_GROUP'];
-                    } elseif($field['type'] == 'radio') {
+                    } elseif($aFields['type'] == 'radio') {
                         echo $TEXT['RADIO_BUTTON_GROUP'];
-                    } elseif($field['type'] == 'email') {
+                    } elseif($aFields['type'] == 'email') {
                         echo $TEXT['EMAIL_ADDRESS'];
                     }
-                    ?>
-                </td>
+ */
+?></td>
                 <td style="text-align: center;">
                 <?php
-                if ($field['type'] != 'group_begin') {
-                    if($field['required'] == 1) { echo $TEXT['YES']; } else { echo $TEXT['NO']; }
+                if ($aFields['type'] != 'group_begin') {
+                    if($aFields['required'] == 1) { echo $TEXT['YES']; } else { echo $TEXT['NO']; }
                 }
                 ?>
                 </td>
                 <td>
                 <?php
-                if ($field['type'] == 'select') {
-                    $field['extra'] = explode(',',$field['extra']);
-                     if($field['extra'][1] == 'multiple') { echo $TEXT['YES']; } else { echo $TEXT['NO']; }
+                if ($aFields['type'] == 'select') {
+                    $aFields['extra'] = explode(',',$aFields['extra']);
+                     if($aFields['extra'][1] == 'multiple') { echo $TEXT['YES']; } else { echo $TEXT['NO']; }
                 }
                 ?>
                 </td>
-                <td width="20" style="text-align: center;">
-                <?php if($field['position'] != 1) { ?>
-                    <a href="<?php echo WB_URL; ?>/modules/form/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>&amp;move_id=<?php echo $field['field_id']; ?>&amp;position=<?php echo $field['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>"> 
-                        <img src="<?php echo THEME_URL; ?>/images/up_16.png" border="0" alt="^" />
+                <td style="text-align: center;">
+                <?php if($aFields['position'] != 1) { ?>
+                    <a href="<?php echo $ModuleUrl; ?>move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>&amp;move_id=<?php echo $aFields['field_id']; ?>&amp;position=<?php echo $aFields['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>"> 
+                        <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="^" />
                     </a>
                 <?php } ?>
                 </td>
-                <td width="20" style="text-align: center;">
-                <?php if($field['position'] != $num_fields) { ?>
-                    <a href="<?php echo WB_URL; ?>/modules/form/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $admin->getIDKEY($field['field_id']); ?>&amp;move_id=<?php echo $field['field_id']; ?>&amp;position=<?php echo $field['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/down_16.png" border="0" alt="v" />
+                <td  style="text-align: center;">
+                <?php if($aFields['position'] != $num_fields) { ?>
+                    <a href="<?php echo $ModuleUrl; ?>move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>&amp;move_id=<?php echo $aFields['field_id']; ?>&amp;position=<?php echo $aFields['position']; ?>&amp;module=<?php echo $module_dir; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="v" />
                     </a>
                 <?php } ?>
                 </td>
-                <td width="20" style="text-align: center;">
+                <td style="text-align: center;">
 <?php
-                $url = (WB_URL.'/modules/form/delete_field.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;field_id='.$admin->getIDKEY($field['field_id']))
+                $url = ($ModuleUrl.'delete_field.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;field_id='.$sFielIdkey)
 ?>
-                    <a href="confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>','<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" border="0" alt="X" />
+                    <a href="javascript:confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>','<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                     </a>
                 </td>
-                <td>
+                <td style="text-align: right; padding-right: 5px;">
                 <?php
-                    echo $field['position'];
+                    echo $aFields['position'];
                 ?>
                 </td>
             </tr>
 <?php
             // Alternate row color
-            if($row == 'a') {
-                $row = 'b';
-            } else {
-                $row = 'a';
-            }
         }
 ?>
         </tbody>
@@ -215,67 +251,71 @@ $sql .=            'FROM `'.TABLE_PREFIX.'mod_form_submissions` s ';
 $sql .= 'LEFT OUTER JOIN `'.TABLE_PREFIX.'users` u ';
 $sql .= 'ON u.`user_id` = s.`submitted_by` ';
 $sql .= 'WHERE s.`section_id` = '.(int)$section_id.' ';
-$sql .= 'ORDER BY s.`submitted_when` ASC ';
+$sql .= 'ORDER BY s.`submitted_when` DESC ';
 
-if($query_submissions = $database->query($sql)) {
+if($oSubmissions = $database->query($sql)) {
 ?>
 <!-- submissions -->
-        <table id="frm-ScrollTable" >
-        <thead>
-        <tr style="background-color: #dddddd; font-weight: bold;">
-            <th width="23" style="text-align: center;">&nbsp;</th>
-            <th width="33" style="text-align: right;"> ID </th>
-            <th width="250" style="padding-left: 10px;"><?php echo $TEXT['SUBMITTED'] ?></th>
-            <th width="240" style="padding-left: 10px;"><?php echo $TEXT['USER']; ?></th>
-            <th width="250"><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['FROM'] ?></th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
-            <th width="20">&nbsp;</th>
+    <div class="frm-ScrollTableDiv">
+        <table id="frm-ScrollTable">
+        <thead class="frm-Scroll">
+        <tr id="frm-Scroll">
+            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
+            <th class="frm-Scroll" style="text-align: center; width: 3%;"> ID </th>
+            <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['SUBMITTED'] ?></th>
+            <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['USER']; ?></th>
+            <th class="frm-Scroll" style=" width: 10%;"><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['FROM'] ?></th>
+            <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
+            <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
+            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
+            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
         </tr>
         </thead>
-        <tbody>
+        <tfoot>
+            <tr><td colspan="9"></td></tr>
+        </tfoot>
+        <tbody class="scrolling">
 <?php
-    if($query_submissions->numRows() > 0) {
+    if($oSubmissions->numRows() > 0) {
         // List submissions
-        $row = 'a';
-        while($submission = $query_submissions->fetchRow(MYSQL_ASSOC)) {
+        while($submission = $oSubmissions->fetchRow(MYSQL_ASSOC)) {
             $submission['display_name'] = (($submission['display_name']!=null) ? $submission['display_name'] : '');
             $sBody = $submission['body'];
             $regex = "/[a-z0-9\-_]?[a-z0-9.\-_]+[a-z0-9\-_]?@[a-z0-9.-]+\.[a-z]{2,}/i";
             preg_match ($regex, $sBody, $output);
 // workout if output is empty
             $submission['email'] = (isset($output['0']) ? $output['0'] : '');
+            $sSubmissionIdkey = $admin->getIDKEY($submission['submission_id']);
 ?>
-            <tr class="row_<?php echo $row; ?>">
-                <td width="20" style="padding-left: 5px;text-align: center;">
-                    <a href="<?php echo WB_URL; ?>/modules/form/view_submission.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;submission_id=<?php echo $admin->getIDKEY($submission['submission_id']); ?>" title="<?php echo $TEXT['OPEN']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/folder_16.png" alt="<?php echo $TEXT['OPEN']; ?>" border="0" />
+            <tr class="frm-Scroll" >
+                <td class="frm-Scroll" style="text-align: center; width: 3%;">
+                    <a href="<?php echo WB_URL; ?>/modules/form/view_submission.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;submission_id=<?php echo $sSubmissionIdkey; ?>" title="<?php echo $TEXT['OPEN']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/folder_16.png" alt="<?php echo $TEXT['OPEN']; ?>" />
                     </a>
                 </td>
-                <td width="30" style="padding-right: 5px;text-align: right;"><?php echo $submission['submission_id']; ?></td>
-                <td width="250" style="padding-left: 10px;"><?php echo gmdate(DATE_FORMAT.', '.TIME_FORMAT, $submission['submitted_when']+TIMEZONE ); ?></td>
-                <td width="250" style="padding-left: 10px;"><?php echo $submission['display_name']; ?></td>
-                <td width="240"><?php echo $submission['email']; ?></td>
-                <td width="20" style="text-align: center;">&nbsp;</td>
-                <td width="20">&nbsp;</td>
-                <td width="20" style="text-align: center;">
-<?php
-                $url = (WB_URL.'/modules/form/delete_submission.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;submission_id='.$admin->getIDKEY($submission['submission_id']))
+                <td class="frm-Scroll" style="padding-right: 15px;text-align: right; width: 3%; font-weight: normal;"><?php echo $submission['submission_id']; ?></td>
+                <td class="frm-Scroll" style=" width: 20%;"><?php echo gmdate(DATE_FORMAT.', '.TIME_FORMAT, $submission['submitted_when']+TIMEZONE ); ?></td>
+                <td class="frm-Scroll" style=" width: 20%;"><?php echo $submission['display_name']; ?></td>
+                <td class="frm-Scroll" style=" width: 10%;" ><?php echo $submission['email']; ?></td>
+                <td class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</td>
+                <td class="frm-Scroll" style=" width: 5%;"  >&nbsp;</td>
+                <td class="frm-Scroll"  style="text-align: center; width: 5%;">
+<?php 
+                $url = (WB_URL.'/modules/form/delete_submission.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;submission_id='.$sSubmissionIdkey)
 ?>
-                    <a href="javascript: confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>', '<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" border="0" alt="X" />
+                    <a href="javascript:confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>', '<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                     </a>
                 </td>
-                <td width="20">&nbsp;</td>
+<?php 
+if ( DEBUG ) { ?>
+                <td class="frm-Scroll" style=" width: 3%;" ><?php echo $sSubmissionIdkey; ?></td>
+<?php } else  { ?>
+                <td class="frm-Scroll" style=" width: 3%;" >&nbsp;</td>
+<?php }  ?>
+
             </tr>
 <?php
-            // Alternate row color
-            if($row == 'a') {
-                $row = 'b';
-            } else {
-                $row = 'a';
-            }
         }
     } else {
 ?>
@@ -284,13 +324,10 @@ if($query_submissions = $database->query($sql)) {
     }
 ?>
         </tbody>
-        </table>
+        </table><br />
+    </div>
 <?php
 } else {
     echo $database->get_error().'<br />';
     echo $sql;
-}
-if(file_exists(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php'))
-{
-    include(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php');
 }

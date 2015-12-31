@@ -17,7 +17,7 @@
  */
 
 // Print admin header
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'users_add',false);
@@ -36,19 +36,6 @@ $admin->print_header();
 $aInputs = array();
 
 $aInputs = array_merge( $_POST );
-/**
- * 
-$groups_id = (isset($_POST['groups'])) ? implode(",", $admin->add_slashes($_POST['groups'])) : ''; //should check permissions
-$groups_id = trim($groups_id, ','); // there will be an additional ',' when "Please Choose" was selected, too
-$active = $admin->add_slashes($_POST['active'][0]);
-$username_fieldname = $admin->get_post_escaped('username_fieldname');
-$username = strtolower($admin->get_post_escaped($username_fieldname));
-$password = $admin->get_post('password');
-$password2 = $admin->get_post('password2');
-$display_name = $admin->get_post_escaped('display_name');
-$email = $admin->get_post_escaped('email');
-$home_folder = $admin->get_post_escaped('home_folder');
- */
 
 // Get details entered
 $groups_id = ( isset($aInputs['groups']) ? implode(",", $aInputs['groups']) : '');

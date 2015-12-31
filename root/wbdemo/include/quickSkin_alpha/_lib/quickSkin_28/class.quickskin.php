@@ -161,8 +161,8 @@ class QuickSkin {
    */
   function __construct( $template_filename = '' ) {
     global $_CONFIG;
-	// make extension directory setting
-	if (!empty($_CONFIG['extensions_dir'])) {
+    // make extension directory setting
+    if (!empty($_CONFIG['extensions_dir'])) {
       $this->extensions_dir  =  $_CONFIG['extensions_dir'];
     }
     if (!empty($_CONFIG['quickskin_compiled'])) {
@@ -872,11 +872,11 @@ class QuickSkinParser {
       $page  =  "<?php\n$header\n?>$page";
     }
 
-	/* use_common_placeholders */
-	if(function_exists('use_common_placeholders')){
-		$page = use_common_placeholders($page);
-	}
-	
+    /* use_common_placeholders */
+    if(function_exists('use_common_placeholders')){
+        $page = use_common_placeholders($page);
+    }
+    
     /* do substitutions on included supplementary templates */
     $page = $this->worx_tpl_swap($page, $data, $supp_templates);
 
@@ -979,8 +979,8 @@ class QuickSkinParser {
 
   function worx_tpl_swap($tpldata, $data, $supp_templates) { // do the substitution of the sub templates here 
 
-	// do the substitution of the directory names here
-	/*/
+    // do the substitution of the directory names here
+    /*/
     // do image link substitution 
     if ( $data['tpl_img'] != '' && $data['url_img'] != '' ) {
       $tpldata = str_replace($data['tpl_img'],$data['url_img'],$tpldata);
@@ -1005,9 +1005,9 @@ class QuickSkinParser {
     } elseif (defined(_URL_USRCSS)) {
       $tpldata = str_replace('url_css/',_URL_USRCSS,$tpldata);
     }
-	/*/
+    /*/
     return $tpldata;
-	
+    
   }
 
 }

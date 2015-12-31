@@ -4,11 +4,11 @@
  * @category        frontend
  * @package         page
  * @author          WebsiteBaker Project
- * @copyright       2009-, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: index.php 1626 2012-02-29 22:45:20Z darkviper $
  * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/index.php $
  * @lastmodified    $Date: 2012-02-29 23:45:20 +0100 (Mi, 29. Feb 2012) $
@@ -18,7 +18,7 @@
 $starttime = array_sum(explode(" ",microtime()));
 
 // Include config file
-$config_file = __dir__.'/config.php';
+$config_file = __DIR__.'/config.php';
 if(file_exists($config_file))
 {
     require_once($config_file);

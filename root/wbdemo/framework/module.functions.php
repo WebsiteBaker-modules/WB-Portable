@@ -84,7 +84,7 @@ if (!function_exists('edit_module_css')) {
          $edit_css_caption = (isset($GLOBALS['TEXT']['CAP_EDIT_CSS'])) ?$GLOBALS['TEXT']['CAP_EDIT_CSS'] :'Edit CSS';
          ?>
          <form name="edit_module_file" action="<?php echo WB_URL .'/modules/edit_module_files.php?page_id='.$page_id;?>" 
-            method="post" style="margin: 0; align:right;">
+            method="post" style="margin: 0; text-align:right;">
             <?php echo $admin->getFTAN();?>
             <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
             <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />

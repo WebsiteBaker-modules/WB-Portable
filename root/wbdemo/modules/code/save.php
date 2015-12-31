@@ -15,8 +15,7 @@
  *
  */
 
-require('../../config.php');
-
+require( dirname(dirname((__DIR__))).'/config.php' );
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -24,7 +23,7 @@ $update_when_modified = true;
 // Include WB admin wrapper script
 require(WB_PATH.'/modules/admin.php');
 
-if (!$admin->checkFTAN())
+if ( !$admin->checkFTAN())
 {
     $admin->print_header();
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
@@ -34,7 +33,11 @@ $admin->print_header();
 if(isset($_POST['content'])) {
     $tags = array('<?php', '?>' , '<?', '<?=');
     $content = $admin->add_slashes(str_replace($tags, '', $_POST['content']));
-    $query = "UPDATE ".TABLE_PREFIX."mod_code SET content = '$content' WHERE section_id = '$section_id'";
+
+    $query = 'UPDATE `'.TABLE_PREFIX.'mod_code` SET '
+           .'`content` = \''.$content.'\' '
+           .'WHERE `section_id` = '.$section_id;
+
     $database->query($query);    
 }
 

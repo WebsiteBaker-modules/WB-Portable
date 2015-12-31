@@ -16,8 +16,7 @@
  *
  */
 
-require('../../config.php');
-
+require( dirname(dirname((__DIR__))).'/config.php' );
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -45,15 +44,6 @@ $position = $order->get_new($section_id);
 $sql = 'SELECT `commenting` FROM `'.TABLE_PREFIX.'mod_news_settings` '
      . 'WHERE `section_id`='.(int)$section_id;
 $commenting = $database->get_one($sql);
-/*
-$query_settings = $database->query("SELECT commenting FROM ".TABLE_PREFIX."mod_news_settings WHERE section_id = '$section_id'");
-$fetch_settings = $query_settings->fetchRow();
-$commenting = $fetch_settings['commenting'];
-
- Insert new row into database
-$created_when = time();
-$created_by = $admin->get_user_id();
-*/
 
 $sUrl = WB_URL.'/modules/news/modify_post.php?page_id='.$page_id.'&section_id='.$section_id.'&post_id=';
 $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_posts` '

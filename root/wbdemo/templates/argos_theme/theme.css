@@ -1,6 +1,6 @@
 html { overflow :-moz-scrollbars-vertical; /* Force firefox to always show room for a vertical scrollbar */ }
 body,td,th,input,textarea { font-family :verdana,arial,helvetica,sans-serif; font-size :11px; color :#333333; }
-body { background :url(images/background.jpg) #f9f9f9 0 0 repeat-x; margin :0; text-align :center; }
+body { background :url(images/background.jpg) #f9f9f9 0 0 repeat-x; margin :0;  }
 img { border :0px; }
 #admin_header { text-align :center;height :105px; margin :0 auto; padding :10px 0 0 0; }
 #admin_header a#website_title { display :block; text-align :left; font-size :14px; font-weight :bold; color :#ffffff; text-transform :uppercase; text-decoration :none; }
@@ -30,6 +30,7 @@ a:hover { text-decoration :underline; color :#28609b; }
 .pages_list table, 
 table.pages_view  {
   width :998px;
+  border-collapse: collapse;
 }
 
 hr { margin :15px 0; color :#003366; height :1px; }

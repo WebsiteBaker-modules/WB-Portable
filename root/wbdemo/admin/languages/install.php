@@ -21,7 +21,7 @@
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
 // Include config file and admin class file
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('Addons', 'languages_install', false);
@@ -75,7 +75,6 @@ if(!move_uploaded_file($_FILES['userfile']['tmp_name'], $temp_file)) {
 // Check if uploaded file is a valid language file (no binary file etc.)
 $content = file_get_contents($temp_file);
 if (strpos($content, '<?php') === false) $admin->print_error($MESSAGE['GENERIC_INVALID_LANGUAGE_FILE']);
-
 // Remove any vars with name "language_code"
 unset($language_code);
 
@@ -120,7 +119,7 @@ load_language($language_file);
 
 // Restore to correct language
 require(WB_PATH.'/languages/'.LANGUAGE.'.php');
-
+rm_full_dir(WB_PATH.'/temp', true);
 // Print success message
 if ($action=="install") {
     $admin->print_success($MESSAGE['GENERIC']['INSTALLED']);

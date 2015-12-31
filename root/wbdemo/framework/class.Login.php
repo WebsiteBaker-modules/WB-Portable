@@ -31,7 +31,7 @@ require_once(ADMIN_PATH.'/interface/version.php');
 class Login extends admin {
 
 
-    const PASS_CHARS = '[\w!#$%&*+\-.:=?@\|]';
+    const PASS_CHARS = '[\,w!#$%&*+\-.:=?@\|]';
     const USER_CHARS = '[a-z0-9&\-.=@_]';
 
     protected $oDb     = null;
@@ -178,10 +178,11 @@ class Login extends admin {
                     $aSettings['GROUP_NAME'] = array();
                     $bOnlyAdminGroup = $this->ami_group_member('1') && (sizeof($aGroupsIds) == 1);
                     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'groups` '
-                         . 'WHERE `group_id` IN (\''.$aUser['groups_id'].',0\') '
+                         . 'WHERE `group_id` IN ('.$aUser['groups_id'].',0) '
                          . 'ORDER BY `group_id`';
+
                     if (($oGroups = $this->oDb->query($sql))) {
-                        while (($aGroup = $oGroups->fetchRow())) {
+                        while (($aGroup = $oGroups->fetchRow( MYSQLI_ASSOC ))) {
                             $aSettings['GROUP_NAME'][$aGroup['group_id']] = $aGroup['name'];
                         // collect system_permissions (additively)
                             $aSettings['SYSTEM_PERMISSIONS'] = array_merge(

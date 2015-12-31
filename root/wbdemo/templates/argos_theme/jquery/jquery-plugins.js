@@ -29,7 +29,7 @@ domReady(function()
 
         if( document.querySelectorAll(".jsadmin") ) {
             LoadOnFly('', WB_URL+"/modules/jsadmin/backend.css");
-          }
+        }
 /**
  * 
     //Add external link class to external links -

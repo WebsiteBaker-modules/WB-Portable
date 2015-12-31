@@ -79,7 +79,6 @@ if(!function_exists('mod_news_Upgrade'))
             $database->query($sql);
         }
 
-    $array = rebuildFolderProtectFile($sPostsPath);
     // now iterate through all existing accessfiles,
     // write its creation date into database
         $oDir = new DirectoryIterator($sPostsPath);
@@ -95,9 +94,10 @@ if(!function_exists('mod_news_Upgrade'))
             // save creation date from old accessfile
                 if($doImportDate) {
                     $link = '/posts/'.preg_replace('/'.preg_quote(PAGE_EXTENSION).'$/i', '', $fileinfo->getFilename());
-                    $sql  = 'UPDATE `'.TABLE_PREFIX.'mod_news_posts` ';
-                    $sql .= 'SET `created_when`='.$fileinfo->getMTime().' ';
-                    $sql .= 'WHERE `link`=\''.$link.'\'';
+                    $sql  = 'UPDATE `'.TABLE_PREFIX.'mod_news_posts` SET '
+                          . '`created_when`='.$fileinfo->getMTime().' '
+                          . 'WHERE `link`=\''.$link.'\' '
+                          .   'AND `created_when`= 0';
                     $database->query($sql);
                 }
             // delete old access file

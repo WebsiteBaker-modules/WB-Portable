@@ -23,7 +23,7 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 $module_directory   = 'news';
 $module_name        = 'News';
 $module_function    = 'page';
-$module_version     = '3.5.8';
+$module_version     = '3.5.9';
 $module_platform    = '2.8.3';
 $module_author      = 'Ryan Djurovich, Rob Smith, Werner v.d.Decken';
 $module_license     = 'GNU General Public License';

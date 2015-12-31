@@ -35,10 +35,12 @@ if(!defined('WB_PATH')) {
     $include_head_links    = '';
 
 // workout to included frontend.css, fronten.js and frontend_body.js in snippets
-    $sql  = 'SELECT `directory` FROM `'.TABLE_PREFIX.'addons` ';
-    $sql .= 'WHERE `type`=\'module\' AND `function`=\'snippet\'';
+    $sql = 'SELECT `type`,`function`,`directory` FROM `'.TABLE_PREFIX.'addons` '
+         . 'WHERE `type`=\'module\' AND `function` IN (\'snippet\',\'wysiwyg\')';
+    $sql  = 'SELECT `directory` FROM `'.TABLE_PREFIX.'addons` '
+          . 'WHERE `type`=\'module\' AND `function`=\'snippet\' ';
     if(($resSnippets = $database->query($sql))) {
-        while($recSnippet = $resSnippets->fetchRow()) {
+        while($recSnippet = $resSnippets->fetchRow( MYSQLI_ASSOC)) {
             $module_dir = $recSnippet['directory'];
             if (file_exists(WB_PATH.'/modules/'.$module_dir.'/include.php')) {
                 include(WB_PATH.'/modules/'.$module_dir.'/include.php');

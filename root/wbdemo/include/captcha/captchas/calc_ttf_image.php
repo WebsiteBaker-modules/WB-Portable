@@ -22,8 +22,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
-
-require_once("../../../config.php");
+require( dirname(dirname(dirname((__DIR__)))).'/config.php' );
 require_once(WB_PATH.'/include/captcha/captcha.php');
 
 if(!isset($_SESSION['captcha_time']))

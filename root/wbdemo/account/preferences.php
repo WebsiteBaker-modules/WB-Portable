@@ -27,7 +27,6 @@ if(!FRONTEND_LOGIN) {
         exit(0);
     }
 }
-
 require_once(WB_PATH.'/framework/class.frontend.php');
 $wb_inst = new wb();
 if ($wb_inst->is_authenticated()==false) {
@@ -35,14 +34,12 @@ if ($wb_inst->is_authenticated()==false) {
     exit(0);
 }
 
-//$page_id = !empty($_SESSION['PAGE_ID']) ? $_SESSION['PAGE_ID'] : 0;
+$page_id = @$_SESSION['PAGE_ID'] ?: 0;
 
 // Required page details
-/* */
-// $page_id = 0;
 $page_description = '';
 $page_keywords = '';
-//define('PAGE_ID', $page_id);
+define('PAGE_ID', $page_id);
 define('ROOT_PARENT', 0);
 define('PARENT', 0);
 define('LEVEL', 0);

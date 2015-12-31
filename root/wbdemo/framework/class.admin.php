@@ -117,6 +117,7 @@ class admin extends wb {
         }
 
         $header_template->set_var(    array(
+                            'FTAN_GET' => ( DEBUG ? $this->getFTAN('GET') : '' ),
                             'SECTION_NAME'        => $MENU[strtoupper($this->section_name)],
                             'STYLE'               => strtolower($this->section_name),
                             'BODY_TAGS'           => $body_tags,
@@ -159,7 +160,7 @@ class admin extends wb {
                     array(ADMIN_URL.'/preferences/index.php',         '', $MENU['PREFERENCES'], 'preferences', 0),
                     array(ADMIN_URL.'/settings/index.php?advanced=0', '', $MENU['SETTINGS'],    'settings',    1),
                     array(ADMIN_URL.'/admintools/index.php',          '', $MENU['ADMINTOOLS'],  'admintools',  1),
-                    array(ADMIN_URL.'/access/index.php',              '', $MENU['ACCESS'],      'access',      1)
+                    array(ADMIN_URL.'/access/index.php',              '', $MENU['ACCESS'],      'access',      1),
                     );
         $header_template->set_block('header_block', 'linkBlock', 'link');
         foreach($menu AS $menu_item) {

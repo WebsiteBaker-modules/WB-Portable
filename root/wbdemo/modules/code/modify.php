@@ -17,7 +17,7 @@
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__dir__).'/'.basename(__file__).' directly'); }
+if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 $sModulName = basename(__DIR__);
 if( !$admin->get_permission($sModulName,'module' ) ) {
@@ -31,9 +31,10 @@ $template->set_file('page', 'htt/modify.htt');
 $template->set_block('page', 'main_block', 'main');
 
 // Get page content
-$query = "SELECT content FROM ".TABLE_PREFIX."mod_code WHERE section_id = '$section_id'";
+
+$query = "SELECT content FROM `".TABLE_PREFIX."mod_code` WHERE `section_id` = '$section_id'";
 $get_content = $database->query($query);
-$content = $get_content->fetchRow();
+$content = $get_content->fetchRow(MYSQL_ASSOC);
 $content = htmlspecialchars($content['content']);
 
 // Insert vars

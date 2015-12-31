@@ -19,7 +19,7 @@
 
 // Print admin header
 
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Preferences','start', false);
@@ -76,13 +76,13 @@ function save_preferences( &$admin, &$database)
                  . 'WHERE `user_id` = '.(int)$admin->get_user_id().' AND `email` LIKE \''.$email.'\'';
             $IsOldMail = $database->get_one($sql);
         // check that email is unique in whoole system
-                $email = $admin->add_slashes($email);
-                $sql = 'SELECT `email` FROM `'.TABLE_PREFIX.'users` '
-                     . 'WHERE `user_id` <> '.(int)$admin->get_user_id().' AND `email` LIKE \''.$email.'\'';
-                $checkMail = $database->get_one($sql);
+            $email = $admin->add_slashes($email);
+            $sql = 'SELECT `email` FROM `'.TABLE_PREFIX.'users` '
+                 . 'WHERE `user_id` <> '.(int)$admin->get_user_id().' AND `email` LIKE \''.$email.'\'';
+            $checkMail = $database->get_one($sql);
 
-                if( $checkMail == $email ){ $err_msg[] = $MESSAGE['USERS_EMAIL_TAKEN']; }
-                $bMailHasChanged = ($email != $IsOldMail);
+            if( $checkMail == $email ){ $err_msg[] = $MESSAGE['USERS_EMAIL_TAKEN']; }
+            $bMailHasChanged = ($email != $IsOldMail);
         }
     }
 // receive password vars and calculate needed action

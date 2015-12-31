@@ -110,6 +110,7 @@ if (!function_exists("new_submission_id") ) {
       return $submission_id;
    }
 }
+    $sRecallUrl = WB_URL.PAGES_DIRECTORY.'/'.$wb->page['link'].PAGE_EXTENSION ;
 
 // Work-out if the form has been submitted or not
 if($_POST == array()) {
@@ -146,7 +147,7 @@ if($_POST == array()) {
    if($query_fields = $database->query($sql)) {
       if($query_fields->numRows() > 0) {
 ?>
-         <form <?php echo ( ( (strlen($form_name) > 0) AND (false == $use_xhtml_strict) ) ? "name=\"".$form_name."\"" : ""); ?> action="<?php echo htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'';?>" method="post" style="width: 100%;">
+         <form <?php echo ( ( (strlen($form_name) > 0) AND (false == $use_xhtml_strict) ) ? "name=\"".$form_name."\"" : ""); ?> action="<?php echo $sRecallUrl.'';?>" method="post" style="width: 100%;">
             <input type="hidden" name="submission_id" value="<?php echo $_SESSION['form_submission_id']; ?>" />
             <?php
             $iFormRequestId = isset($_GET['fri']) ? intval($_GET['fri']) : 0;
@@ -283,7 +284,7 @@ if($_POST == array()) {
       $sql .= 'WHERE `section_id` = '.(int)$section_id.'';
       if($query_settings = $database->query($sql) ) {
          if($query_settings->numRows() > 0) {
-            $fetch_settings = $query_settings->fetchRow(MYSQL_ASSOC);
+            $fetch_settings = $query_settings->fetchRow(MYSQLI_ASSOC);
 
             // $email_to = $fetch_settings['email_to'];
             $email_to = (($fetch_settings['email_to'] != '') ? $fetch_settings['email_to'] : emailAdmin());
@@ -397,18 +398,19 @@ if($_POST == array()) {
          // Create blank "required" array
          $required = array();
          echo '</ul>'.PHP_EOL;
-         echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
+//         echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
+           echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
       } else {
          if(isset($email_error)) {
             echo '<br /><ul>'.PHP_EOL;
             echo '<li>'.$email_error.'</li>'.PHP_EOL;
             echo '</ul>'.PHP_EOL;
-            echo '<a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a>';
+             echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
          } elseif(isset($captcha_error)) {
             echo '<br /><ul>'.PHP_EOL;
             echo '<li>'.$captcha_error.'</li>'.PHP_EOL;
             echo '</ul>'.PHP_EOL;
-            echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
+             echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
          } else {
             // Check how many times form has been submitted in last hour
             $last_hour = time()-3600;
@@ -496,16 +498,14 @@ if($_POST == array()) {
          }
       }  // email_error
    } else {
-
-   echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
+       echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
    }
-
    // Now check if the email was sent successfully
    if(isset($success) AND $success == true) {
       if ($success_page=='none') {
          echo str_replace("\n","<br />",($success_email_text));
-            echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
-        } else {
+         echo '<p>&nbsp;</p>'.PHP_EOL.'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'.PHP_EOL;
+      } else {
          $query_menu = $database->query("SELECT link,target FROM ".TABLE_PREFIX."pages WHERE `page_id` = '$success_page'");
          if($query_menu->numRows() > 0) {
                 $fetch_settings = $query_menu->fetchRow(MYSQL_ASSOC);

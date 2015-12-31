@@ -107,7 +107,7 @@ $admin->print_header();
 
       // output content of module file to textareas
      ?><form name="edit_module_file" action="<?php echo $_SERVER['SCRIPT_NAME'];?>" method="post" style="margin: 0;">
-
+        <?php echo $admin->getFTAN(); ?>
         <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
         <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
         <input type="hidden" name="mod_dir" value="<?php echo $mod_dir; ?>" />

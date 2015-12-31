@@ -17,7 +17,7 @@
  */
 
 // Include config file
-require( dirname(dirname((__dir__))).'/config.php' );
+require( dirname(dirname((__DIR__))).'/config.php' );
 
 // Make sure people are allowed to access this page
 if(MANAGE_SECTIONS != 'enabled')
@@ -69,7 +69,7 @@ switch ($action):
                 require(WB_PATH.'/modules/'.$modulname.'/delete.php');
             }
             $sql  = 'DELETE FROM `'.TABLE_PREFIX.'sections` ';
-            $sql .= 'WHERE `section_id` ='.(int)$section_id.' LIMIT 1';
+            $sql .= 'WHERE `section_id` ='.(int)$section_id;
             if( !$database->query($sql) ) {
                 if($admin_header) { $admin->print_header(); }
                 $admin->print_error($database->get_error(),$backlink);

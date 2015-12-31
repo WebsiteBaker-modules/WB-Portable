@@ -27,10 +27,10 @@
 */
 
 // Headings and text outputs
-$MOD_JSADMIN['TXT_HEADING_B'] 				= 'Please choose the Javascript functions you want to enable';
-$MOD_JSADMIN['TXT_PERSIST_ORDER_B'] 		= 'Remember expanded pages';
-$MOD_JSADMIN['TXT_AJAX_ORDER_PAGES_B'] 	= 'Reorder pages by the use of drag-and-drop';
+$MOD_JSADMIN['TXT_HEADING_B']                 = 'Please choose the Javascript functions you want to enable';
+$MOD_JSADMIN['TXT_PERSIST_ORDER_B']         = 'Remember expanded pages';
+$MOD_JSADMIN['TXT_AJAX_ORDER_PAGES_B']     = 'Reorder pages by the use of drag-and-drop';
 $MOD_JSADMIN['TXT_AJAX_ORDER_SECTIONS_B'] = 'Reorder sections by the use of drag-and-drop';
-$MOD_JSADMIN['TXT_ERROR_INSTALLINFO_B'] 	= '<h1>Error</h1><p>JavaScript Admin requires the YUI (Yahoo User Interface) framework.<br />The following files are required to get Javascript Admin work as expected:<br /><br />';
+$MOD_JSADMIN['TXT_ERROR_INSTALLINFO_B']     = '<h1>Error</h1><p>JavaScript Admin requires the YUI (Yahoo User Interface) framework.<br />The following files are required to get Javascript Admin work as expected:<br /><br />';
 
 ?>

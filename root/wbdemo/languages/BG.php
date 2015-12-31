@@ -2,16 +2,16 @@
 /**
  *
  * @category        framework
- * @package         language
- * @author          Website Baker Project
- * @copyright       2004-2009, Ryan Djurovich
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link			http://www.websitebaker2.org/
+ * @package         languages
+ * @author          WebsiteBaker Project
+ * @copyright       Ryan Djurovich
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
  * @version         $Id: BG.php 1636 2012-03-09 14:30:29Z Luisehahne $
- * @filesource		$HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/languages/BG.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/languages/BG.php $
  * @lastmodified    $Date: 2012-03-09 15:30:29 +0100 (Fr, 09. Mrz 2012) $
  *
  */
@@ -26,7 +26,7 @@ define('LANGUAGE_LOADED', true);
 
 // Set the language information
 $language_code = 'BG';
-$language_name = 'Bulgarian';
+$language_name = 'Български'; // Bulgarian
 $language_version = '2.8';
 $language_platform = '2.8.x';
 $language_author = 'Hristo Benev(&#1061;&#1088;&#1080;&#1089;&#1090;&#1086; &#1041;&#1077;&#1085;&#1077;&#1074;)';
@@ -680,5 +680,5 @@ $OVERVIEW['VIEW'] = '&#1042;&#1080;&#1078; &#1089;&#1074;&#1086;&#1103; &#1089;&
 /* include old languages format */
 if(file_exists(WB_PATH.'/languages/old.format.inc.php'))
 {
-	include(WB_PATH.'/languages/old.format.inc.php');
+    include(WB_PATH.'/languages/old.format.inc.php');
 }
