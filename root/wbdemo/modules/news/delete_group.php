@@ -15,7 +15,7 @@
  *
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -30,9 +30,14 @@ if (!$group_id) {
 }
 $admin->print_header();
 
-$database->query("UPDATE `".TABLE_PREFIX."mod_news_posts` SET `group_id` = '0' WHERE `group_id`='$group_id'");
+    $sql  = 'UPDATE `'.TABLE_PREFIX.'mod_news_posts` SET '
+          . '`group_id`=0, '
+          . 'WHERE `group_id` = '.$database->escapeString($group_id);
+    $database->query($sql);
 // Update row
-$database->query("DELETE FROM `".TABLE_PREFIX."mod_news_groups` WHERE `group_id` = '$group_id'");
+    $sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_news_groups` '
+          . 'WHERE `group_id` = '.$database->escapeString($group_id);
+    $database->query($sql);
 // Check if there is a db error, otherwise say successful
 if($database->is_error()) {
     $admin->print_error($database->get_error(), ADMIN_URL.'/pages/modify.php?page_id='.$page_id);

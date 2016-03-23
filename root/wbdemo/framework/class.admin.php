@@ -21,7 +21,7 @@ if(!defined('WB_PATH')) {
     throw new IllegalFileException();
 }
 /* -------------------------------------------------------- */
-require_once(WB_PATH.'/framework/class.wb.php');
+if ( !class_exists('wb', false) ) { require(WB_PATH.'/framework/class.wb.php'); }
 
 // Get WB version
 require_once(ADMIN_PATH.'/interface/version.php');
@@ -83,17 +83,38 @@ class admin extends wb {
     }
     }
 
+    private function mysqlVersion() {
+      global $database;
+      $sql = 'SELECT VERSION( ) AS versionsinfo';
+      if( $oRes = ($database->query($sql)) ) { 
+          $aRes = $oRes->fetchRow(MYSQLI_ASSOC);
+          return $aRes['versionsinfo'];
+      }
+      return 0;
+    }
+
+    private function mysqlStrict() {
+      global $database;
+      $retVal ='';
+      $sql = 'SELECT @@global.sql_mode AS strictinfo';
+      if( $oRes = ($database->query($sql)) ) { 
+          $aRes = $oRes->fetchRow(MYSQLI_ASSOC);
+          $retVal = $aRes['strictinfo'];
+      }
+      return is_numeric( strpos( $retVal,'STRICT' ) );
+    }
+
     // Print the admin header
-    function print_header($body_tags = '') {
+    public function print_header($body_tags = '') {
         // Get vars from the language file
         global $MENU, $MESSAGE, $TEXT, $database;
         // Connect to database and get website title
         // $GLOBALS['FTAN'] = $this->getFTAN();
-        $this->createFTAN();
+//        $this->createFTAN();
         $sql = 'SELECT `value` FROM `'.TABLE_PREFIX.'settings` '
              . 'WHERE `name`=\'website_title\'';
         $get_title = $database->query($sql);
-        $title = $get_title->fetchRow(MYSQLI_ASSOC);
+        $aWebsiteTitle= $get_title->fetchRow( MYSQLI_ASSOC );
         // Setup template object, parse vars to it, then parse it
         $header_template = new Template(dirname($this->correct_theme_source('header.htt')));
         $header_template->set_file('page', 'header.htt');
@@ -112,8 +133,73 @@ class admin extends wb {
             $sql = 'SELECT `link` FROM `'.TABLE_PREFIX.'pages` '
                  . 'WHERE `page_id`='.intval($_GET['page_id']);
             $result = @$database->query($sql);
-            $row = @$result->fetchRow(MYSQLI_ASSOC);
+            $row = @$result->fetchRow( MYSQLI_ASSOC );
             if($row) $view_url .= PAGES_DIRECTORY .$row['link']. PAGE_EXTENSION;
+        }
+
+        // Create the backend menu
+        $aMenu = array(
+//                    array(ADMIN_URL.'/start/index.php',               '', $MENU['START'],       'start',       1),
+                    array(ADMIN_URL.'/pages/index.php',               '', $MENU['PAGES'],       'pages',       1),
+                    array(ADMIN_URL.'/media/index.php',               '', $MENU['MEDIA'],       'media',       1),
+                    array(ADMIN_URL.'/addons/index.php',              '', $MENU['ADDONS'],      'addons',      1),
+                    array(ADMIN_URL.'/preferences/index.php',         '', $MENU['PREFERENCES'], 'preferences', 0),
+                    array(ADMIN_URL.'/settings/index.php?advanced=0', '', $MENU['SETTINGS'],    'settings',    1),
+                    array(ADMIN_URL.'/admintools/index.php',          '', $MENU['ADMINTOOLS'],  'admintools',  1),
+                    array(ADMIN_URL.'/access/index.php',              '', $MENU['ACCESS'],      'access',      1),
+                    );
+        $header_template->set_block('header_block', 'linkBlock', 'link');
+        foreach($aMenu AS $menu_item) {
+            $link = $menu_item[0];
+            $target = ($menu_item[1] == '') ? '_self' : $menu_item[1];
+            $titleMenu = $menu_item[2];
+            $permission_title = $menu_item[3];
+            $required = $menu_item[4];
+            $replace_old = array(ADMIN_URL, WB_URL, '/', 'index.php');
+            if($required == false || $this->get_link_permission($permission_title)) {
+                $header_template->set_var('LINK', $link);
+                $header_template->set_var('TARGET', $target);
+                // If link is the current section apply a class name
+                if($permission_title == strtolower($this->section_name)) {
+                    $header_template->set_var('CLASS', $menu_item[3] . ' current');
+                } else {
+                    $header_template->set_var('CLASS', $menu_item[3]);
+                }
+                $header_template->set_var('TITLE', $titleMenu);
+                // Print link
+                $header_template->parse('link', 'linkBlock', true);
+
+                $header_template->set_block('header_block', 'infoBlockBasis',   'infoBasis');
+                $header_template->set_block('header_block', 'infoBlockExented', 'infoExented');
+                if ( strtolower($this->section_name) == 'admintools' ) {
+//                    print $permission_title.'<br />';
+                    $header_template->set_block('infoBasis', '');
+                    $header_template->set_var( array(
+                                        'VERSION'             => WB_VERSION,
+                                        'SP'                  => (defined('WB_SP') ? WB_SP : ''),
+                                        'REVISION'            => WB_REVISION,
+                                        'PHP_VERSION'         => phpversion(),
+                                        'MYSQLI_VERSION'      => $this->mysqlVersion(),
+                                        'MYSQLSTRICT'         => ( ($this->mysqlStrict())?'STRICT': 'NON STRICT' ),
+                                    ) );
+                    $header_template->parse('infoExented', 'infoBlockExented', true);
+                } else {
+//                    print '<b>'.$menu_item[3].'/<b><br />';
+                    $header_template->set_block('infoExented', '');
+                    $header_template->set_var( array(
+                                        'VERSION'             => VERSION,
+                                        'SP'                  => (defined('SP') ? SP : ''),
+                                        'REVISION'            => REVISION,
+                                        'SERVER_ADDR'         => ($this->get_user_id() == 1
+                                                                   ? (!isset($_SERVER['SERVER_ADDR']) 
+                                                                      ? '127.0.0.1' 
+                                                                      : $_SERVER['SERVER_ADDR'])
+                                                                  : ''),
+                                    ) );
+//                    $header_template->set_block('infoBasis', '');
+                    $header_template->parse('infoBasis', 'infoBlockBasis', true);
+                }
+            }
         }
 
         $header_template->set_var(    array(
@@ -121,20 +207,12 @@ class admin extends wb {
                             'SECTION_NAME'        => $MENU[strtoupper($this->section_name)],
                             'STYLE'               => strtolower($this->section_name),
                             'BODY_TAGS'           => $body_tags,
-                            'WEBSITE_TITLE'       => ($title['value']),
+                            'WEBSITE_TITLE'       => ($aWebsiteTitle['value']),
                             'TEXT_ADMINISTRATION' => $TEXT['ADMINISTRATION'],
                             'CURRENT_USER'        => $MESSAGE['START_CURRENT_USER'],
                             'DISPLAY_NAME'        => $this->get_display_name(),
                             'CHARSET'             => $charset,
                             'LANGUAGE'            => strtolower(LANGUAGE),
-                            'VERSION'             => VERSION,
-                            'SP'                  => (defined('SP') ? SP : ''),
-                            'REVISION'            => REVISION,
-                            'SERVER_ADDR'         => ($this->get_user_id() == 1
-                                                       ? (!isset($_SERVER['SERVER_ADDR']) 
-                                                          ? '129.0.0.1' 
-                                                          : $_SERVER['SERVER_ADDR'])
-                                                      : ''),
                             'WB_URL'              => WB_URL,
                             'ADMIN_URL'           => ADMIN_URL,
                             'THEME_URL'           => THEME_URL,
@@ -151,45 +229,12 @@ class admin extends wb {
                         )
                     );
 
-        // Create the backend menu
-        $menu = array(
-//                    array(ADMIN_URL.'/start/index.php',               '', $MENU['START'],       'start',       1),
-                    array(ADMIN_URL.'/pages/index.php',               '', $MENU['PAGES'],       'pages',       1),
-                    array(ADMIN_URL.'/media/index.php',               '', $MENU['MEDIA'],       'media',       1),
-                    array(ADMIN_URL.'/addons/index.php',              '', $MENU['ADDONS'],      'addons',      1),
-                    array(ADMIN_URL.'/preferences/index.php',         '', $MENU['PREFERENCES'], 'preferences', 0),
-                    array(ADMIN_URL.'/settings/index.php?advanced=0', '', $MENU['SETTINGS'],    'settings',    1),
-                    array(ADMIN_URL.'/admintools/index.php',          '', $MENU['ADMINTOOLS'],  'admintools',  1),
-                    array(ADMIN_URL.'/access/index.php',              '', $MENU['ACCESS'],      'access',      1),
-                    );
-        $header_template->set_block('header_block', 'linkBlock', 'link');
-        foreach($menu AS $menu_item) {
-            $link = $menu_item[0];
-            $target = ($menu_item[1] == '') ? '_self' : $menu_item[1];
-            $title = $menu_item[2];
-            $permission_title = $menu_item[3];
-            $required = $menu_item[4];
-            $replace_old = array(ADMIN_URL, WB_URL, '/', 'index.php');
-            if($required == false OR $this->get_link_permission($permission_title)) {
-                $header_template->set_var('LINK', $link);
-                $header_template->set_var('TARGET', $target);
-                // If link is the current section apply a class name
-                if($permission_title == strtolower($this->section_name)) {
-                    $header_template->set_var('CLASS', $menu_item[3] . ' current');
-                } else {
-                    $header_template->set_var('CLASS', $menu_item[3]);
-                }
-                $header_template->set_var('TITLE', $title);
-                // Print link
-                $header_template->parse('link', 'linkBlock', true);
-            }
-        }
         $header_template->parse('header', 'header_block', false);
         $header_template->pparse('output', 'page');
     }
     
     // Print the admin footer
-        function print_footer($activateJsAdmin = false) {
+        public function print_footer($activateJsAdmin = false) {
         // include the required file for Javascript admin
         if($activateJsAdmin != false) {
             if(file_exists(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php')){
@@ -212,7 +257,7 @@ class admin extends wb {
     }
     
     // Return a system permission
-    function get_permission($name, $type = 'system') {
+    public function get_permission($name, $type = 'system') {
         // Append to permission type
         $type .= '_permissions';
         // Check if we have a section to check for
@@ -242,7 +287,7 @@ class admin extends wb {
         }
     }
 
- function get_user_details($user_id) {
+ public function get_user_details($user_id) {
   global $database;
   $retval = array('username'=>'unknown','display_name'=>'Unknown','email'=>'');
   $sql  = 'SELECT `username`,`display_name`,`email` ';
@@ -257,7 +302,7 @@ class admin extends wb {
  }
 
     //
-    function get_section_details( $section_id, $backLink = 'index.php' ) {
+    public function get_section_details( $section_id, $backLink = 'index.php' ) {
     global $database, $TEXT;
         $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'sections` ';
         $sql .= 'WHERE `section_id`='.intval($section_id);
@@ -273,7 +318,7 @@ class admin extends wb {
         return $recSection;
     }
 
-    function get_page_details( $page_id, $backLink = 'index.php' ) {
+    public function get_page_details( $page_id, $backLink = 'index.php' ) {
         global $database, $TEXT;
         $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'pages` ';
         $sql .= 'WHERE `page_id`='.intval($page_id);
@@ -289,7 +334,7 @@ class admin extends wb {
         return $recPage;
     }
 
-    function get_page_permission($page,$action='admin') {
+    public function get_page_permission($page,$action='admin') {
         if($action != 'viewing') { $action = 'admin'; }
         $action_groups = $action.'_groups';
         $action_users  = $action.'_users';
@@ -313,7 +358,7 @@ class admin extends wb {
     }
 
     // Returns a system permission for a menu link
-    function get_link_permission($title) {
+    public function get_link_permission($title) {
         $title = str_replace('_blank', '', $title);
         $title = strtolower($title);
         // Set system permissions var
@@ -333,7 +378,7 @@ class admin extends wb {
     }
 
     // Function to add optional module Javascript or CSS stylesheets into the <body> section of the backend   
-    function register_backend_modfiles_body($file_id="js")
+    public function register_backend_modfiles_body($file_id="js")
     {
         $sCallingScript = $_SERVER['SCRIPT_NAME'];
         $AcpDir = str_replace('\\','/', ADMIN_PATH).'/';
@@ -358,7 +403,7 @@ class admin extends wb {
         {
             // check if displayed page contains a installed admin tool
             $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` ';
-            $sql .= 'WHERE `type`=\'module\' AND `function`=\'tool\' AND `directory`=\''.addslashes($_GET['tool']).'\'';
+            $sql .= 'WHERE `type`=\'module\' AND `function`=\'tool\' AND `directory`=\''.$database->escapeString($_GET['tool']).'\'';
             $result = $database->query($sql);
             if($result->numRows())
             {
@@ -375,9 +420,9 @@ class admin extends wb {
             // check if displayed page in the backend contains a page module
             if (isset($_GET['page_id']))
             {
-                $page_id = (int) addslashes($_GET['page_id']);
+                $page_id = (int) $database->escapeString($_GET['page_id']);
             } else {
-                $page_id = (int) addslashes($_POST['page_id']);
+                $page_id = (int) $database->escapeString($_POST['page_id']);
             }
             // gather information for all models embedded on actual page
             $sql = 'SELECT DISTINCT `module` FROM `'.TABLE_PREFIX.'sections` WHERE `page_id`='.(int)$page_id;
@@ -400,7 +445,7 @@ class admin extends wb {
 
 
     // Function to add optional module Javascript or CSS stylesheets into the <head> section of the backend  preg_quote($AcpDir,'/').
-    function register_backend_modfiles($file_id="css") {
+    public function register_backend_modfiles($file_id="css") {
         $sCallingScript = $_SERVER['SCRIPT_NAME'];
         $AcpDir = str_replace('\\','/', ADMIN_PATH).'/';
         if( preg_match( '/'.'pages\/(settings|sections)\.php$/is', $sCallingScript)) {
@@ -428,7 +473,7 @@ class admin extends wb {
         if(isset($_GET['tool'])) {
             // check if displayed page contains a installed admin tool
             $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` ';
-            $sql .= 'WHERE `type`=\'module\' AND `function`=\'tool\' AND `directory`=\''.addslashes($_GET['tool']).'\'';
+            $sql .= 'WHERE `type`=\'module\' AND `function`=\'tool\' AND `directory`=\''.$database->escapeString($_GET['tool']).'\'';
             $result = $database->query($sql);
             if($result->numRows()) {
                 // check if admin tool directory contains a backend.js or backend.css file to include

@@ -15,51 +15,10 @@
  *
  */
 
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
-
-if(defined('WB_URL'))
+if(defined('WB_PATH'))
 {
-
-    // Create table
-    $database->query("DROP TABLE IF EXISTS `".TABLE_PREFIX."mod_code`");
-    $mod_code = 'CREATE TABLE IF NOT EXISTS `'.TABLE_PREFIX.'mod_code` ('
-        . ' `section_id` INT NOT NULL DEFAULT \'0\','
-        . ' `page_id` INT NOT NULL DEFAULT \'0\','
-        . ' `content` TEXT NOT NULL,'
-        . ' PRIMARY KEY ( `section_id` )'
-        . ' ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
-    $database->query($mod_code);
-
-    $mod_search = "SELECT * FROM ".TABLE_PREFIX."search  WHERE value = 'code'";
-    $insert_search = $database->query($mod_search);
-    if( $insert_search->numRows() == 0 )
-    {
-        // Insert info into the search table
-        // Module query info
-        $field_info = array();
-        $field_info['page_id'] = 'page_id';
-        $field_info['title'] = 'page_title';
-        $field_info['link'] = 'link';
-        $field_info['description'] = 'description';
-        $field_info['modified_when'] = 'modified_when';
-        $field_info['modified_by'] = 'modified_by';
-        $field_info = serialize($field_info);
-        $database->query("INSERT INTO ".TABLE_PREFIX."search (name,value,extra) VALUES ('module', 'code', '$field_info')");
-        // Query start
-        $query_start_code = "SELECT [TP]pages.page_id, [TP]pages.page_title,    [TP]pages.link, [TP]pages.description, [TP]pages.modified_when, [TP]pages.modified_by    FROM [TP]mod_code, [TP]pages WHERE ";
-        $database->query("INSERT INTO ".TABLE_PREFIX."search (name,value,extra) VALUES ('query_start', '$query_start_code', 'code')");
-        // Query body
-        $query_body_code = " [TP]pages.page_id = [TP]mod_code.page_id AND [TP]mod_code.content [O] \'[W][STRING][W]\' AND [TP]pages.searching = \'1\'";
-        $database->query("INSERT INTO ".TABLE_PREFIX."search (name,value,extra) VALUES ('query_body', '$query_body_code', 'code')");
-        // Query end
-        $query_end_code = "";
-        $database->query("INSERT INTO ".TABLE_PREFIX."search (name,value,extra) VALUES ('query_end', '$query_end_code', 'code')");
-
-        // Insert blank row (there needs to be at least on row for the search to work)
-        $database->query("INSERT INTO ".TABLE_PREFIX."mod_code (page_id,section_id) VALUES ('0','0')");
-
+    // create tables from sql dump file
+    if (is_readable(__DIR__.'/install-struct.sql')) {
+        $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
     }
 }

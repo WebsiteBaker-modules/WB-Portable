@@ -48,10 +48,10 @@ if(isset($_POST['email']) && $_POST['email'] != "" )
                 $old_pass = $results_array['password'];
             // Generate a random password then update the database with it
                 $new_pass = $pwh->NewPassword();
-                $sql = 'UPDATE `'.TABLE_PREFIX.'users` '.
-                       'SET `password`=\''.$pwh->HashPassword($new_pass, true).'\', '.
-                           '`last_reset`='.time().' '.
-                       'WHERE `user_id`='.(int)$results_array['user_id'];
+                $sql  = 'UPDATE `'.TABLE_PREFIX.'users` SET '
+                      . '`password`=\''.$database->escapeString($pwh->HashPassword($new_pass, true)).'\', '
+                      . '`last_reset`='.time().' '
+                      . 'WHERE `user_id`='.(int)$results_array['user_id'];
                 unset($pwh); // destroy $pwh-Object
                 if($database->query($sql))
                 { // Setup email to send
@@ -67,7 +67,7 @@ if(isset($_POST['email']) && $_POST['email'] != "" )
                         $display_form = false;
                     }else { // snd mail failed, rollback
                         $sql = 'UPDATE `'.TABLE_PREFIX.'users` '.
-                               'SET `password`=\''.$old_pass.'\' '.
+                               'SET `password`=\''.$database->escapeString($old_pass).'\' '.
                                'WHERE `user_id`='.(int)$results_array['user_id'];
                         $database->query($sql);
                         $errMsg = $MESSAGE['FORGOT_PASS_CANNOT_EMAIL'];
@@ -108,7 +108,6 @@ if( ($errMsg=='') && ($message != '')) {
 </div>
 <h1 style="text-align: center;"><?php echo $MENU['FORGOT']; ?></h1>
 <form name="forgot_pass" action="<?php echo WB_URL.'/account/forgot.php'; ?>" method="post" class="account">
-    <input type="hidden" name="url" value="{URL}" />
         <table >
         <tr>
             <td height="40" align="center" style="color: #<?php echo $message_color; ?>;" colspan="3">

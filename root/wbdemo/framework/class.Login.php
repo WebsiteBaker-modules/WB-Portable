@@ -49,23 +49,27 @@ class Login extends admin {
             $this->{(strtolower($key))} = $value;
         }
     // calculate redirect URL
+        $aRedirecthUrl = null;
+        if(!isset($this->frontend)) { $this->frontend = false; }
         if(!isset($this->redirect_url)) { $this->redirect_url = ''; }
-        $aServerUrl = $this->mb_parse_url(WB_URL);
         $sServerUrl = $_SERVER['SERVER_NAME'];
+        $aServerUrl = $this->mb_parse_url(WB_URL);
         $sServerScheme = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : isset($aServerUrl['scheme']) ? $aServerUrl['scheme'] : ' http';
         $sServerPath = $_SERVER['SCRIPT_NAME'];
         // If the url is blank, set it to the default url
         $this->url = $this->get_post('url');
+        if ( !$this->frontend ){ $this->redirect_url = ( @$this->url ? : '' );}
+        if ( $this->frontend ){ $this->url = ( @$this->redirect_url ? : null );}
         if (preg_match('/%0d|%0a|\s/i', $this->url)) {
             throw new Exception('Warning: possible intruder detected on login');
         }
         $aUrl = $this->mb_parse_url( $this->url );
-        $this->url = isset($aRedirecthUrl['host']) &&($sServerUrl==$aUrl['host']) ? $this->url:ADMIN_URL.'/start/index.php';
         if ($this->redirect_url!='') {
             $aRedirecthUrl = $this->mb_parse_url( $this->redirect_url );
             $this->redirect_url = isset($aRedirecthUrl['host']) &&($sServerUrl==$aRedirecthUrl['host']) ? $this->redirect_url:$sServerScheme.'://'.$sServerUrl;
             $this->url = $this->redirect_url;
         }
+        $this->url = isset($aRedirecthUrl['host']) &&($sServerUrl==$aUrl['host']) ? $this->url:ADMIN_URL.'/start/index.php';
         if(strlen($this->url) < 2) {
             $aDefaultUrl = $this->mb_parse_url( $this->default_url );
             $this->default_url = isset($aDefaultUrl['host']) &&($sServerUrl==$aDefaultUrl['host']) ? $this->default_url:$sServerScheme.'://'.$sServerUrl;
@@ -279,7 +283,9 @@ class Login extends admin {
                 'INTERFACE_DIR_URL' =>  ADMIN_URL.'/interface',
                 'MAX_USERNAME_LEN' => $this->max_username_len,
                 'MAX_PASSWORD_LEN' => $this->max_password_len,
+                'ADMIN_URL' => ADMIN_URL,
                 'WB_URL' => WB_URL,
+                'URL' => $this->redirect_url,
                 'THEME_URL' => THEME_URL,
                 'VERSION' => VERSION,
                 'REVISION' => REVISION,

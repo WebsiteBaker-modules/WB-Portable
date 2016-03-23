@@ -29,4 +29,5 @@
 // Headings and text outputs
 $MOD_WRAPPER['NOTICE']         =    'Uw browser laat geen ondersteuning toe voor inline frames.<br />Klik op de link hieronder om de site te tonen die je eigenlijk wilde zien...<br />';
 
-?>
+// end of file
+

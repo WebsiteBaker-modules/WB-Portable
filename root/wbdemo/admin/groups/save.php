@@ -17,7 +17,7 @@
  */
 
 // Print admin header
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'groups_modify', false);
@@ -39,7 +39,7 @@ if( ($group_id < 2 ) )
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
 }
 // Gather details entered
-$group_name = $admin->get_post_escaped('group_name');
+$group_name = $admin->get_post('group_name');
 
 // Check values
 if($group_name == "") {
@@ -61,10 +61,10 @@ require(ADMIN_PATH.'/groups/get_permissions.php');
 // Update the database
 $sql  = 'UPDATE `'.TABLE_PREFIX.'groups` SET '
       .'`name` = \''.$group_name.'\', '
-      .'`system_permissions` = \''.$system_permissions.'\', '
-      .'`module_permissions` = \''.$module_permissions.'\', '
-      .'`template_permissions` = \''.$template_permissions.'\' '
-      .'WHERE `group_id` = '.$group_id;
+      .'`system_permissions` = \''.$database->escapeString($system_permissions).'\', '
+      .'`module_permissions` = \''.$database->escapeString($module_permissions).'\', '
+      .'`template_permissions` = \''.$database->escapeString($template_permissions).'\' '
+      .'WHERE `group_id` = '.$database->escapeString($group_id);
 
 $database->query($sql);
 if($database->is_error()) {

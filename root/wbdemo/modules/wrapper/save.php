@@ -1,53 +1,39 @@
 <?php
-/**
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * @category        modules
- * @package         wrapper
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         Id: save.php 1538 2011-12-10 15:06:15Z Luisehahne $
- * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/wrapper/install.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10 Jan 2011) $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
-$admin_header = false;
-// Tells script to update when this page was last updated
-$update_when_modified = true;
-// Include WB admin wrapper script
-require(WB_PATH.'/modules/admin.php');
-if (!$admin->checkFTAN())
-{
-    $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
-}
-$admin->print_header();
+/**
+ * save.php
+ *
+ * @category     Addons
+ * @package      Addons_wrapper
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      http://www.gnu.org/licenses/gpl.html   GPL License
+ * @version      3.0.1
+ * @lastmodified $Date: $
+ * @since        File available since 2015-12-17
+ * @deprecated   This interface is deprecated since 2015-12-17
+ * @description  xyz
+ */
 
-// Update the mod_wrapper table with the contents
-if(isset($_POST['url'])) {
-    $url = $admin->add_slashes(strip_tags($_POST['url']));
-    $height = intval($_POST['height']);
-    if(!is_numeric($height)) {
-        $height = 400;
-    }
-    $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wrapper` SET '
-         .'`url` = \''.$url.'\', '
-         .'`height` = '.$height.' '
-         .'WHERE `section_id` = '.$section_id.' ';
-    $database->query($sql);
-}
+    // forwarding to the dispatcher
+    $sCommand = 'save';
+    include __DIR__.'/addon.php';
 
-// Check if there is a database error, otherwise say successful
-if($database->is_error()) {
-    $admin->print_error($database->get_error(), $js_back);
-} else {
-    $admin->print_success($MESSAGE['PAGES']['SAVED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
-}
+// end of file
 
-// Print admin footer
-$admin->print_footer();

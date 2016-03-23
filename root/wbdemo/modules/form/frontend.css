@@ -1,14 +1,36 @@
-.frm-required { color :#ff0000; }
-.frm-field_title { font-size :12px; width :25%; vertical-align :top; white-space :nowrap; text-align :right; }
-.frm-textfield { font-size :12px; width :90%; }
-.frm-textarea { font-size :12px; width :100%; height :100px; }
-.frm-field_heading { font-size :12px; font-weight :bold; border-bottom-width :2px; border-bottom-style :solid; border-bottom-color :#666666; padding-top :10px; color :#666666; }
-.frm-select { font-size :12px; width :50%; }
-.frm-select option { font-size :12px; width :95%; }
-.frm-field_checkbox { font-size :11px; cursor :pointer; width :30px; vertical-align :middle; }
-.frm-checkbox_label { font-size :11px; cursor :pointer; width :auto; }
-.frm-radio_label { font-size :11px; cursor :pointer; }
-.frm-email { font-size :12px; width : 90%; }
+.frm-field_table { width :100%; vertical-align :middle; table-layout :auto; border-collapse :separate; border :none; }
+.frm-field_table tbody { font-size :100%; padding :0.4em 0.2em; }
+.frm-field_table tbody td { border :none; }
+.frm-field_table tbody td.field_heading,
+.frm-field_table tbody td.frm-field_heading { border-bottom :2px solid #666666; color :#666666; font-weight :bold; padding-top :0.5em; }
+.frm-formular { float: none; }
+.frm-required { color :#FF0000; }
+.frm-field_title { width :25%; vertical-align :top; white-space :nowrap; text-align :right; }
+.frm-textfield { width :90%; }
+.frm-textarea { width :100%; height :100px; }
+.frm-select { width :50%; }
+.frm-select option { width :95%; }
+.frm-field_checkbox { cursor :pointer; width :2em; vertical-align :middle; }
+.frm-checkbox_label { cursor :pointer; vertical-align :middle; }
+.frm-radio_label { cursor :pointer; }
+.frm-email { width :90%; }
 /*** Don't remove the class nixhier, this is required for ASP ***/
+.nixhier,
 .frm-nixhier { display :none; }
-.frm-submission { margin :0 auto; position :relative; width :auto; }        
+.frm-submission { margin :0 auto; position :relative; width :auto; }
+.print-email { font-size :0.8em; color :#000000; margin :10px auto; }
+.frm-warning { background :#FFEEEE; border :0.1em #884444 solid; color :#E10000; margin-bottom :1em; padding :0.5em 2.8em; font-size :96.5%; font-weight :normal; }
+.frm-note { background :#EEFFEE; border :0.2em #448844 solid; color :#004400; margin-bottom :1em; padding :0.8em; font-size :1.2em; font-weight :bold; }
+.previewprinttop { text-align :right; }
+.previewprinttop img { padding-left :1em; }
+.frm-thankyou { }
+.frm-tbody { }
+.frm-warning h3 { font-size :120%; line-height :1.3em; margin :0.1em; padding :0.1em; }
+ .frm-warning ol { color :#333333; margin :0.1em; }
+.frm-field_table input[type="submit"] { padding :0.1em 0.8em; }
+ .frm-warning a, 
+ p.frm-warning a { background :transparent; padding-left :0; }
+fieldset.frm-fieldset { border :none; margin :0%; padding :0%; }
+.frm-warning-success-email { display :block; }
+.previewPrintTop { float :right; }
+.previewPrintTop span { display : none; }

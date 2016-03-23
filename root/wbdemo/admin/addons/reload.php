@@ -29,7 +29,7 @@ if (count($post_check) == 0) die(header('Location: index.php?advanced'));
  * check if user has permissions to access this file
  */
 // include WB configuration file and WB admin class
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // check user permissions for admintools (redirect users with wrong permissions)
 $admin = new admin('Admintools', 'admintools', false, false);
@@ -62,6 +62,33 @@ if (!$admin->checkFTAN())
 }
 
 /**
+ * delete no existing addons in table
+ */
+$sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+      . 'ORDER BY `type`, `directory` ';
+if ( $oAddons = $database->query( $sql ) ) {
+    while ( $aAddon = $oAddons->fetchRow( MYSQLI_ASSOC ) ) {
+        $delAddon = 'DELETE  FROM `'.TABLE_PREFIX.'addons` WHERE `addon_id`='.(int)$aAddon['addon_id'];
+        $sAddonFile = WB_PATH.'/'.$aAddon['type'].'s/'.$aAddon['directory'];
+        switch ($aAddon['type']):
+            case 'language':
+                if ( !file_exists( $sAddonFile.'.php' ) )
+                { 
+                    $oDelResult = $database->query( $delAddon );
+                }
+                break;
+            default:
+                if ( !file_exists( $sAddonFile ) )
+                { 
+                    $oDelResult = $database->query( $delAddon );
+//                    echo $sAddonFile.'<br />';
+                }
+            break;
+        endswitch;
+    }
+}
+/**
+ * 
  * Reload all specified Addons
  */
 $msg = array();
@@ -70,69 +97,41 @@ $table = TABLE_PREFIX . 'addons';
 foreach ($post_check as $key) {
     switch ($key) {
         case 'reload_modules':
-            if ($handle = opendir(WB_PATH . '/modules')) {
-                // delete modules from database
-                $sql = "DELETE FROM `$table` WHERE `type` = 'module'";
-                $database->query($sql);
-                // loop over all modules
-                while(false !== ($file = readdir($handle))) {
-                    if ($file != '' && substr($file, 0, 1) != '.' && $file != 'admin.php' && $file != 'index.php') {
-                        load_module(WB_PATH . '/modules/' . $file);
-                    }
+            $aAddonList = glob(WB_PATH.'/modules/*', GLOB_ONLYDIR );
+            foreach( $aAddonList as $sAddonFile ) {
+                if (is_readable( $sAddonFile )) {
+                    load_module( $sAddonFile );
                 }
-                closedir($handle);
-                // add success message
-                $msg[] = $MESSAGE['ADDON']['MODULES_RELOADED'];
-            } else {
-                // provide error message and stop
-                $admin->print_error($MESSAGE['ADDON']['ERROR_RELOAD'], $js_back);
             }
+            // add success message
+            $msg[] = $MESSAGE['ADDON_MODULES_RELOADED'];
+            unset($aAddonList);
             break;
-            
+
         case 'reload_templates':
-            if ($handle = opendir(WB_PATH . '/templates')) {
-                // delete templates from database
-                $sql = "DELETE FROM `$table` WHERE `type` = 'template'";
-                $database->query($sql);
-                // loop over all templates
-                while(false !== ($file = readdir($handle))) {
-                    if($file != '' AND substr($file, 0, 1) != '.' AND $file != 'index.php') {
-                        load_template(WB_PATH . '/templates/' . $file);
-                    }
+            $aAddonList = glob(WB_PATH.'/templates/*', GLOB_ONLYDIR );
+            foreach( $aAddonList as $sAddonFile ) {
+                if (is_readable( $sAddonFile )) {
+                    load_template( $sAddonFile );
                 }
-                closedir($handle);
-                // add success message
-                $msg[] = $MESSAGE['ADDON']['TEMPLATES_RELOADED'];
-            } else {
-                // provide error message and stop
-                $admin->print_header();
-                $admin->print_error($MESSAGE['ADDON']['ERROR_RELOAD'], $js_back);
             }
+            // add success message
+            $msg[] = $MESSAGE['ADDON_TEMPLATES_RELOADED'];
+            unset($aAddonList);
             break;
+
         case 'reload_languages':
-            if ($handle = opendir(WB_PATH . '/languages/')) {
-                $aDebug = array();
-                // delete languages from database
-                $sql = "DELETE FROM `$table` WHERE `type` = 'language'";
-                $database->query($sql);
-                // loop over all languages
-                while(false !== ($file = readdir($handle))) {
-                    if ($file != '' && substr($file, 0, 1) != '.' && $file != 'index.php') {
-                        $aDebug[] = $file;
-                        if(!load_language(WB_PATH . '/languages/' . $file)) {
-                        }
-                    }
+            $aAddonList = glob(WB_PATH.'/languages/*.php' );
+            foreach( $aAddonList as $sAddonFile ) {
+                if (is_readable( $sAddonFile )) {
+                    load_language( $sAddonFile );
                 }
-                closedir($handle);
-                // add success message
-                $msg[] = $MESSAGE['ADDON']['LANGUAGES_RELOADED'];
-                
-            } else {
-                // provide error message and stop
-                $admin->print_header();
-                $admin->print_error($MESSAGE['ADDON']['ERROR_RELOAD'], $js_back);
             }
+            // add success message
+            $msg[] = $MESSAGE['ADDON_LANGUAGES_RELOADED'];
+            unset($aAddonList);
             break;
+
     }
 }
 

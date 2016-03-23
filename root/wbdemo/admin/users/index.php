@@ -16,7 +16,7 @@
  *
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('Access', 'users');
@@ -119,10 +119,12 @@ $template->pparse('output', 'page');
 
 // Setup template object, parse vars to it, then parse it
 // Create new template object
-$template = new Template(dirname($admin->correct_theme_source('users_form.htt')));
+$template = new Template(dirname($admin->correct_theme_source('users_form.htt')), 'remove');
 // $template->debug = true;
 $template->set_file('page', 'users_form.htt');
 $template->set_block('page', 'main_block', 'main');
+$template->set_block('main_block', 'user_display_block', 'user_display');
+
 $template->set_var('DISPLAY_EXTRA', 'display:none;');
 $template->set_var('ACTIVE_CHECKED', ' checked="checked"');
 $template->set_var('ACTION_URL', ADMIN_URL.'/users/add.php');
@@ -225,6 +227,7 @@ $template->set_var(array(
              'CANCEL_LINK' => ADMIN_URL.'/access/index.php',
             )
     );
+$template->set_block( 'user_display_block', '');
 
 // Parse template for add user form
 $template->parse('main', 'main_block', false);

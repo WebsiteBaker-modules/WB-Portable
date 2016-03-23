@@ -13,6 +13,7 @@
         if(!options){
             options = {};
             options.el = document.body;
+console.info( options );
         }
 
         this.options = this.extend(options, this.default_options);
@@ -105,7 +106,6 @@
 console.info( this.options );
         },
 
-
         get: function() {
             this.generate();
             return this._passwort;
@@ -113,7 +113,7 @@ console.info( this.options );
 
         render: function() {
             this.options.el.value  = this.get();
-            this.options.el2.value = this._passwort;
+            this.options.el2.value = ''; //this._passwort;
         }
     };
 

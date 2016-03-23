@@ -17,7 +17,7 @@
  *
  */
 
-require( dirname(dirname(dirname((__DIR__)))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname(dirname((__DIR__)))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Include WB admin wrapper script
 $admintool_link = ADMIN_URL .'/admintools/index.php';
@@ -37,32 +37,32 @@ $admin->print_header();
 if($admin->get_post('title') == '') {
     $admin->print_error($MESSAGE['GENERIC_FILL_IN_ALL'].' ( Droplet Name )', $ToolUrl );
 } else {
-    $title = $admin->add_slashes($admin->get_post('title'));
+    $title = $admin->StripCodeFromText($admin->get_post('title'));
     $active = (int) $admin->get_post('active');
     $admin_view = (int) $admin->get_post('admin_view');
     $admin_edit = (int) $admin->get_post('admin_edit');
     $show_wysiwyg = (int) $admin->get_post('show_wysiwyg');
-    $description = $admin->add_slashes($admin->get_post('description'));
-    $tags = array('<?php', '?>' , '<?');
-    $content = $admin->add_slashes(str_replace($tags, '', $_POST['savecontent']));
-    $comments = trim($admin->add_slashes($admin->get_post('comments')));
+    $description = $admin->get_post('description');
+    $aForbiddenTags = array('<?php', '?>' , '<?');
+    $content = str_replace($aForbiddenTags, '', $_POST['savecontent']);
+    $comments = trim(($admin->get_post('comments')));
     $modified_when = time();
     $modified_by = (int) $admin->get_user_id();
 }
 
 // Update row
 $sql = 'UPDATE `'.TABLE_PREFIX.'mod_droplets` SET '
-    . '`name` = \''.$title.'\', '
-    . '`active` = '.$active.', '
-    . '`admin_view` = '.$admin_view.', '
-    . '`admin_edit` = '.$admin_edit.', '
-    . '`show_wysiwyg` = '.$show_wysiwyg.', '
-    . '`description` = \''.$description.'\', '
-    . '`code` = \''.$content.'\', '
-    . '`comments` = \''.$comments.'\', '
-    . '`modified_when` = '.$modified_when.', '
-    . '`modified_by` = '.$modified_by.' '
-    . 'WHERE `id` = '.$droplet_id;
+    . '`name` = \''.$database->escapeString($title).'\', '
+    . '`active` = '.(int)$active.', '
+    . '`admin_view` = '.(int)$admin_view.', '
+    . '`admin_edit` = '.(int)$admin_edit.', '
+    . '`show_wysiwyg` = '.(int)$show_wysiwyg.', '
+    . '`description` = \''.$database->escapeString($description).'\', '
+    . '`code` = \''.$database->escapeString($content).'\', '
+    . '`comments` = \''.$database->escapeString($comments).'\', '
+    . '`modified_when` = '.(int)$modified_when.', '
+    . '`modified_by` = '.(int)$modified_by.' '
+    . 'WHERE `id` = '.(int)$droplet_id;
 $database->query($sql);
 
 // Check if there is a db error, otherwise say successful

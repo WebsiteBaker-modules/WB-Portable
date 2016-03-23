@@ -14,7 +14,7 @@
     <!-- <img src="{THEME_URL}/images/logo.png" alt="Logo" /> -->
     {TEXT_LOGIN}
 </div> 
-<table class="container" summary="" cellpadding="0" cellspacing="0" border="0" width="770" align="center" style="margin-top: 30px;">
+<table class="container" style="margin-top: 30px; width: 100%;">
   <tr>
     <td class="content">
       <form name="login" class="login" action="{ACTION_URL}" method="post" >
@@ -63,7 +63,7 @@
     <br />
         <br />
         <br />
-        <a href="{WB_URL}/">{TEXT_HOME}</a>
+        <a target="_blank" href="{WB_URL}/">{TEXT_HOME}</a>
       </center>
     </td>
   </tr>

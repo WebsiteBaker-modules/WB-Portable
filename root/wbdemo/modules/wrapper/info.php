@@ -1,28 +1,46 @@
 <?php
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
+ * info.php
  *
- * @category        modules
- * @package         wrapper
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: info.php 1540 2011-12-11 21:43:16Z Luisehahne $
- * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/wrapper/install.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10 Jan 2011) $
- *
+ * @category     Addons
+ * @package      Addons_wrapper
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      http://www.gnu.org/licenses/gpl.html   GPL License
+ * @version      3.0.1
+ * @lastmodified $Date: $
+ * @since        File available since 17.12.2015
+ * @description  xyz
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
+if (!defined('WB_PATH')) { throw new Exception('Cannot access the addon \"'.basename(__DIR__).'\" directly'); }
 /* -------------------------------------------------------- */
-$module_directory = 'wrapper';
-$module_name = 'Wrapper';
-$module_function = 'page';
-$module_version = '2.8.4';
-$module_platform = '2.7 | 2.8.x';
-$module_author = 'Ryan Djurovich';
-$module_license = 'GNU General Public License';
-$module_description = 'This module allows you to wrap your site around another using an inline frame';
+    $module_directory   = 'wrapper';
+    $module_name        = 'Wrapper v3.0.1';
+    $module_function    = 'page';
+    $module_version     = '3.0.1';
+    $module_platform    = '2.8.3-SP6';
+    $module_author      = 'Manuela v.d.Decken <manuela@isteam.de>';
+    $module_license     = 'GNU General Public License';
+    $module_description = 'This module allows you to show third party sites inside an inline frame';
+
+// end of file
+

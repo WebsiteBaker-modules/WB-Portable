@@ -16,7 +16,7 @@
  * @lastmodified    $Date: 2011-06-25 19:18:50 +0200 (Sa, 25. Jun 2011) $
  *
  */
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('admintools', 'admintools');
@@ -31,12 +31,10 @@ $output = '';
 if ( !class_exists('msgQueue', false) ) { require(WB_PATH.'/framework/class.msg_queue.php'); }
 msgQueue::clear();
 // Load Language file
-if(LANGUAGE_LOADED) {
-    if(!file_exists($ModulePath.'languages/'.LANGUAGE.'.php')) {
-        require_once($ModulePath.'languages/EN.php');
-    } else {
-        require_once($ModulePath.'languages/'.LANGUAGE.'.php');
-    }
+$sAddonName = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
 }
 $sOverviewDroplets = $TEXT['LIST_OPTIONS'].' '.$DR_TEXT['DROPLETS'];
 

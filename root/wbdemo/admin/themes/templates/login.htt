@@ -75,7 +75,7 @@
         <br />
         <br />
         <br />
-        <a href="{WB_URL}/">{TEXT_HOME}</a>
+        <a target="_blank" href="{WB_URL}/">{TEXT_HOME}</a>
     </center>
 
     </td>

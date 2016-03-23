@@ -15,18 +15,15 @@
  *
  */
 
-// prevent this file from being accessed directly
 /* -------------------------------------------------------- */
-if(!defined('WB_PATH')) {
-    require_once (dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
-    throw new IllegalFileException();
-}
+// Must include code to stop this file being accessed directly
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 $module_directory   = 'captcha_control';
 $module_name        = 'Captcha and Spam-Protection (ASP) Control';
 $module_function    = 'tool';
 $module_version     = '1.2.0';
-$module_platform    = '2.7 | 2.8.x';
+$module_platform    = '2.8.3 SP6';
 $module_author      = 'Thomas Hornik (thorn)';
 $module_license     = 'GNU General Public License';
 $module_description = 'Admin-Tool to control CAPTCHA and ASP';

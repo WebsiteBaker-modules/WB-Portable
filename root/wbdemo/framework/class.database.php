@@ -41,6 +41,7 @@ class database {
     private $error      = '';
     private $error_type = '';
     private $message    = array();
+    private $sActionFile  = '';
 
 
     // Set DB_URL
@@ -317,45 +318,123 @@ class database {
         }
         return $retval;
     }
+
+    public function setSqlImportActionFile ( $sCallingScript ){
+       $this->sActionFile = $sCallingScript;
+        trigger_error('Deprecated function call: '.__CLASS__.'::'.__METHOD__, E_USER_DEPRECATED);
+    }
+
 /**
  * Import a standard *.sql dump file
  * @param string $sSqlDump link to the sql-dumpfile
  * @param string $sTablePrefix
- * @param bool $bPreserve set to true will ignore all DROP TABLE statements
+ * @param mixed $mAction
+ *        (bool)true => upgrade (default)
+ *        (bool)false => install
+ *        or command (install|uninstall|upgrade) as string
+ *        or calling script as string
  * @param string $sTblEngine
  * @param string $sTblCollation
  * @return boolean true if import successful
  */
-    public function SqlImport($sSqlDump,
-                              $sTablePrefix = '',
-                              $bPreserve = true,
-                              $sTblEngine = 'ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci',
-                              $sTblCollation = ' collate utf8_unicode_ci')
-    {
-        $retval = true;
+    public function SqlImport(
+        $sSqlDump,
+        $sTablePrefix  = '',
+        $mAction       = true,
+        $sTblEngine    = 'MyISAM',
+        $sTblCollation = 'utf8_unicode_ci'
+    ) {
+        $iCount = 0;
+        $sSqlBuffer  = '';
+        $bRetval     = true;
         $this->error = '';
-        $aSearch  = array('{TABLE_PREFIX}','{TABLE_ENGINE}', '{TABLE_COLLATION}');
-        $aReplace = array($sTablePrefix, $sTblEngine, $sTblCollation);
-        $sql = '';
-        $aSql = file($sSqlDump);
+        // detect requested action
+        if (is_string($mAction)) {
+            // search for valid command string in $mAction
+            $sAction = strtolower(preg_replace(
+                '/^.*?(uninstall|install|upgrade)(\.[^\.]+)?$/is',
+                '$1',
+                $mAction,
+                -1,
+                $iCount
+            ));
+            $sAction = $iCount ? $sAction : 'upgrade';
+        } else if (is_bool($mAction)) {
+            // on boolean request select true='upgrade' or false='install'
+            $sAction = $mAction ? 'upgrade' : 'install';
+        } else {
+            // select 'upgrade' if no valid command found
+            $sAction = 'upgrade';
+        }
+        // extract charset from given collation
+        $aTmp = preg_split('/_/', $sTblCollation, null, PREG_SPLIT_NO_EMPTY);
+        $sCharset = $aTmp[0];
+        // define placeholders
+        $aSearch[] = '/\{TABLE_PREFIX\}/';                                        /* step 0 */
+        $aSearch[] = '/\{FIELD_CHARSET\}/';                                       /* step 1 */
+        $aSearch[] = '/\{FIELD_COLLATION\}/';                                     /* step 2 */
+        $aSearch[] = '/\{TABLE_ENGINE\}/';                                        /* step 3 */
+        $aSearch[] = '/\{TABLE_ENGINE=([a-zA-Z_0-9]*)\}/';                        /* step 4 */
+        $aSearch[] = '/\{CHARSET\}/';                                             /* step 5 */
+        $aSearch[] = '/\{COLLATION\}/';                                           /* step 6 */
+        // define replacements
+        $aReplace[] = $sTablePrefix;                                              /* step 0 */
+        $aReplace[] = ' CHARACTER SET {CHARSET}';                                 /* step 1 */
+        $aReplace[] = ' COLLATE {COLLATION}';                                     /* step 2 */
+        $aReplace[] = ' {TABLE_ENGINE='.$sTblEngine.'}';                          /* step 3 */
+        $aReplace[] = ' ENGINE=$1 DEFAULT CHARSET={CHARSET} COLLATE={COLLATION}'; /* step 4 */
+        $aReplace[] = $sCharset;                                                  /* step 5 */
+        $aReplace[] = $sTblCollation;                                             /* step 6 */
+        // read file into an array
+        $aSql = file( $sSqlDump, FILE_SKIP_EMPTY_LINES );
+        // remove possible BOM from file
+        $aSql[0] = preg_replace('/^[\xAA-\xFF]{3}/', '', $aSql[0]);
+        // replace placeholders by replacements over the whole file
+        $aSql = preg_replace($aSearch, $aReplace, $aSql);
+
         while ( sizeof($aSql) > 0 ) {
             $sSqlLine = trim(array_shift($aSql));
             if (!preg_match('/^[-\/]+.*/', $sSqlLine)) {
-                $sql = $sql.' '.$sSqlLine;
-                if ((substr($sql,-1,1) == ';')) {
-                    $sql = trim(str_replace( $aSearch, $aReplace, $sql));
-                    if (!($bPreserve && preg_match('/^\s*DROP TABLE IF EXISTS/siU', $sql))) {
-                        if(! $this->query($sql)) {
-                            $retval = false;
+                $sSqlBuffer .= ' '.$sSqlLine;
+                if ((substr($sSqlBuffer,-1,1) == ';')) {
+                    if (
+                        // drop tables on install or uninstall
+                        preg_match('/^\s*DROP TABLE IF EXISTS/siU', $sSqlBuffer) &&
+                        ($sAction == 'install' || $sAction == 'uninstall')
+                    ) {
+                        if (!$this->query($sSqlBuffer)) {
+                            $bRetval = false;
+                            unset($aSql);
+                            break;
+                        }
+                    } else if (
+                        // create and alter tables on install or upgrade
+                        (preg_match('/^\s*CREATE TABLE/siU', $sSqlBuffer) ||
+                        preg_match('/^\s*ALTER TABLE/siU', $sSqlBuffer)) &&
+                        ($sAction == 'install' || $sAction == 'upgrade')
+                    ) {
+                        if (!$this->query($sSqlBuffer)) {
+                            $bRetval = false;
+                            unset($aSql);
+                            break;
+                        }
+                    } else if (
+                        // insert default data on install
+                        (preg_match('/^\s*INSERT INTO /siU', $sSqlBuffer)) &&
+                        ( $sAction == 'install' )
+                    ) {
+                        if (!$this->query($sSqlBuffer)) {
+                            $bRetval = false;
                             unset($aSql);
                             break;
                         }
                     }
-                    $sql = '';
+                    // clear buffer for next statement
+                    $sSqlBuffer = '';
                 }
             }
         }
-        return $retval;
+        return $bRetval;
     }
 
 /**
@@ -462,7 +541,7 @@ class DatabaseException extends Exception {}
         foreach( $key as $index=>$val)
         {
             $index = strtolower($index);
-            $sql = 'SELECT COUNT(`setting_id`) FROM `'.TABLE_PREFIX.$table.'` WHERE `name` = \''.$index.'\' ';
+            $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.$table.'` WHERE `name` = \''.$index.'\' ';
             if($database->get_one($sql))
             {
                 $sql = 'UPDATE ';

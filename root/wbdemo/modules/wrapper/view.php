@@ -1,41 +1,39 @@
 <?php
-/**
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * @category        modules
- * @package         wrapper
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: view.php 1538 2011-12-10 15:06:15Z Luisehahne $
- * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/wrapper/install.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10 Jan 2011) $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
+/**
+ * view.php
+ *
+ * @category     Addons
+ * @package      Addons_wrapper
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      http://www.gnu.org/licenses/gpl.html   GPL License
+ * @version      3.0.1
+ * @lastmodified $Date: $
+ * @since        File available since 2015-12-17
+ * @deprecated   This interface is deprecated since 2015-12-17
+ * @description  xyz
+ */
 
-// check if module language file exists for the language set by the user (e.g. DE, EN)
-if(!file_exists(WB_PATH .'/modules/wrapper/languages/'.LANGUAGE .'.php')) {
-    // no module language file exists for the language set by the user, include default module language file EN.php
-    require_once(WB_PATH .'/modules/wrapper/languages/EN.php');
-} else {
-    // a module language file exists for the language defined by the user, load it
-    require_once(WB_PATH .'/modules/wrapper/languages/'.LANGUAGE .'.php');
-}
+    // forwarding to the dispatcher
+    $sCommand = 'view';
+    include __DIR__.'/addon.php';
 
-// get url
-$get_settings = $database->query("SELECT `url`,`height` FROM `".TABLE_PREFIX."mod_wrapper` WHERE `section_id` = '$section_id'");
-$fetch_settings = $get_settings->fetchRow(MYSQLI_ASSOC);
-$url = ($fetch_settings['url']);
+// end of file
 
-?>
-<iframe src="<?php echo $url; ?>" width="100%" height="<?php echo $fetch_settings['height']; ?>" frameborder="0" scrolling="auto">
-<?php echo $MOD_WRAPPER['NOTICE']; ?>
-<a href="<?php echo $url; ?>" target="_blank"><?php echo $url; ?></a>
-</iframe>

@@ -2,7 +2,7 @@
 ===
 === !!! ATTENTION:
 ===
-=== !!! This patch is for WB-2.8.3-SP1-SP4 only!!!
+=== !!! This patch is for WB-2.8.3-SP1-SP5 only!!!
 ===
 === !!! NEVER EVER use it in combination with other versions!!!
 ===
@@ -11,18 +11,22 @@ Step 1
 =
 === finished
 
-=== CHANGELOG WB283 SP5 r1643 including WB283 SP1 to SP4
+=== CHANGELOG WB283 SP6 r1645 including WB283 SP1 to SP5
 
 Add missing parameter in system permission (group management)
 Not possible to delete groups who are in use.
 Security fixes news and form modul (Don't allow backend access to persons you don't trust)!
 Preferences - confirm with current password only by e-mail or password changes
+Preferences - user- and display-name are unique in the system
 Add SecureToken (Multitab), remove Single Secureform and Secureform.mtab, Secureform Switcher no longer needed
 SecureToken Settings by Superadmin in advanced settings (Server Settings)
 Updating settings.js Switching linux/Windows  and PhpMail/SMTP
 Modify page, add block-outer border with info-header area, showing if block is active or inactive
-Sanitize HttpReferer - Value will be first save in ORG_REFERER to use in statistic scripts  
+Sanitize HttpReferer - Value will be first save in ORG_REFERER to use in statistic scripts
 upgrade-script deleting protected files in some folder, you don't needed them
-Droplet add new features 
-
-
+Droplet add new features
+Output-Filter - add new filter methods
+rss.php convert wblink and sysvar:media placeholder to absolute urls
+Prevent core modules/templates from uninstall in addons management
+add a new class to prevent unwantend code in strings
+Most of sql statememts now are strict 

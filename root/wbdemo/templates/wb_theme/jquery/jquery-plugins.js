@@ -22,13 +22,13 @@ function redirect_to_page (url, timer) {
 
 domReady(function()
 {
-        var matches = document.querySelectorAll(".jcalendar");
-        if( document.querySelectorAll(".jcalendar") ) {
-            LoadOnFly('', WB_URL+"/include/jscalendar/calendar-system.css");
+//        var matches = document.querySelectorAll(".jcalendar");
+        if( document.querySelectorAll(".jcalendar").length > 0 ) {
+            LoadOnFly('head', WB_URL+"/include/jscalendar/calendar-system.css");
           }
 
-        if( document.querySelectorAll(".jsadmin") ) {
-            LoadOnFly('', WB_URL+"/modules/jsadmin/backend.css");
+        if( document.querySelectorAll(".jsadmin").length > 0 ) {
+            LoadOnFly('head', WB_URL+"/modules/jsadmin/backend.css");
           }
 /**
  * 

@@ -16,18 +16,16 @@
  * @lastmodified    $Date: 2011-08-18 04:18:59 +0200 (Do, 18. Aug 2011) $
  *
  */
+
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(!defined('WB_PATH')) {
-    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
-    throw new IllegalFileException();
-}
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 
 $module_directory = 'droplets';
-$module_name = 'Droplets v1.9.2';
+$module_name = 'Droplets v2.0.0';
 $module_function = 'tool';
-$module_version = '1.9.2';
+$module_version = '2.0.0';
 $module_platform = '2.8.3';
 $module_author = 'Ruud and pcwacht, Luisehahne';
 $module_license = 'GNU General Public License';

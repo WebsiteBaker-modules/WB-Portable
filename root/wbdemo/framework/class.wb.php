@@ -2,7 +2,7 @@
 /**
  *
  * @category        framework
- * @package         frontend 
+ * @package         frontend
  * @author          Ryan Djurovich, WebsiteBaker Project
  * @copyright       WebsiteBaker Org. e.V.
  * @link            http://websitebaker.org/
@@ -16,44 +16,40 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
+if (defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 /* -------------------------------------------------------- */
-// Include PHPLIB template class
-require_once(WB_PATH."/include/phplib/template.inc");
+// Include depending classes if needed
+if (!class_exists('Template', false))              { require(WB_PATH.'/include/phplib/template.inc'); }
+if (!class_exists('database', false))              { require(__DIR__.'/class.database.php'); }
+if (!class_exists('wbmailer', false))              { require(__DIR__.'/class.wbmailer.php'); }
+if (!class_exists('SecureTokens', false))          { require(__DIR__.'/SecureTokens.php'); }
+if (!class_exists('SecureTokensInterface', false)) { require(__DIR__.'/SecureTokensInterface.php'); }
+if (!class_exists('Sanitize', false )) { include __DIR__.'/Sanitize.php'; }
 
-require_once(WB_PATH.'/framework/class.database.php');
-
-// Include new wbmailer class (subclass of PHPmailer)
-require_once(WB_PATH."/framework/class.wbmailer.php");
-
-require_once(WB_PATH . '/framework/SecureTokens.php');
-
-class wb extends SecureTokens
+class wb extends SecureTokensInterface
 {
 
-//     public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
-     public $password_chars = '[\w!#$%&*+\-.:=?@\|]';    // General initialization function
-    // performed when frontend or backend is loaded.
+//    public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
+    public $password_chars = '[\w!#$%&*+\-.:=?@\|]';    // General initialization function
 
-//    public function  __construct($mode = SecureForm::FRONTEND) {
     public function  __construct($mode = 0) {
-        parent::__construct($mode);
+        parent::__construct();
     }
   /**
    * Created parse_url utf-8 compatible function
-   * 
+   *
    * @param string $url The string to decode
    * @return array Associative array containing the different components
-   * 
+   *
    */
-  public function mb_parse_url( $url)
-  {
-    $encodedUrl = preg_replace_callback( '%[^:/?#&=\.]+%usD', create_function( '$aMatches',
-      ';return urlencode($aMatches[0]);'), /*                                   'urlencode(\'$0\')', */ $url);
-    $components = parse_url( $encodedUrl);
-    foreach ( $components as &$component) $component = urldecode( $component);
-    return $components;
-  }
+    public function mb_parse_url( $url)
+    {
+      $encodedUrl = preg_replace_callback( '%[^:/?#&=\.]+%usD', create_function( '$aMatches',
+        ';return urlencode($aMatches[0]);'), /*                                   'urlencode(\'$0\')', */ $url);
+      $components = parse_url( $encodedUrl);
+      foreach ( $components as &$component) $component = urldecode( $component);
+      return $components;
+    }
 /* ****************
  * check if one or more group_ids are in both group_lists
  *
@@ -63,7 +59,7 @@ class wb extends SecureTokens
  * @param array &$matches: an array-var whitch will return possible matches
  * @return bool: true there is a match, otherwise false
  */
-    function is_group_match( $groups_list1 = '', $groups_list2 = '', &$matches = null )
+    public function is_group_match( $groups_list1 = '', $groups_list2 = '', &$matches = null )
     {
         if( $groups_list1 == '' ) { return false; }
         if( $groups_list2 == '' ) { return false; }
@@ -86,7 +82,7 @@ class wb extends SecureTokens
  * @param mixed $groups_list: an array or a coma seperated list of group-ids
  * @return bool: true if current user is member of one of this groups, otherwise false
  */
-    function ami_group_member( $groups_list = '' )
+    public function ami_group_member( $groups_list = '' )
     {
         if( $this->get_user_id() == 1 ) { return true; }
         return $this->is_group_match( $groups_list, $this->get_groups_id() );
@@ -98,7 +94,7 @@ class wb extends SecureTokens
         false: if page-visibility is 'none' or 'deleted', or page-vis. is 'registered' or 'private' and user isn't allowed to see the page.
         true: if page-visibility is 'public' or 'hidden', or page-vis. is 'registered' or 'private' and user _is_ allowed to see the page.
     */
-    function page_is_visible($page)
+    public function page_is_visible($page)
     {
         $show_it = false; // shall we show the page?
         $page_id = $page['page_id'];
@@ -148,7 +144,7 @@ class wb extends SecureTokens
         return($show_it);
     }
     // Check if there is at least one active section on this page
-    function page_is_active($page)
+    public function page_is_active($page)
     {
         global $database;
         $has_active_sections = false;
@@ -172,14 +168,14 @@ class wb extends SecureTokens
     }
 
     // Check whether we should show a page or not (for front-end)
-    function show_page($page)
+    public function show_page($page)
     {
         $retval = ($this->page_is_visible($page) && $this->page_is_active($page));
         return $retval;
     }
 
     // Check if the user is already authenticated or not
-    function is_authenticated() {
+    public function is_authenticated() {
         $retval = ( isset($_SESSION['USER_ID']) AND
                     $_SESSION['USER_ID'] != "" AND
                     is_numeric($_SESSION['USER_ID']));
@@ -187,7 +183,7 @@ class wb extends SecureTokens
     }
 
     // Modified addslashes function which takes into account magic_quotes
-    function add_slashes($input) {
+    public function add_slashes($input) {
         if( get_magic_quotes_gpc() || (!is_string($input)) ) {
             return $input;
         }
@@ -198,7 +194,7 @@ class wb extends SecureTokens
     // Attn: this is _not_ the counterpart to $this->add_slashes() !
     // Use stripslashes() to undo a preliminarily done $this->add_slashes()
     // The purpose of $this->strip_slashes() is to undo the effects of magic_quotes_gpc==On
-    function strip_slashes($input) {
+    public function strip_slashes($input) {
         if ( !get_magic_quotes_gpc() || ( !is_string($input) ) ) {
             return $input;
         }
@@ -206,11 +202,11 @@ class wb extends SecureTokens
     }
 
     // Escape backslashes for use with mySQL LIKE strings
-    function escape_backslashes($input) {
+    public function escape_backslashes($input) {
         return str_replace("\\","\\\\",$input);
     }
 
-    function page_link($link){
+    public function page_link($link){
         // Check for :// in the link (used in URL's) as well as mailto:
         if(strstr($link, '://') == '' AND substr($link, 0, 7) != 'mailto:') {
             return WB_URL.PAGES_DIRECTORY.$link.PAGE_EXTENSION;
@@ -218,85 +214,85 @@ class wb extends SecureTokens
             return $link;
         }
     }
-    
+
     // Get POST data
-    function get_post($field) {
+    public function get_post($field) {
         return (isset($_POST[$field]) ? $_POST[$field] : null);
     }
 
     // Get POST data and escape it
-    function get_post_escaped($field) {
+    public function get_post_escaped($field) {
         $result = $this->get_post($field);
         return (is_null($result)) ? null : $this->add_slashes($result);
     }
-    
+
     // Get GET data
-    function get_get($field) {
+    public function get_get($field) {
         return (isset($_GET[$field]) ? $_GET[$field] : null);
     }
 
     // Get SESSION data
-    function get_session($field) {
+    public function get_session($field) {
         return (isset($_SESSION[$field]) ? $_SESSION[$field] : null);
     }
 
     // Get SERVER data
-    function get_server($field) {
+    public function get_server($field) {
         return (isset($_SERVER[$field]) ? $_SERVER[$field] : null);
     }
 
     // Get the current users id
-    function get_user_id() {
+    public function get_user_id() {
         return $this->get_session('USER_ID');
     }
 
     // Get the current users group id
-    function get_group_id() {
+    public function get_group_id() {
         return $this->get_session('GROUP_ID');
     }
 
     // Get the current users group ids
-    function get_groups_id() {
+    public function get_groups_id() {
         return explode(",", $this->get_session('GROUPS_ID'));
     }
 
     // Get the current users group name
-    function get_group_name() {
+    public function get_group_name() {
         return implode(",", $this->get_session('GROUP_NAME'));
     }
 
     // Get the current users group name
-    function get_groups_name() {
+    public function get_groups_name() {
         return $this->get_session('GROUP_NAME');
     }
 
     // Get the current users username
-    function get_username() {
+    public function get_username() {
         return $this->get_session('USERNAME');
     }
 
     // Get the current users display name
-    function get_display_name() {
+    public function get_display_name() {
         return $this->get_session('DISPLAY_NAME');
     }
 
     // Get the current users email address
-    function get_email() {
+    public function get_email() {
         return $this->get_session('EMAIL');
     }
 
     // Get the current users home folder
-    function get_home_folder() {
+    public function get_home_folder() {
         return $this->get_session('HOME_FOLDER');
     }
 
     // Get the current users timezone
-    function get_timezone() {
+    public function get_timezone() {
         return (isset($_SESSION['USE_DEFAULT_TIMEZONE']) ? '-72000' : $_SESSION['TIMEZONE']);
     }
 
     // Validate supplied email address
-    function validate_email($email) {
+    public function validate_email($email) {
         if(function_exists('idn_to_ascii')){ /* use pear if available */
             $email = idn_to_ascii($email);
         }else {
@@ -316,20 +312,20 @@ class wb extends SecureTokens
    * @param string $location, redirected url
    * @return void
    */
-  public function send_header( $location)
-  {
-    if( !headers_sent()) {
-      header( 'Location: '.$location);
-      exit( 0);
-    } else {
-
-      //            $aDebugBacktrace = debug_backtrace();
-      //            array_walk( $aDebugBacktrace, create_function( '$a,$b', 'print "<br /><b>". basename( $a[\'file\'] ). "</b> &nbsp; <font color=\"red\">{$a[\'line\']}</font> &nbsp; <font color=\"green\">{$a[\'function\']} ()</font> &nbsp; -- ". dirname( $a[\'file\'] ). "/";' ) );
-      $msg = "<div style=\"text-align:center;\"><h2>An error has occurred</h2><p>The <strong>Redirect</strong> could not be start automatically.\n".
-        "Please click <a style=\"font-weight:bold;\" "."href=\"".$location."\">on this link</a> to continue!</p></div>\n";
-      throw new Exception( $msg);
+    public function send_header( $location)
+    {
+      if( !headers_sent()) {
+        header( 'Location: '.$location);
+        exit( 0);
+      } else {
+  
+        //            $aDebugBacktrace = debug_backtrace();
+        //            array_walk( $aDebugBacktrace, create_function( '$a,$b', 'print "<br /><b>". basename( $a[\'file\'] ). "</b> &nbsp; <font color=\"red\">{$a[\'line\']}</font> &nbsp; <font color=\"green\">{$a[\'function\']} ()</font> &nbsp; -- ". dirname( $a[\'file\'] ). "/";' ) );
+        $msg = "<div style=\"text-align:center;\"><h2>An error has occurred</h2><p>The <strong>Redirect</strong> could not be start automatically.\n".
+          "Please click <a style=\"font-weight:bold;\" "."href=\"".$location."\">on this link</a> to continue!</p></div>\n";
+        throw new Exception( $msg);
+      }
     }
-  }
 
 /* ****************
  * set one or more bit in a integer value
@@ -339,7 +335,7 @@ class wb extends SecureTokens
  * @param int $bits2set: the bitmask witch shall be added to value
  * @return void
  */
-    function bit_set( &$value, $bits2set )
+    public function bit_set( &$value, $bits2set )
     {
         $value |= $bits2set;
     }
@@ -352,7 +348,7 @@ class wb extends SecureTokens
  * @param int $bits2reset: the bitmask witch shall be removed from value
  * @return void
  */
-    function bit_reset( &$value, $bits2reset)
+    public function bit_reset( &$value, $bits2reset)
     {
         $value &= ~$bits2reset;
     }
@@ -365,13 +361,13 @@ class wb extends SecureTokens
  * @param int $bits2set: the bitmask witch shall be added to value
  * @return void
  */
-    function bit_isset( $value, $bits2test )
+    public function bit_isset( $value, $bits2test )
     {
         return (($value & $bits2test) == $bits2test);
     }
 
     // Print a success message which then automatically redirects the user to another page
-    function print_success( $message, $redirect = 'index.php' ) {
+    public function print_success( $message, $redirect = 'index.php' ) {
         global $TEXT;
         if(is_array($message)) {
            $message = implode ('<br />',$message);
@@ -400,7 +396,7 @@ class wb extends SecureTokens
     }
 
     // Print an error message
-    function print_error($message, $link = 'index.php', $auto_footer = true) {
+    public function print_error($message, $link = 'index.php', $auto_footer = true) {
         global $TEXT;
         if(is_array($message)) {
            $message = implode ('<br />',$message);
@@ -422,9 +418,95 @@ class wb extends SecureTokens
         exit();
     }
 
+    /**
+     * wb::mail()
+     *
+     * @param string $sFromAddress
+     * @param string $toAddress, comma sepated list of adresses
+     * @param string $sSubject
+     * @param string $sMessage
+     * @param string $sFromname
+     * @param string $toName
+     * @param string $sReplyTo
+     * @param string $sReplyToName
+     * @param string $sMessagePath
+     * @param array  $aAttachment=array (
+     *                            'File to the attachment',
+     *                             )
+     * @return
+     */
+    public function mail(
+                    $sFromAddress,
+                    $toAddress,
+                    $sSubject,
+                    $sMessage,
+                    $sFromname='',
+                    $toName='',
+                    $sReplyToAddress='',
+                    $sReplyToName='',
+                    $sMessagePath='',
+                    $aAttachment=null
+                    ) {
+        // Strip breaks and trim
+        $sFromAddress     = trim(preg_replace('/[\r\n]/', '', $sFromAddress));
+        $toAddress        = trim(preg_replace('/[\r\n]/', '', $toAddress));
+        $sSubject         = trim(preg_replace('/[\r\n]/', '', $sSubject));
+        $sReplyToAddress  = trim(preg_replace('/[\r\n]/', '', $sReplyToAddress));
+        // sanitize parameter to prevent injection
+        $sRecipient       = preg_replace( "/[^a-z0-9 !?:;,.\/_\-=+@#$&\*\(\)]/im", "", $sFromname );
+        $sFromname        = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sRecipient );
+        $sMessage         = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sMessage );
+
+        // create PHPMailer object and define default settings
+        $myMail = new wbmailer();
+
+        $html   = nl2br($sMessage);
+        $plain  = $myMail->html2text($html);
+
+        // convert commaseperated toAdresses List to an array
+        $aToAddress = $myMail->parseAddresses( $toAddress, false );
+
+        // set user defined from address
+        if ($sFromAddress!='') {
+//Set who the message is to be sent from
+            $myMail->setFrom($sFromAddress, $sFromname);
+            $sReplyToAddress = ( ($sReplyToAddress=='')?$sFromAddress:$sReplyToAddress );
+        // convert commaseperated toAdresses List to an array
+            $aReplyToAddress = $myMail->parseAddresses( $sReplyToAddress, false );
+            foreach ($aReplyToAddress as $replyToAddr) {                            // TO:
+                $myMail->addReplyTo($replyToAddr['address']);
+            }
+            foreach ($aToAddress as $toAddr) {                            // TO:
+                $myMail->AddAddress($toAddr['address']);
+            }
+        }
+
+//Set the subject line
+        $myMail->Subject = $sSubject;
+
+        $myMail->wrapText($html, 80);
+
+//Read an HTML message body from an external file, convert referenced images to embedded,
+//convert HTML into a basic plain-text alternative body
+        $myMail->msgHTML( $html, $sMessagePath, true);
+
+        if( is_array( $aAttachment )) {
+            foreach($aAttachment as $sFile) {
+                $myMail->AddAttachment( $sFile );
+            }
+        }
+
+        if( $myMail->getReplyToAddresses() ) {
+
+        }
+//send the message, check for errors
+        return ($myMail->Send());
+
+    }
+
     // Validate send email
-    function mail($fromaddress, $toaddress, $subject, $message, $fromname='') {
-/* 
+    public function _mail($fromaddress, $toaddress, $subject, $message, $fromname='') {
+/*
     INTEGRATED OPEN SOURCE PHPMAILER CLASS FOR SMTP SUPPORT AND MORE
     SOME SERVICE PROVIDERS DO NOT SUPPORT SENDING MAIL VIA PHP AS IT DOES NOT PROVIDE SMTP AUTHENTICATION
     NEW WBMAILER CLASS IS ABLE TO SEND OUT MESSAGES USING SMTP WHICH RESOLVE THESE ISSUE (C. Sommer)
@@ -432,7 +514,7 @@ class wb extends SecureTokens
     NOTE:
     To use SMTP for sending out mails, you have to specify the SMTP host of your domain
     via the Settings panel in the backend of Website Baker
-*/ 
+*/
 
         $fromaddress = preg_replace('/[\r\n]/', '', $fromaddress);
         $toaddress = preg_replace('/[\r\n]/', '', $toaddress);
@@ -468,19 +550,19 @@ class wb extends SecureTokens
   * @return string the relative theme path
   *
   */
-        function correct_theme_source($sThemeFile = 'start.htt') {
-        $sRetval = $sThemeFile;
-        if (file_exists(THEME_PATH.'/templates/'.$sThemeFile )) {
-            $sRetval = THEME_PATH.'/templates/'.$sThemeFile;
+    public function correct_theme_source($sThemeFile = 'start.htt') {
+    $sRetval = $sThemeFile;
+    if (file_exists(THEME_PATH.'/templates/'.$sThemeFile )) {
+        $sRetval = THEME_PATH.'/templates/'.$sThemeFile;
+    } else {
+        if (file_exists(ADMIN_PATH.'/themes/templates/'.$sThemeFile ) ) {
+        $sRetval = ADMIN_PATH.'/themes/templates/'.$sThemeFile;
         } else {
-            if (file_exists(ADMIN_PATH.'/themes/templates/'.$sThemeFile ) ) {
-            $sRetval = ADMIN_PATH.'/themes/templates/'.$sThemeFile;
-            } else {
-                throw new InvalidArgumentException('missing template file '.$sThemeFile);
-            }
+            throw new InvalidArgumentException('missing template file '.$sThemeFile);
         }
-        return $sRetval;
-        }
+    }
+    return $sRetval;
+    }
 
     /**
      * Check if a foldername doesn't have invalid characters
@@ -488,7 +570,7 @@ class wb extends SecureTokens
      * @param String $str to check
      * @return Bool
      */
-    function checkFolderName($str){
+    public function checkFolderName($str){
         return !( preg_match('#\^|\\\|\/|\.|\?|\*|"|\'|\<|\>|\:|\|#i', $str) ? TRUE : FALSE );
     }
 
@@ -500,7 +582,7 @@ class wb extends SecureTokens
      * @param String $sBaseDir
      * @return $sCurrentPath or FALSE
      */
-    function checkpath($sCurrentPath, $sBaseDir = WB_PATH){
+    public function checkpath($sCurrentPath, $sBaseDir = WB_PATH){
         // Clean the cuurent path
         $sCurrentPath = rawurldecode($sCurrentPath);
         $sCurrentPath = realpath($sCurrentPath);
@@ -515,6 +597,21 @@ class wb extends SecureTokens
         } else {
             return false;
         }
+    }
+
+/**
+ * remove <?php code ?>, [[text]], link, script, scriptblock and styleblock from a given string
+ * and return the cleaned string
+ *
+ * @param string $sValue
+ * @returns
+ *    false: if @param is not a string
+ *    string: cleaned string
+ */
+    public function StripCodeFromText($mText, $iFlags = Sanitize::REMOVE_DEFAULT )
+    {
+        if (!class_exists('Sanitize')) { include __DIR__.'/Sanitize.php'; }
+        return Sanitize::StripFromText($mText, $iFlags);
     }
 
 }

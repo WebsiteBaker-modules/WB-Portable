@@ -16,7 +16,7 @@
  *
  */
 
-$debug = true;
+$debug = false;
 
 if (true === $debug) {
     ini_set('display_errors', 1);
@@ -339,6 +339,7 @@ Begin Create Database Tables
 *****************************/
 $sInstallDir = dirname(__FILE__);
 if (is_readable($sInstallDir.'/install_struct.sql')) {
+        $database->setSqlImportActionFile('install');
     if (! $database->SqlImport($sInstallDir.'/install_struct.sql', TABLE_PREFIX, false)) {
         set_error('unable to import \'install/install_struct.sql\'');
     }
@@ -346,6 +347,7 @@ if (is_readable($sInstallDir.'/install_struct.sql')) {
     set_error('unable to read file \'install/install_struct.sql\'');
 }
 if (is_readable($sInstallDir.'/install_data.sql')) {
+        $database->setSqlImportActionFile('upgrade');
     if (! $database->SqlImport($sInstallDir.'/install_data.sql', TABLE_PREFIX)) {
         set_error('unable to import \'install/install_data.sql\'');
     }

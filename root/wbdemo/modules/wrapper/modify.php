@@ -1,52 +1,39 @@
 <?php
-/**
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * @category        modules
- * @package         wrapper
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: modify.php 1538 2011-12-10 15:06:15Z Luisehahne $
- * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/wrapper/install.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10 Jan 2011) $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
+/**
+ * modify.php
+ *
+ * @category     Addons
+ * @package      Addons_wrapper
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      http://www.gnu.org/licenses/gpl.html   GPL License
+ * @version      3.0.1
+ * @lastmodified $Date: $
+ * @since        File available since 2015-12-17
+ * @deprecated   This interface is deprecated since 2015-12-17
+ * @description  xyz
+ */
 
-// Setup template object
-$template = new Template(WB_PATH.'/modules/wrapper');
-$template->set_file('page', 'modify.htt');
-$template->set_block('page', 'main_block', 'main');
+    // forwarding to the dispatcher
+    $sCommand = 'modify';
+    include __DIR__.'/addon.php';
 
-// Get page content
-$query = 'SELECT `url`,`height` FROM `'.TABLE_PREFIX.'mod_wrapper` WHERE `section_id` = '.$section_id.'';
-$get_settings = $database->query($query);
-$settings = $get_settings->fetchRow();
-$url = ($settings['url']);
-$height = $settings['height'];
+// end of file
 
-// Insert vars
-$template->set_var(array(
-                    'PAGE_ID' => $page_id,
-                    'SECTION_ID' => $section_id,
-                    'WB_URL' => WB_URL,
-                    'URL' => $url,
-                    'HEIGHT' => $height,
-                    'TEXT_URL' => $TEXT['URL'],
-                    'TEXT_HEIGHT' => $TEXT['HEIGHT'],
-                    'TEXT_SAVE' => $TEXT['SAVE'],
-                    'TEXT_CANCEL' => $TEXT['CANCEL'],
-                    'FTAN' => $admin->getFTAN()
-                )
-            );
-
-// Parse template object
-$template->parse('main', 'main_block', false);
-$template->pparse('output', 'page');

@@ -15,13 +15,7 @@
  * @lastmodified    $Date: 2012-02-07 23:48:27 +0100 (Di, 07. Feb 2012) $
  *
  */
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(!defined('WB_PATH')) {
-    require_once(dirname(__FILE__).'/globalExceptionHandler.php');
-    throw new IllegalFileException();
-}
-/* -------------------------------------------------------- */
+
 // Define that this file has been loaded
 define('FUNCTIONS_FILE_LOADED', true);
 
@@ -443,7 +437,7 @@ function is_parent($page_id)
 {
     global $database;
     // Get parent
-    $sql = 'SELECT `parent` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$page_id;
+    $sql = 'SELECT `parent` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($page_id);
     $parent = $database->get_one($sql);
     // If parent isnt 0 return its ID
     if(is_null($parent)) {
@@ -458,12 +452,12 @@ function level_count($page_id)
 {
     global $database;
     // Get page parent
-    $sql = 'SELECT `parent` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$page_id;
+    $sql = 'SELECT `parent` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($page_id);
     $parent = $database->get_one($sql);
     if($parent > 0)
     {    // Get the level of the parent
-        $sql = 'SELECT `level` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$parent;
-        $level = $database->get_one($sql);
+        $sql = 'SELECT `level` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($parent);
+        $level = intval($database->get_one($sql));
         return $level+1;
     }else {
         return 0;
@@ -475,11 +469,11 @@ function root_parent($page_id)
 {
     global $database;
     // Get page details
-    $sql = 'SELECT `parent`, `level` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$page_id;
+    $sql = 'SELECT `parent`, `level` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($page_id);
     $query_page = $database->query($sql);
     $fetch_page = $query_page->fetchRow();
-    $parent = $fetch_page['parent'];
-    $level = $fetch_page['level'];
+    $parent = intval($fetch_page['parent']);
+    $level = intval($fetch_page['level']);
     if($level == 1) {
         return $parent;
     }elseif($parent == 0) {
@@ -495,7 +489,7 @@ function get_page_title($id)
 {
     global $database;
     // Get title
-    $sql = 'SELECT `page_title` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$id;
+    $sql = 'SELECT `page_title` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($id);
     $page_title = $database->get_one($sql);
     return $page_title;
 }
@@ -505,7 +499,7 @@ function get_menu_title($id)
 {
     global $database;
     // Get title
-    $sql = 'SELECT `menu_title` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$id;
+    $sql = 'SELECT `menu_title` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.intval($id);
     $menu_title = $database->get_one($sql);
     return $menu_title;
 }
@@ -524,7 +518,7 @@ function get_parent_titles($parent_id)
 // Function to get all parent page id's
 function get_parent_ids($parent_id)
 {
-    $ids[] = $parent_id;
+    $ids[] = intval($parent_id);
     if(is_parent($parent_id) != false) {
         $parent_ids = get_parent_ids(is_parent($parent_id));
         $ids = array_merge($ids, $parent_ids);
@@ -544,10 +538,10 @@ function get_subs($parent, array $subs )
     // Connect to the database
     global $database;
     // Get id's
-    $sql = 'SELECT `page_id` FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent;
+    $sql = 'SELECT `page_id` FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.intval($parent);
     if( ($query = $database->query($sql)) ) {
-        while($fetch = $query->fetchRow()) {
-            $subs[] = $fetch['page_id'];
+        while($fetch = $query->fetchRow( MYSQLI_ASSOC )) {
+            $subs[] = intval($fetch['page_id']);
             // Get subs of this sub recursive
             $subs = get_subs($fetch['page_id'], $subs);
         }
@@ -640,87 +634,14 @@ if(!function_exists('page_link'))
 // Create a new directory and/or protected file in the given directory
 function createFolderProtectFile($sAbsDir='',$make_dir=true)
 {
+    trigger_error('Deprecated function call: '.basename(__DIR__).'/'.basename(__FILE__).'::'.__FUNCTION__, E_USER_DEPRECATED );
     return array();
-
-/*
-    global $admin, $MESSAGE;
-    $retVal = array();
-    $wb_path = rtrim(str_replace('\/\\', '/', WB_PATH), '/');
-    if( ($sAbsDir=='') || ($sAbsDir == $wb_path) ) { return $retVal;}
-
-    if ( $make_dir==true ) {
-        // Check to see if the folder already exists
-        if(file_exists($sAbsDir)) {
-            // $admin->print_error($MESSAGE['MEDIA_DIR_EXISTS']);
-            $retVal[] = basename($sAbsDir).'::'.$MESSAGE['MEDIA_DIR_EXISTS'];
-        }
-        if (!is_dir($sAbsDir) && !make_dir($sAbsDir) ) {
-            // $admin->print_error($MESSAGE['MEDIA_DIR_NOT_MADE']);
-            $retVal[] = basename($sAbsDir).'::'.$MESSAGE['MEDIA_DIR_NOT_MADE'];
-        } else {
-            change_mode($sAbsDir);
-        }
-    }
-
-    if( is_writable($sAbsDir) )
-    {
-        // if(file_exists($sAbsDir.'/index.php')) { unlink($sAbsDir.'/index.php'); }
-        // Create default "index.php" file
-        $rel_pages_dir = str_replace($wb_path, '', dirname($sAbsDir) );
-        $step_back = str_repeat( '../', substr_count($rel_pages_dir, '/')+1 );
-
-        $sResponse  = $_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently';
-        $content =
-            '<?php'."\n".
-            '// *** This file is generated by WebsiteBaker Ver.'.VERSION."\n".
-            '// *** Creation date: '.date('c')."\n".
-            '// *** Do not modify this file manually'."\n".
-            '// *** WB will rebuild this file from time to time!!'."\n".
-            '// *************************************************'."\n".
-            "\t".'header(\''.$sResponse.'\');'."\n".
-            "\t".'header(\'Location: '.WB_URL.'/index.php\');'."\n".
-            '// *************************************************'."\n";
-
-        $filename = $sAbsDir.'/index.php';
-        // write content into file
-          if(is_writable($filename) || !file_exists($filename)) {
-              if(file_put_contents($filename, $content)) {
-        //    print 'create => '.str_replace( $wb_path,'',$filename).'<br />';
-                  change_mode($filename, 'file');
-              }else {
-            $retVal[] = $MESSAGE['GENERIC_BAD_PERMISSIONS'].' :: '.$filename;
-           }
-          }
-         } else {
-           $retVal[] = $MESSAGE['GENERIC_BAD_PERMISSIONS'];
-         }
-         return $retVal;
-*/
 }
 
 function rebuildFolderProtectFile($dir='')
 {
+    trigger_error('Deprecated function call: '.basename(__DIR__).'/'.basename(__FILE__).'::'.__FUNCTION__, E_USER_DEPRECATED );
     return array();
-/*
-    global $MESSAGE;
-    $retVal = array();
-    $dir = rtrim(str_replace('\/\\', '/', $dir), '/');
-    try {
-        $files = array();
-        $files[] = $dir;
-        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $fileInfo) {
-            $files[] = $fileInfo->getPath();
-        }
-        $files = array_unique($files);
-        foreach( $files as $file) {
-            $protect_file = rtrim(str_replace('\/\\', '/', $file), '/');
-            $retVal[] = createFolderProtectFile($protect_file,false);
-        }
-    } catch ( Exception $e ) {
-        $retVal[] = $MESSAGE['MEDIA_DIR_ACCESS_DENIED'];
-    }
-    return $retVal;
-*/
 }
 
 // Create a new file in the pages directory
@@ -769,7 +690,7 @@ function create_access_file($filename,$page_id,$level)
         // Chmod the file
         change_mode($filename);
     } else {
-        $admin->print_error($MESSAGE['PAGES']['CANNOT_CREATE_ACCESS_FILE']);
+        $admin->print_error($MESSAGE['PAGES_CANNOT_CREATE_ACCESS_FILE']);
     }
     return;
  }
@@ -1050,51 +971,6 @@ function extract_permission($octal_value, $who, $action)
         return $subject;
     }
 
-// Load module into DB
-function load_module($directory, $install = false)
-{
-    global $database,$admin,$MESSAGE;
-    $retVal = false;
-    if(is_dir($directory) && file_exists($directory.'/info.php'))
-    {
-        require($directory.'/info.php');
-        if(isset($module_name))
-        {
-            if(!isset($module_license)) { $module_license = 'GNU General Public License'; }
-            if(!isset($module_platform) && isset($module_designed_for)) { $module_platform = $module_designed_for; }
-            if(!isset($module_function) && isset($module_type)) { $module_function = $module_type; }
-            $module_function = strtolower($module_function);
-            // Check that it doesn't already exist
-            $sqlwhere = 'WHERE `type` = \'module\' AND `directory` = \''.$module_directory.'\'';
-            $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'addons` '.$sqlwhere;
-            if( $database->get_one($sql) ) {
-                $sql  = 'UPDATE `'.TABLE_PREFIX.'addons` SET ';
-            }else{
-                // Load into DB
-                $sql  = 'INSERT INTO `'.TABLE_PREFIX.'addons` SET ';
-                $sqlwhere = '';
-            }
-            $sql .= '`directory`=\''.$module_directory.'\', ';
-            $sql .= '`name`=\''.$module_name.'\', ';
-            $sql .= '`description`=\''.addslashes($module_description).'\', ';
-            $sql .= '`type`=\'module\', ';
-            $sql .= '`function`=\''.$module_function.'\', ';
-            $sql .= '`version`=\''.$module_version.'\', ';
-            $sql .= '`platform`=\''.$module_platform.'\', ';
-            $sql .= '`author`=\''.addslashes($module_author).'\', ';
-            $sql .= '`license`=\''.addslashes($module_license).'\'';
-            $sql .= $sqlwhere;
-            $retVal = $database->query($sql);
-            // Run installation script
-            if($install == true) {
-                if(file_exists($directory.'/install.php')) {
-                    require($directory.'/install.php');
-                }
-            }
-        }
-    }
-}
-
 // Load template into DB
 function load_template($directory)
 {
@@ -1124,16 +1000,16 @@ function load_template($directory)
                 $sql  = 'INSERT INTO `'.TABLE_PREFIX.'addons` SET ';
                 $sqlwhere = '';
             }
-            $sql .= '`directory`=\''.$template_directory.'\', ';
-            $sql .= '`name`=\''.$template_name.'\', ';
-            $sql .= '`description`=\''.addslashes($template_description).'\', ';
-            $sql .= '`type`=\'template\', ';
-            $sql .= '`function`=\''.$template_function.'\', ';
-            $sql .= '`version`=\''.$template_version.'\', ';
-            $sql .= '`platform`=\''.$template_platform.'\', ';
-            $sql .= '`author`=\''.addslashes($template_author).'\', ';
-            $sql .= '`license`=\''.addslashes($template_license).'\' ';
-            $sql .= $sqlwhere;
+            $sql .= '`directory`=\''.$database->escapeString($template_directory).'\', '
+                  . '`name`=\''.$database->escapeString($template_name).'\', '
+                  . '`description`=\''.$database->escapeString($template_description).'\', '
+                  . '`type`=\'template\', '
+                  . '`function`=\''.$database->escapeString($template_function).'\', '
+                  . '`version`=\''.$database->escapeString($template_version).'\', '
+                  . '`platform`=\''.$database->escapeString($template_platform).'\', '
+                  . '`author`=\''.$database->escapeString($template_author).'\', '
+                  . '`license`=\''.$database->escapeString($template_license).'\' '
+                  . $sqlwhere;
             $retVal = $database->query($sql);
         }
     }
@@ -1152,12 +1028,11 @@ function load_language($file)
         $data = @file_get_contents(WB_PATH.'/languages/'.str_replace('.php','',basename($file)).'.php');
         // use regular expressions to fetch the content of the variable from the string
         $language_name = get_variable_content('language_name', $data, false, false);
-        $language_code = get_variable_content('language_code', $data, false, false);
+        $language_code = preg_replace('/^.*([a-zA-Z]{2})\.php$/si', '\1', $file);
         $language_author = get_variable_content('language_author', $data, false, false);
         $language_version = get_variable_content('language_version', $data, false, false);
         $language_platform = get_variable_content('language_platform', $data, false, false);
         $language_description = get_variable_content('language_platform', $data, false, false);
-
         if(isset($language_name))
         {
             if(!isset($language_license)) { $language_license = 'GNU General Public License'; }
@@ -1173,18 +1048,65 @@ function load_language($file)
                 $sqlwhere = '';
             }
             $sql .= '`directory`=\''.$language_code.'\', '
-                  . '`name`=\''.$language_name.'\', '
+                  . '`name`=\''.$database->escapeString($language_name).'\', '
                   . '`type`=\'language\', '
-                  . '`version`=\''.$language_version.'\', '
-                  . '`platform`=\''.$language_platform.'\', '
-                  . '`author`=\''.addslashes($language_author).'\', '
+                  . '`version`=\''.$database->escapeString($language_version).'\', '
+                  . '`platform`=\''.$database->escapeString($language_platform).'\', '
+                  . '`author`=\''.$database->escapeString($language_author).'\', '
                   . '`description`=\'\', '
-                  . '`license`=\''.addslashes($language_license).'\' '
+                  . '`license`=\''.$database->escapeString($language_license).'\' '
                   . $sqlwhere;
             $retVal = $database->query($sql);
         }
     }
     return $retVal;
+}
+
+// Load module into DB
+function load_module($directory, $install = false)
+{
+    global $database,$admin,$MESSAGE;
+    $retVal = array();
+    if(is_dir($directory) && file_exists($directory.'/info.php'))
+    {
+        require($directory.'/info.php');
+        if(isset($module_name))
+        {
+            if(!isset($module_license)) { $module_license = 'GNU General Public License'; }
+            if(!isset($module_platform) && isset($module_designed_for)) { $module_platform = $module_designed_for; }
+            if(!isset($module_function) && isset($module_type)) { $module_function = $module_type; }
+            $module_function = strtolower($module_function);
+            // Check that it doesn't already exist
+            $sqlwhere = 'WHERE `type` = \'module\' AND `directory` = \''.$module_directory.'\'';
+            $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'addons` '.$sqlwhere;
+            if( $database->get_one($sql) ) {
+                $sql  = 'UPDATE `'.TABLE_PREFIX.'addons` SET ';
+            }else{
+                // Load into DB
+                $sql  = 'INSERT INTO `'.TABLE_PREFIX.'addons` SET ';
+                $sqlwhere = '';
+            }
+            $sql .= '`directory`=\''.$database->escapeString($module_directory).'\', '
+                  . '`name`=\''.$database->escapeString($module_name).'\', '
+                  . '`description`=\''.$database->escapeString($module_description).'\', '
+                  . '`type`=\'module\', '
+                  . '`function`=\''.$database->escapeString($module_function).'\', '
+                  . '`version`=\''.$database->escapeString($module_version).'\', '
+                  . '`platform`=\''.$database->escapeString($module_platform).'\', '
+                  . '`author`=\''.$database->escapeString($module_author).'\', '
+                  . '`license`=\''.$database->escapeString($module_license).'\''
+            . $sqlwhere;
+            $retVal[] = $database->query($sql);
+            // Run installation script
+            if($install == true) {
+                if(file_exists($directory.'/install.php')) {
+                    require($directory.'/install.php');
+                    $retVal[] = isset($msg)?:'Info '.$module_name;
+                }
+            }
+        }
+    }
+return $retVal;
 }
 
 // Upgrade module info in DB, optionally start upgrade script
@@ -1207,13 +1129,13 @@ function upgrade_module($directory, $upgrade = false)
             if( $database->get_one($sql) )
             {
                 // Update in DB
-                $sql  = 'UPDATE `'.TABLE_PREFIX.'addons` SET ';
-                $sql .= '`version`=\''.$module_version.'\', ';
-                $sql .= '`description`=\''.addslashes($module_description).'\', ';
-                $sql .= '`platform`=\''.$module_platform.'\', ';
-                $sql .= '`author`=\''.addslashes($module_author).'\', ';
-                $sql .= '`license`=\''.addslashes($module_license).'\' ';
-                $sql .= 'WHERE `directory`=\''.$module_directory.'\' ';
+                $sql  = 'UPDATE `'.TABLE_PREFIX.'addons` SET '
+                      . '`version`=\''.$database->escapeString($module_version).'\', '
+                      . '`description`=\''.$database->escapeString($module_description).'\', '
+                      . '`platform`=\''.$database->escapeString($module_platform).'\', '
+                      . '`author`=\''.$database->escapeString($module_author).'\', '
+                      . '`license`=\''.$database->escapeString($module_license).'\' '
+                      . 'WHERE `directory`=\''.$database->escapeString($module_directory).'\' ';
                 $database->query($sql);
                 if($database->is_error()) {
                     $admin->print_error($database->get_error());

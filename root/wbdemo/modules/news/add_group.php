@@ -15,8 +15,7 @@
  *
  */
 
-require('../../config.php');
-
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -43,13 +42,12 @@ $position = $order->get_new($section_id);
 // Insert new row into database
 
     // Insert new row into database
-    $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_groups` SET '
-    . '`section_id` = '.$section_id.', '
-    . '`page_id` = '.$page_id.', '
-    . '`position` = '.$position.', '
-    . '`active` = 1, '
-    . '`title` = \'\' ';
-    $database->query($sql);
+    $sql  = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_groups` SET '
+          . '`section_id` = '.$database->escapeString($section_id).', '
+          . '`page_id` = '.$database->escapeString($page_id).', '
+          . '`position` = '.$database->escapeString($position).', '
+          . '`active` = 1, '
+          . '`title` = \'\' ';
 
 $database->query($sql);
 

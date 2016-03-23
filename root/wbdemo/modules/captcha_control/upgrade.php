@@ -14,24 +14,22 @@
  * @lastmodified    $Date: 2011-12-10 05:22:29 +0100 (Sa, 10. Dez 2011) $
  *
  */
-
-// prevent this file from being accessed directly
 /* -------------------------------------------------------- */
-if(defined('WB_PATH') == false)
-{
-    // Stop this file being access directly
-        die('<head><title>Access denied</title></head><body><h2 style="color:red;margin:3em auto;text-align:center;">Cannot access this file directly</h2></body></html>');
-}
-/* -------------------------------------------------------- */
-$msg = '';
-$sTable = TABLE_PREFIX.'mod_captcha_control';
-if(($sOldType = $database->getTableEngine($sTable))) {
-    if(('myisam' != strtolower($sOldType))) {
-        if(!$database->query('ALTER TABLE `'.$sTable.'` Engine = \'MyISAM\' ')) {
-            $msg = $database->get_error();
-        }
-    }
+// Must include code to stop this file being accessed directly
+if(!defined('WB_PATH')) {
+    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
 } else {
-    $msg = $database->get_error();
-}
+    $msg = '';
+    $sTable = TABLE_PREFIX.'mod_captcha_control';
+    if(($sOldType = $database->getTableEngine($sTable))) {
+        if(('myisam' != strtolower($sOldType))) {
+            if(!$database->query('ALTER TABLE `'.$sTable.'` Engine = \'MyISAM\' ')) {
+                $msg = $database->get_error();
+            }
+        }
+    } else {
+        $msg = $database->get_error();
+    }
 // ------------------------------------
+}

@@ -37,24 +37,27 @@
  * @param   string $sContent  content to apply filters
  * @return  string
  */
-function OutputFilterApi($mFilters, $sContent)
-{
-    if (!is_array($mFilters)) {
-        $mFilters = preg_split('/\s*?[,;| +]\s*?/', $mFilters, -1, PREG_SPLIT_NO_EMPTY);
-    }
-    foreach ($mFilters as $sFilterName) {
-        if (!preg_match('/^[a-z][a-z0-9\-]*$/si', $sFilterName)) { continue; }
-        $sFilterFile = __DIR__.'/filters/'.'filter'.$sFilterName.'.php';
-        $sFilterFunc = 'doFilter'.$sFilterName;
-        if (is_readable($sFilterFile)) {
-            if (!function_exists($sFilterFunc)) {
-                require($sFilterFile);
-            }
-            $sContent = $sFilterFunc($sContent);
+    function OutputFilterApi($mFilters, $sContent)
+    {
+        if (!is_array($mFilters)) {
+            $mFilters = preg_split('/\s*?[,;| +]\s*?/', $mFilters, -1, PREG_SPLIT_NO_EMPTY);
         }
+        foreach ($mFilters as $sFilter) {
+            $aTmp = preg_split('/\?/', $sFilter, 2, PREG_SPLIT_NO_EMPTY);
+            $sFilterName = $aTmp[0];
+            $sOptions = (isset($aTmp[1])) ? $aTmp[1] : '';
+            if (!preg_match('/^[A-Z][A-Za-z0-9]+$/s', $sFilterName)) { continue; }
+            $sFilterFile = __DIR__.'/filters/'.'filter'.$sFilterName.'.php';
+            $sFilterFunc = 'doFilter'.$sFilterName;
+            if (is_readable($sFilterFile)) {
+                if (!function_exists($sFilterFunc)) {
+                    require($sFilterFile);
+                }
+                $sContent = $sFilterFunc($sContent, $sOptions);
+            }
+        }
+        return $sContent;
     }
-    return $sContent;
-}
 /* ************************************************************************** */
 /**
  * function to read the current filter settings
@@ -63,14 +66,11 @@ function OutputFilterApi($mFilters, $sContent)
  * @param void
  * @return array contains all settings
  */
-    function getOutputFilterSettings() {
+    function getOutputFilterSettings()
+    {
         global $database;
     // set default values
-        $settings = array(
-            'sys_rel'         => false,
-            'opf'             => false,
-            'email_filter'    => false,
-            'mailto_filter'   => false,
+        $aSettings = array(
             'at_replacement'  => '(at)',
             'dot_replacement' => '(dot)'
         );
@@ -78,13 +78,14 @@ function OutputFilterApi($mFilters, $sContent)
         $sql = 'SELECT * FROM `'.TABLE_PREFIX.'mod_output_filter`';
         if (($oRes = $database->query($sql))) {
             while (($aRec = $oRes->fetchRow(MYSQLI_ASSOC))) {
-                $settings[$aRec['name']] = $aRec['value'];
+                $aSettings[$aRec['name']] = $aRec['value'];
             }
         }
-        $settings['OutputFilterMode'] = 0;
-        $settings['OutputFilterMode'] |= ($settings['email_filter'] * pow(2, 0));  // n | 2^0
-        $settings['OutputFilterMode'] |= ($settings['mailto_filter'] * pow(2, 1)); // n | 2^1
+        $aSettings['OutputFilterMode'] = 0;
+        $aSettings['OutputFilterMode'] |= ($aSettings['email_filter'] * pow(2, 0));  // n | 2^0
+        $aSettings['OutputFilterMode'] |= ($aSettings['mailto_filter'] * pow(2, 1)); // n | 2^1
     // return array with filter settings
-        return $settings;
+        return $aSettings;
     }
 /* ************************************************************************** */
+

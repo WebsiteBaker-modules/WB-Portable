@@ -2,18 +2,18 @@
 
 <form name="groups" action="groups.php" method="post">
  {FTAN}
-  <table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
+<table style="margin-bottom:10px; width: 100%; border-collapse: collapse; white-space-collapsing: collapse; ">
     <tr >
-        <td align="left"><h2>{HEADING_MODIFY_DELETE_GROUP}</h2></td>
-        <td align="right">
+        <td align="left"><h2 class="page_titel">{HEADING_MODIFY_DELETE_GROUP}</h2></td>
+        <td class="right" >
         <!-- BEGIN manage_users_block -->
-        <a href="{ADMIN_URL}/users/index.php">{TEXT_MANAGE_USERS}</a>
+        <a class="button" href="{ADMIN_URL}/users/index.php">{TEXT_MANAGE_USERS}</a>
         <!-- END manage_users_block -->
         </td>
      </tr>
 </table>
 
-  <select name="group_id" style="width: 500px;">
+  <select name="group_id" style="width: 550px;">
     <!-- BEGIN list_block -->
     <option value="{VALUE}">
     {NAME}

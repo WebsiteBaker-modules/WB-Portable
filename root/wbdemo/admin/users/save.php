@@ -17,7 +17,7 @@
  */
 
 // Print admin header
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'users_modify', false);
@@ -49,21 +49,14 @@ if(!isset($aInputs['user_id']) OR !is_numeric($aInputs['user_id']) OR $aInputs['
 $groups_id = ( isset($aInputs['groups']) ? implode(",", $aInputs['groups']) : '');
 $active = intval( is_array($aInputs['active'])  ?($aInputs['active'][0]):$aInputs['active']);
 
-$username_fieldname = $admin->get_post_escaped('username_fieldname');
-$username = strtolower($admin->get_post_escaped($username_fieldname));
-
 $password = $admin->get_post('password');
 $password2 = $admin->get_post('password2');
-$display_name = $admin->get_post_escaped('display_name');
-$email = $admin->get_post_escaped('email');
-$home_folder = $admin->get_post_escaped('home_folder');
+$display_name = $admin->StripCodeFromText(($admin->get_post('display_name')));
+$email = ($admin->get_post('email'));
+$home_folder = $admin->get_post('home_folder');
 // Check values
 if($groups_id == "") {
     $admin->print_error($MESSAGE['USERS_NO_GROUP'], $js_back);
-}
-
-if(!preg_match('/^[a-z]{1}[a-z0-9_-]{2,}$/i', $username)) {
-    $admin->print_error( $MESSAGE['USERS_NAME_INVALID_CHARS'], $js_back);
 }
 
 if($password != "") {
@@ -80,10 +73,10 @@ if($email != "")
 {
     if($admin->validate_email($email) == false)
     {
-        $admin->print_error($MESSAGE['USERS']['INVALID_EMAIL'], $js_back);
+        $admin->print_error($MESSAGE['USERS_INVALID_EMAIL'], $js_back);
     }
 } else { // e-mail must be present
-    $admin->print_error($MESSAGE['SIGNUP']['NO_EMAIL'], $js_back);
+    $admin->print_error($MESSAGE['SIGNUP_NO_EMAIL'], $js_back);
 }
 
 // Check if the email already exists
@@ -94,32 +87,29 @@ $sql  = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` '
 $results = $database->query($sql);
 if($results->numRows() > 0)
 {
-    if(isset($MESSAGE['USERS']['EMAIL_TAKEN']))
+    if(isset($MESSAGE['USERS_EMAIL_TAKEN']))
     {
         $admin->print_error($MESSAGE['USERS_EMAIL_TAKEN'], $js_back);
     } else {
         $admin->print_error($MESSAGE['USERS_INVALID_EMAIL'], $js_back);
     }
 }
-
-// Prevent from renaming user to "admin"
-if($username != 'admin') {
-    $username_code = ", username = '$username'";
-} else {
-    $username_code = '';
-}
+    $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
+    $sql .= 'WHERE `user_id` <> '.$user_id.' AND `display_name` LIKE \''.$display_name.'\'';
+    if ($database->get_one($sql) > 0) {
+        $admin->print_error( $MESSAGE['MEDIA_BLANK_NAME'].' ('.$TEXT['DISPLAY_NAME'].')', $js_back);
+    } 
 
 // Update the database
 
 $sql  = 'UPDATE `'.TABLE_PREFIX.'users` SET '
-      . '`groups_id` = \''.$groups_id.'\', '
-      . '`active` = '.$active.', '
-      . ( ($username != 'admin') ? '`username` = \''.$username.'\', ':' ' )
-      . '`display_name` = \''.$display_name.'\', '
-      . '`home_folder` = \''.$home_folder.'\', '
-      . '`email` = \''.$email.'\''
-      . ( ($password == "") ? ' ': ', `password` = \''.$md5_password.'\' ' )
-      . 'WHERE `user_id` = '.$user_id;
+      . '`groups_id` = \''.$database->escapeString($groups_id).'\', '
+      . '`active` = '.$database->escapeString($active).', '
+      . '`display_name` = \''.$database->escapeString($display_name).'\', '
+      . '`home_folder` = \''.$database->escapeString($home_folder).'\', '
+      . '`email` = \''.$database->escapeString($email).'\''
+      . ( ($password == "") ? ' ': ', `password` = \''.$database->escapeString($md5_password).'\' ' )
+      . 'WHERE `user_id` = '.$database->escapeString($user_id);
 
 $database->query($sql);
 if($database->is_error()) {

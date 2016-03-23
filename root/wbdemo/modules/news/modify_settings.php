@@ -15,51 +15,40 @@
  *
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 // suppress to print the header, so no new FTAN will be set
-$admin_header = false;
+//$admin_header = false;
 // Tells script to update when this page was last updated
 $update_when_modified = false;
 // show the info banner
-//$print_info_banner = true;
+$print_info_banner = true;
 // Include WB admin wrapper script
 require(WB_PATH.'/modules/admin.php');
 
 if(!$admin->checkFTAN('GET')) {
-    $admin->print_header();
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
 }
-
-// After check print the header
-$admin->print_header();
 
 // include core functions of WB 2.7 to edit the optional module CSS files (frontend.css, backend.css)
 @include_once(WB_PATH .'/framework/module.functions.php');
 
 // check if module language file exists for the language set by the user (e.g. DE, EN)
-if(!file_exists(WB_PATH .'/modules/news/languages/'.LANGUAGE .'.php')) {
-   // no module language file exists for the language set by the user, include default module language file EN.php
-   require_once(WB_PATH .'/modules/news/languages/EN.php');
-} else {
-   // a module language file exists for the language defined by the user, load it
-   require_once(WB_PATH .'/modules/news/languages/'.LANGUAGE .'.php');
+$sAddonName = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
 }
 
 // Get header and footer
-$query_content = $database->query("SELECT * FROM ".TABLE_PREFIX."mod_news_settings WHERE section_id = '$section_id'");
-$fetch_content = $query_content->fetchRow();
+$sql  = 'SELECT * FROM '.TABLE_PREFIX.'mod_news_settings '
+      . 'WHERE section_id = '.$database->escapeString($section_id);
+$query_content = $database->query( $sql );
+$fetch_content = $query_content->fetchRow( MYSQLI_ASSOC );
 
 // Set raw html <'s and >'s to be replace by friendly html code
 $raw = array('<', '>');
 $friendly = array('&lt;', '&gt;');
-
-// check if backend.css file needs to be included into the <body></body> of modify.php
-if(!method_exists($admin, 'register_backend_modfiles') && file_exists(WB_PATH ."/modules/form/backend.css")) {
-   echo '<style type="text/css">';
-   include(WB_PATH .'/modules/form/backend.css');
-   echo "\n</style>\n";
-}
 
 ?>
 <h2><?php echo $MOD_NEWS['SETTINGS']; ?></h2>

@@ -2,7 +2,6 @@
 <h2>{HEADING_MY_SETTINGS}</h2>
 <div class="content_box">
     <form name="{FORM_NAME}" id="{FORM_NAME}" action="{ACTION_URL}" method="post">
-        {FTAN}
             <div class="subcolumns">
                 <div class="c25l">
                     <label>{TEXT_USERNAME}:</label><br />
@@ -103,11 +102,12 @@
             </div>
             <div class="subcolumns save_section">
                 <div class="c60l">
-                    <input type="submit" id="submit" name="submit" value="{TEXT_SAVE}" />
-                    <input type="reset" id="reset" name="reset" value="{TEXT_RESET}" />
+                    <input type="submit" id="submitBtn" name="submit" value="{TEXT_SAVE}" />
+                    <input type="reset" id="resetBtn" name="reset" value="{TEXT_RESET}" />
                 </div>
                 <div class="c25l">&nbsp;</div>
             </div>
+        {FTAN}
     </form>
 </div>
 

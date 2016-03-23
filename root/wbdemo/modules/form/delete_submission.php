@@ -4,18 +4,18 @@
  * @category        module
  * @package         Form
  * @author          WebsiteBaker Project
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: delete_submission.php 1573 2012-01-16 02:01:52Z Luisehahne $
- * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/form/delete_submission.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/form/delete_submission.php $
  * @lastmodified    $Date: 2012-01-16 03:01:52 +0100 (Mo, 16. Jan 2012) $
  * @description     
  */
 
-require('../../config.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 // Include WB admin wrapper script
 $update_when_modified = true; // Tells script to update when this page was last updated
@@ -29,7 +29,9 @@ if (!$submission_id) {
 }
 
 // Delete row
-$database->query("DELETE FROM ".TABLE_PREFIX."mod_form_submissions WHERE submission_id = '$submission_id'");
+    $sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_form_submissions` '
+          . 'WHERE `submission_id` = '.$database->escapeString($submission_id);
+    $database->query($sql);
     $admin->clearIDKEY();
 
 // Check if there is a db error, otherwise say successful

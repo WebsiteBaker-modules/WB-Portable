@@ -4,15 +4,22 @@
     <tr>
         <td align="left">{CHANGE_TEMPLATE_NOTICE}</td>
         <td align="right">
+<!-- BEGIN addon_module_block -->
             <span ><a class="button" href="{URL_MODULES}">{MENU_MODULES}</a></span>
             -
+<!-- END addon_module_block -->
+<!-- BEGIN addon_language_block -->
             <span ><a class="button" href="{URL_LANGUAGES}">{MENU_LANGUAGES}</a></span>
             -
+<!-- END addon_language_block -->
+<!-- BEGIN addon_template_block -->
             <span class="button" >{URL_ADVANCED}</span>
+<!-- END addon_template_block -->
         </td>
      </tr>
 </table>
 
+<!-- BEGIN template_install_block -->
 <form name="install" enctype="multipart/form-data" action="install.php" method="post" class="{DISPLAY_INSTALL}">
 {FTAN}
 
@@ -33,9 +40,10 @@
 </table>
 
 <br />
-
 </form>
+<!-- END template_install_block -->
 
+<!-- BEGIN template_uninstall_block -->
 <form name="uninstall" action="uninstall.php" method="post" class="{DISPLAY_UNINSTALL}">
 {FTAN}
 
@@ -46,9 +54,9 @@
     <td>
         <select name="file" style="width: 97%;">
         <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-        <!-- BEGIN template_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-        <!-- END template_list_block -->
+        <!-- BEGIN template_uninstall_select_block -->
+            <option value="{UNINSTALL_VALUE}">{UNINSTALL_NAME}</option>
+        <!-- END template_uninstall_select_block -->
         </select>
     </td>
     <td width="110">
@@ -56,11 +64,11 @@
     </td>
 </tr>
 </table>
-
 <br />
-
 </form>
+<!-- END template_uninstall_block -->
 
+<!-- BEGIN template_detail_block -->
 <form name="details" action="details.php" method="post" class="{DISPLAY_LIST}">
 {FTAN}
 
@@ -71,9 +79,9 @@
     <td>
         <select name="file" style="width: 97%;">
         <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-        <!-- BEGIN template_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-        <!-- END template_list_block -->
+        <!-- BEGIN template_detail_select_block -->
+            <option value="{DETAIL_VALUE}">{DETAIL_NAME}</option>
+        <!-- END template_detail_select_block -->
         </select>
     </td>
     <td width="110">
@@ -81,8 +89,8 @@
     </td>
 </tr>
 </table>
-
 <br />
 </form>
+<!-- END template_detail_block -->
 
 <!-- END main_block -->

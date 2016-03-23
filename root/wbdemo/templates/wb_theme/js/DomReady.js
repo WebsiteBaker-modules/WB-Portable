@@ -143,4 +143,5 @@ addEvent(window, "load", function() {
         }, ", Hello Text 3");
     }, 1);
 });
+})();
  */

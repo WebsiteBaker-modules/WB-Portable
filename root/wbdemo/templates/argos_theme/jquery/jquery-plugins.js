@@ -22,12 +22,12 @@ function redirect_to_page (url, timer) {
 
 domReady(function()
 {
-        var matches = document.querySelectorAll(".jcalendar");
-        if( document.querySelectorAll(".jcalendar") ) {
+//        var matches = document.querySelectorAll(".jcalendar");
+        if( document.querySelectorAll(".jcalendar").length > 0 ) {
             LoadOnFly('', WB_URL+"/include/jscalendar/calendar-system.css");
           }
 
-        if( document.querySelectorAll(".jsadmin") ) {
+        if( document.querySelectorAll(".jsadmin").length > 0 ) {
             LoadOnFly('', WB_URL+"/modules/jsadmin/backend.css");
         }
 /**

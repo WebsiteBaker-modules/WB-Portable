@@ -17,10 +17,10 @@
  */
 
 // Print admin header
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Include the WB functions file
-require_once(WB_PATH.'/framework/functions.php');
+if( !defined('createFolderProtectFile') ){ require(WB_PATH.'/framework/functions.php');  }
 
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Media', 'media_create', false);
@@ -32,7 +32,7 @@ $name = (isset(${$requestMethod}['name'])) ? ${$requestMethod}['name'] : '';
 // Check to see if name or target contains ../
 if(strstr($name, '..')) {
     $admin->print_header();
-    $admin->print_error($MESSAGE['MEDIA']['NAME_DOT_DOT_SLASH']);
+    $admin->print_error($MESSAGE['MEDIA_NAME_DOT_DOT_SLASH']);
 }
 
 // Remove bad characters
@@ -51,7 +51,7 @@ if (!$admin->checkFTAN())
 $admin->print_header();
 
 if (!check_media_path($target, false)) {
-    $admin->print_error($MESSAGE['MEDIA']['TARGET_DOT_DOT_SLASH']);
+    $admin->print_error($MESSAGE['MEDIA_TARGET_DOT_DOT_SLASH']);
 }
 
 // Create relative path of the new dir name
@@ -59,18 +59,19 @@ $directory = WB_PATH.$target.'/'.$name;
 
 // Check to see if the folder already exists
 if(file_exists($directory)) {
-    $admin->print_error($MESSAGE['MEDIA']['DIR_EXISTS']);
+    $admin->print_error($MESSAGE['MEDIA_DIR_EXISTS']);
 }
 
 //if ( sizeof(createFolderProtectFile( $directory )) )
 if ( !make_dir( $directory ) )
 {
-    $admin->print_error($MESSAGE['MEDIA']['DIR_NOT_MADE']);
+    $admin->print_error($MESSAGE['MEDIA_DIR_NOT_MADE']);
 } else {
+    createFolderProtectFile($directory);
     $usedFiles = array();
     // feature freeze
     // require_once(ADMIN_PATH.'/media/dse.php');
-    $admin->print_success($MESSAGE['MEDIA']['DIR_MADE']);
+    $admin->print_success($MESSAGE['MEDIA_DIR_MADE']);
 }
 
 // Print admin

@@ -15,7 +15,7 @@
  *
  */
 
-require('../../config.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 // $admin_header = true;
 // Tells script to update when this page was last updated
@@ -32,9 +32,9 @@ if (!$post_id) {
 }
 
 // Get header and footer
-$sql = 'SELECT * FROM `'.TABLE_PREFIX.'mod_news_posts` '
-.'WHERE `post_id` = '.$post_id.' '
-.'ORDER BY `position` ASC';
+$sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_news_posts` '
+      . 'WHERE `post_id` = '.$post_id.' '
+      . 'ORDER BY `position` ASC';
 $query_content = $database->query($sql);
 $fetch_content = $query_content->fetchRow(MYSQLI_ASSOC);
 
@@ -138,7 +138,10 @@ require_once(WB_PATH."/include/jscalendar/wb-setup.php");
 <tr>
    <td>
    <?php
-   show_wysiwyg_editor("short","short",htmlspecialchars($fetch_content['content_short']),"100%","200px");
+      $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
+      $contentShort = $fetch_content['content_short'];
+      $contentShort = (str_replace('{SYSVAR:MEDIA_REL}', $sMediaUrl, $contentShort));
+      show_wysiwyg_editor("short","short",htmlspecialchars($contentShort),"100%","200px");
    ?>
    </td>
 </tr>
@@ -148,7 +151,9 @@ require_once(WB_PATH."/include/jscalendar/wb-setup.php");
 <tr>
    <td>
    <?php
-   show_wysiwyg_editor("long","long",htmlspecialchars($fetch_content['content_long']),"100%","650px");
+      $contentLong = $fetch_content['content_long'];
+      $contentLong = (str_replace('{SYSVAR:MEDIA_REL}', $sMediaUrl, $contentLong));
+      show_wysiwyg_editor("long","long",htmlspecialchars($contentLong),"100%","650px");
    ?>
    </td>
 </tr>

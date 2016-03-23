@@ -16,9 +16,10 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
-
+if(!defined('WB_PATH')) {
+    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
+} else {
 // Insert an extra row into the database
     $query = 'INSERT INTO `'.TABLE_PREFIX.'mod_code` SET '
            .'`section_id` = \''.$section_id.'\', '
@@ -26,4 +27,4 @@ if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.bas
            .'`content` = \'\' ';
 
     $database->query($query);
-
+}

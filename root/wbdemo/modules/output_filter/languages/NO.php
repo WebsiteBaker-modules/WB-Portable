@@ -18,10 +18,11 @@
 
 // Headings and text outputs
 $MOD_MAIL_FILTER['HEADING']    = 'Valg: Filtrering av ut data';
-$MOD_MAIL_FILTER['HOWTO']    = 'Du kan gj&oslash;re innstillinger for utdatafitreringen i valgene nedenfor.<p style="line-height:1.5em;"><strong>Tips: </strong>Mailto linker kan krypteres av en Javascript funksjon. For &aring; f&aring; benyttet denne funksjonen, m&aring; det legges til f&oslash;lgende PHP kode <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(\'js\');?&gt;</code> inn i &lt;head&gt; seksjonen i index.php p&aring; design malen din. Uten denne modifikasjonen, vil kun @ karakterer i mailto linker bli erstattet.</p>';
+$MOD_MAIL_FILTER['HOWTO']    = 'Du kan gj&oslash;re innstillinger for utdatafitreringen i valgene nedenfor.<strong>Tips: </strong>Mailto linker kan krypteres av en Javascript funksjon. For &aring; f&aring; benyttet denne funksjonen, m&aring; det legges til f&oslash;lgende PHP kode <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(\'js\');?&gt;</code> inn i &lt;head&gt; seksjonen i index.php p&aring; design malen din. Uten denne modifikasjonen, vil kun @ karakterer i mailto linker bli erstattet.';
 $MOD_MAIL_FILTER['WARNING']    = '';
 
 // Text and captions of form elements
+$MOD_MAIL_FILTER['SET_ACTIVE']            = 'Activate Filter';
 $MOD_MAIL_FILTER['BASIC_CONF']    = 'Enkel Epost konfigurasjon';
 $MOD_MAIL_FILTER['SYS_REL'] = 'Frontendoutput with relative Urls';
 $MOD_MAIL_FILTER['opf']        = 'Output filter Dashboard';

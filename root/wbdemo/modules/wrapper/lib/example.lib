@@ -1,0 +1,17 @@
+<?php
+// a placeholder file only
+/*
+in this folder you can place library files for your addon.
+some little rules:
+
+naming conventions:
+- use prefix "m_AddonName_FunctionName()"
+- use '.lib' as only one extension inside this folder
+coding hints:
+- take care for sideeffects. place functions or classes here only
+- do not declare variables outside of functions/classes
+- do not declare constants outside of classes
+- do not place executable code outside of functions/classes
+
+
+*/

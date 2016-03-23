@@ -138,7 +138,6 @@ console.info(cb);
         }
     }
 
-
     function selectSingleElement(IdSuffix, el ) {
         document.getElementById(el.id + IdSuffix).checked ='checked'; 
         document.getElementById('select_all').checked =false;
@@ -154,23 +153,6 @@ console.info(cb);
     }
 
 
-
-
-/**
- * 
-    function OnSubmitForm( elm ) {
-      if( elm.value ) {
-console.info( elm.value );
-//         document.droplets.action = delm.value;
-      }
-      return true;
-    }
-
-    function OnSubmit( elm ) {
-console.info( elm.value );
-//         document.droplets.action = document.pressed;
-    }
- */
 
 
 });

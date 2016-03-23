@@ -14,10 +14,9 @@
  * @lastmodified    $Date: 2011-12-10 16:06:15 +0100 (Sa, 10. Dez 2011) $
  *
  */
-
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 //overwrite php.ini on Apache servers for valid SESSION ID Separator
 if(function_exists('ini_set')) {
@@ -38,14 +37,18 @@ $ModulePath = WB_PATH.'/modules/'.basename(__DIR__).'/';
 $FTAN = $admin->getFTAN('');
 $sFtan = $FTAN['name'].'='.$FTAN['value'];
 // load module language file
-$lang = (dirname(__FILE__)) . '/languages/' . LANGUAGE . '.php';
-require_once(!file_exists($lang) ? (dirname(__FILE__)) . '/languages/EN.php' : $lang );
+$sAddonName = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+}
 
 if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.php');  }
 
-?>
-<table style="width: 100%;">
-<tr>
+?><table style="width: 100%;">
+<?php  ?>
+<tbody>
+<tr style="width: 100%;">
     <td>
         <form action="<?php echo WB_URL; ?>/modules/news/add_post.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
@@ -70,6 +73,7 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
             <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
         </form>
     </td>
+<?php if( $admin->ami_group_member('1') ) {  ?>
     <td >
         <form action="<?php echo WB_URL; ?>/modules/news/reorgPosition.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
@@ -78,7 +82,9 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
             <input type="submit" value="Reorg Position" style="width: 100%;" />
         </form>
     </td>
+<?php } ?>
 </tr>
+</tbody>
 </table>
 
 <br />
@@ -88,7 +94,7 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
 <?php
 
 // Loop through existing posts
-$query_posts = $database->query("SELECT * FROM `".TABLE_PREFIX."mod_news_posts` WHERE section_id = '$section_id' ORDER BY position");
+$query_posts = $database->query("SELECT * FROM `".TABLE_PREFIX."mod_news_posts` WHERE section_id = '$section_id' ORDER BY position DESC");
 if($query_posts->numRows() > 0) {
     $num_posts = $query_posts->numRows();
 ?><div class="jsadmin hide"></div>
@@ -164,15 +170,15 @@ if($query_posts->numRows() > 0) {
             </td>
             <td style="text-align: center;">
             <?php if($post['position'] != 1 ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="^" />
+                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="^" />
                 </a>
             <?php } ?>
             </td>
             <td style="text-align: center;">
             <?php if($post['position'] != $num_posts ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="v" />
+                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="v" />
                 </a>
             <?php } ?>
             </td>
@@ -181,7 +187,7 @@ if($query_posts->numRows() > 0) {
                     <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                 </a>
             </td>
-            <td style="text-align: right;"><?php echo ($post['position']); ?></td>
+            <td style="text-align: right;"><?php echo (defined('DEBUG')&& DEBUG ? $post['position']:''); ?></td>
         </tr>
         <?php
     }
@@ -256,7 +262,7 @@ if($query_groups->numRows() > 0) {
                     <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                 </a>
             </td>
-            <td  style="text-align: right;"><?php echo ($group['position']); ?></td>
+            <td  style="text-align: right;"><?php echo (defined('DEBUG')&& DEBUG ?$group['position']:''); ?></td>
         </tr>
         <?php
     }

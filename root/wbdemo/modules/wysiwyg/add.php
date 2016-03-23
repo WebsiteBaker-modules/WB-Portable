@@ -16,13 +16,15 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
-// Insert an extra row into the database
-$sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_wysiwyg` '
-     . 'SET `page_id`='.$page_id.', '
-     .     '`section_id`='.$section_id.', '
-     .     '`content`=\'\', '
-     .     '`text`=\'\'';
-$database->query($sql);
-
+if(!defined('WB_PATH')) {
+    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
+} else {
+    // Insert an extra row into the database
+    $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_wysiwyg` '
+         . 'SET `page_id`='.$database->escapeString($page_id).', '
+         .     '`section_id`='.$database->escapeString($section_id).', '
+         .     '`content`=\'\', '
+         .     '`text`=\'\'';
+    $database->query($sql);
+}

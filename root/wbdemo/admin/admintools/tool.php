@@ -15,13 +15,14 @@
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
  */
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 require_once(WB_PATH.'/framework/functions.php');
 
     $toolDir = (isset($_GET['tool']) && (trim($_GET['tool']) != '') ? trim($_GET['tool']) : '');
     $doSave = (isset($_POST['save_settings']) || (isset($_POST['action']) && strtolower($_POST['action']) == 'save'));
 // test for valid tool name
+
     if(preg_match('/^[a-z][a-z_\-0-9]{2,}$/i', $toolDir)) {
     // Check if tool is installed
         $sql = 'SELECT `name` FROM `'.TABLE_PREFIX.'addons` '.

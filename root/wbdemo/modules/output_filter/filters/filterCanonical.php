@@ -8,7 +8,8 @@
  */
     function doFilterCanonical($sContent) {
         $aFilterSettings = getOutputFilterSettings();
-        if ($aFilterSettings['sys_rel']) {
+        $key = preg_replace('=^.*?filter([^\.\/\\\\]+)(\.[^\.]+)?$=is', '\1', __FILE__);
+        if ($aFilterSettings[$key]) {
             $sAppUrl  = rtrim(str_replace('\\', '/', WB_URL), '/');
 /**
  * 
@@ -22,8 +23,6 @@
                 '/(<link\s*?.*?(?:rel\s*?=\s*?"canonical"\s*?)?.*?href\s*?=\s*?")'.
                 '([^\"]*?)(\"\s*?.*?(?:rel\s*?=\s*?"canonical"\s*?)?[^>]*?>)/siU',
                 function ($aMatches) use ($sAppUrl) {
-print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
-print_r( $aMatches ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
                     $aMatches[2] = str_replace('\\', '/', $aMatches[2]);
                     if (mb_substr($aMatches[2], 0, 1) == '/') {
                         return '$1'.rtrim($sAppUrl, '/').'$2$3';

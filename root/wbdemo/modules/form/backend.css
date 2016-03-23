@@ -1,2 +1,3 @@
+@import url("css/SabrosusStyle.css") screen;
 /* switch path to default or ownstyle */
-@import url("templates/default/css/backend.css"); 
+@import url("themes/default/css/backend.css"); 

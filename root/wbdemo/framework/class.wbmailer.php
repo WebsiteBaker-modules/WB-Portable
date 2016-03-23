@@ -1,27 +1,21 @@
 <?php
-
-// $Id: class.wbmailer.php 1499 2011-08-12 11:21:25Z DarkViper $
-
-/*
-
- Website Baker Project <http://www.websitebaker.org/>
- Copyright (C) 2004-2009, Ryan Djurovich
-
- Website Baker is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- Website Baker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with Website Baker; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-*/
+/**
+ *
+ * @category        framework
+ * @package         frontend
+ * @subpackage      wbmailer
+ * @author          Ryan Djurovich, WebsiteBaker Project
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
+ * @license         http://www.gnu.org/licenses/gpl.html
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
+ * @version         $Id: class.wbmailer.php 1499 2012-02-29 01:50:57 +0100 DarkViper $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/framework/class.wbmailer.php $
+ * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
+ * @examples        http://phpmailer.worxware.com/index.php?pg=examples
+ *
+ */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
 if(!defined('WB_PATH')) {
@@ -30,46 +24,78 @@ if(!defined('WB_PATH')) {
 }
 /* -------------------------------------------------------- */
 // Include PHPMailer class
-require_once(WB_PATH."/include/phpmailer/class.phpmailer.php");
+if( !class_exists( 'PHPMailer' ) ){ require(WB_PATH.'/include/phpmailer/class.phpmailer.php'); }
 
 class wbmailer extends PHPMailer 
 {
     // new websitebaker mailer class (subset of PHPMailer class)
     // setting default values 
 
-    function wbmailer() {
-        global $database;
+    function __construct() {
+
+        $database = $GLOBALS['database'];
         // set mailer defaults (PHP mail function)
         $db_wbmailer_routine = "phpmail";
         $db_wbmailer_smtp_host = "";
-        $db_wbmailer_default_sendername = "WB Mailer";
-        $db_server_email = SERVER_EMAIL;
+        $db_wbmailer_smtp_port = 25;
+        $db_wbmailer_smtp_secure = '';
+        $db_wbmailer_default_sendername = 'WB Mailer';
+        $db_server_email = '';
+        $ini_sendmail_path = ini_get('sendmail_path');
 
         // get mailer settings from database
-        // $database = new database();
-        $query = "SELECT * FROM " .TABLE_PREFIX. "settings";
-        $results = $database->query($query);
-        while($setting = $results->fetchRow()) {
-            if ($setting['name'] == "wbmailer_routine") { $db_wbmailer_routine = $setting['value']; }
-            if ($setting['name'] == "wbmailer_smtp_host") { $db_wbmailer_smtp_host = $setting['value']; }
-            if ($setting['name'] == "wbmailer_smtp_auth") { $db_wbmailer_smtp_auth = (bool)$setting['value']; }
-            if ($setting['name'] == "wbmailer_smtp_username") { $db_wbmailer_smtp_username = $setting['value']; }
-            if ($setting['name'] == "wbmailer_smtp_password") { $db_wbmailer_smtp_password = $setting['value']; }
-            if ($setting['name'] == "wbmailer_default_sendername") { $db_wbmailer_default_sendername = $setting['value']; }
-            if ($setting['name'] == "server_email") { $db_server_email = $setting['value']; }
+        $sql = 'SELECT * FROM `' .TABLE_PREFIX. 'settings` '
+              . 'WHERE `name` LIKE (\'wbmailer\_%\') '
+              . 'OR `name`=\'server_email\'';
+        $oRes = $database->query($sql);
+        while($aSettings = $oRes->fetchRow( MYSQLI_ASSOC )) {
+            switch ($aSettings['name']):
+                case 'wbmailer_routine':
+                case 'wbmailer_smtp_host':
+                case 'wbmailer_smtp_port':
+                case 'wbmailer_smtp_secure':
+                case 'wbmailer_smtp_username':
+                case 'wbmailer_smtp_password':
+                case 'wbmailer_default_sendername':
+                case 'server_email':
+                    ${'db_'.$aSettings['name']} = $aSettings['value'];
+                    break;
+                case 'wbmailer_smtp_auth':
+                    ${'db_'.$aSettings['name']} =  ( ($aSettings['value']=='true') || (intval($aSettings['value'])==1) ?true:false );
+                    break;
+                default:
+                break;
+            endswitch;
         }
 
-        // set method to send out emails
-        if($db_wbmailer_routine == "smtp" AND strlen($db_wbmailer_smtp_host) > 5) {
+/**
+     * `echo` Output plain-text as-is, appropriate for CLI
+     * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser output
+     * `error_log` Output to error log as configured in php.ini
+     *
+     * Alternatively, you can provide a callable expecting two params: a message string and the debug level:
+     * <code>
+     * $this->Debugoutput = function($str, $level) {echo "debug level $level; message: $str";};
+     * </code>
+ */
+        $this->set('SMTPDebug', 2);                               // Enable verbose debug output
+        $this->set('Debugoutput', 'error_log');
+
+        // set method to send out emails  
+        if($db_wbmailer_routine == "smtp" && strlen($db_wbmailer_smtp_host) > 5 ) {
             // use SMTP for all outgoing mails send by Website Baker
-            $this->IsSMTP();                                            
-            $this->Host = $db_wbmailer_smtp_host;
+            $this->isSMTP();                                             // telling the class to use SMTP
+            $this->isSendmail();                                         // telling the class to use SendMail transport
+            $this->set('Host', $db_wbmailer_smtp_host);
+            $this->set('Port', intval($db_wbmailer_smtp_port));            // TCP port to connect to
+//            $this->set('SMTPKeepAlive', true);                             // SMTP connection will not close after each email sent
             // check if SMTP authentification is required
-            if ($db_wbmailer_smtp_auth == "true" && strlen($db_wbmailer_smtp_username) > 1 && strlen($db_wbmailer_smtp_password) > 1) {
+            if ($db_wbmailer_smtp_auth  && (mb_strlen($db_wbmailer_smtp_username) > 1) && (mb_strlen($db_wbmailer_smtp_password) > 1) ) {
                 // use SMTP authentification
-                $this->SMTPAuth = true;                                           // enable SMTP authentification
-                $this->Username = $db_wbmailer_smtp_username;      // set SMTP username
-                $this->Password = $db_wbmailer_smtp_password;      // set SMTP password
+                $this->set('SMTPAuth', true);                                                 // enable SMTP authentication
+                $this->set('SMTPSecure', $db_wbmailer_smtp_secure );                          // enable TLS encryption, `ssl` also accepted
+                $this->set('Username', $db_wbmailer_smtp_username);                           // set SMTP username
+                $this->set('Password', $db_wbmailer_smtp_password);                           // set SMTP password
             }
         } else {
             // use PHP mail() function for outgoing mails send by Website Baker
@@ -83,29 +109,30 @@ class wbmailer extends PHPMailer
 
         // set default charset
         if(defined('DEFAULT_CHARSET')) { 
-            $this->CharSet = DEFAULT_CHARSET; 
+            $this->set('CharSet', DEFAULT_CHARSET); 
         } else {
-            $this->CharSet='utf-8';
+            $this->set('CharSet', 'utf-8');
         }
 
         // set default sender name
         if($this->FromName == 'Root User') {
             if(isset($_SESSION['DISPLAY_NAME'])) {
-                $this->FromName = $_SESSION['DISPLAY_NAME'];            // FROM NAME: display name of user logged in
+                $this->set('FromName', $_SESSION['DISPLAY_NAME']);                  // FROM NAME: display name of user logged in
             } else {
-                $this->FromName = $db_wbmailer_default_sendername;            // FROM NAME: set default name
+                $this->set('FromName', $db_wbmailer_default_sendername);            // FROM NAME: set default name
             }
         }
 
         /* 
             some mail provider (lets say mail.com) reject mails send out by foreign mail 
             relays but using the providers domain in the from mail address (e.g. myname@mail.com)
+        $this->setFrom($db_server_email);                       // FROM MAIL: (server mail)
         */
-        $this->From = $db_server_email;                           // FROM MAIL: (server mail)
 
         // set default mail formats
-        $this->IsHTML(true);                                        
-        $this->WordWrap = 80;                                       
-        $this->Timeout = 30;
+        $this->IsHTML();                                        // Sets message type to HTML or plain.
+        $this->set('WordWrap', 80);                                       
+        $this->set('Timeout', 30);
     }
 }
+

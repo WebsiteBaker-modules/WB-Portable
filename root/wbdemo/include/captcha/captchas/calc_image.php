@@ -23,7 +23,7 @@
 
 */
 
-require_once("../../../config.php");
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname(dirname((__DIR__)))).'/config.php' ); }
 require_once(WB_PATH.'/include/captcha/captcha.php');
 
 if(!isset($_SESSION['captcha_time']))
@@ -64,7 +64,7 @@ $image = imagecreate(120, 30);
 
 $white = imagecolorallocate($image, 0xFF, 0xFF, 0xFF);
 $gray = imagecolorallocate($image, 0xC0, 0xC0, 0xC0);
-$darkgray = imagecolorallocate($image, 0x30, 0x30, 0x30);
+$textcolor = imagecolorallocate($image, 0x30, 0x30, 0x30);
 
 for($i = 0; $i < 30; $i++) {
     $x1 = mt_rand(0,120);
@@ -74,20 +74,25 @@ for($i = 0; $i < 30; $i++) {
     imageline($image, $x1, $y1, $x2, $y2 , $gray);  
 }
 
-$x = 10;
+$Fontfile = ( dirname(__DIR__).'/fonts/LLBd_cond.ttf');
+$angle = 0;
+$ttfsize = 25; // fontsize
+$x =  15;
 $l = strlen($cap);
 for($i = 0; $i < $l; $i++) {
-    $fnt = mt_rand(3,5);
-    $x = $x + mt_rand(12 , 20);
-    $y = mt_rand(7 , 12); 
-    imagestring($image, $fnt, $x, $y, substr($cap, $i, 1), $darkgray); 
+      $x = $x + mt_rand(10 , 25);
+      $y = mt_rand(18, 23);
+      $angle = mt_rand(-2, 2);
+      $res = imagettftext ($image, $ttfsize, $angle, $x, $y, $textcolor, $Fontfile, substr($cap, $i, 1) );
+//    $fnt = mt_rand(5,7);
+//    imagestring($image, $fnt, $x, $y, substr($cap, $i, 1), $textcolor); 
 }
 
 imagealphablending($reload, TRUE);
 imagesavealpha($reload, TRUE);
 
 // overlay
-imagecopy($reload, $image, 0,0,0,0, 120,30);
+imagecopy($reload, $image, 0,0,0,0, 120,40);
 imagedestroy($image);
 $image = $reload;
 
@@ -95,4 +100,3 @@ captcha_header();
 imagepng($image);
 imagedestroy($image);
 
-?>

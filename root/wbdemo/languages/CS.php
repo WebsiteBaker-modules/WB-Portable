@@ -25,7 +25,7 @@ define('LANGUAGE_LOADED', true);
 }
 
 // Set the language information
-$language_code = 'CZ';
+$language_code = 'CS';
 $language_name = 'Česky';  // Czechoslovakia
 $language_version = '2.8';
 $language_platform = '2.8.x';

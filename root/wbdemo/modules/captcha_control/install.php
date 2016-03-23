@@ -15,12 +15,11 @@
  * @lastmodified    $Date: 2011-12-10 05:22:29 +0100 (Sa, 10. Dez 2011) $
  *
  */
-
-// prevent this file from being accessed directly
-/* -------------------------------------------------------- */
-if (!defined('WB_PATH')) { die('Cannot access this file directly'); }
-/* -------------------------------------------------------- */
-// create tables from sql dump file
-if (is_readable(dirname(__FILE__).'/install_struct.sql')) {
-    $database->SqlImport(dirname(__FILE__).'/install_struct.sql', TABLE_PREFIX, false);
+if(defined('WB_PATH'))
+{
+    // create tables from sql dump file
+    if (is_readable(__DIR__.'/install-struct.sql')) {
+        $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
+    }
+    $msg = 'captcha_control::'.$database->get_error();
 }

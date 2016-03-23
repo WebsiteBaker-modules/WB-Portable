@@ -18,7 +18,7 @@
  */
 
 // Print admin header
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Addons', 'languages');
 
@@ -30,25 +30,70 @@ $template->set_file('page', 'languages.htt');
 $template->set_block('page', 'main_block', 'main');
 
 // Insert values into language list
-$template->set_block('main_block', 'language_list_block', 'language_list');
-$result = $database->query("SELECT * FROM ".TABLE_PREFIX."addons WHERE type = 'language' order by directory");
-if($result->numRows() > 0) {
-    while($addon = $result->fetchRow()) {
-        $template->set_var('VALUE', $addon['directory']);
-        $template->set_var('NAME', $addon['name'].' ('.$addon['directory'].')');
-        $template->parse('language_list', 'language_list_block', true);
+$template->set_block('main_block', 'language_detail_block', 'language_detail');
+$template->set_block('language_detail_block', 'language_detail_select_block', 'language_detail_select');
+$sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+      . 'WHERE `type` =\'language\''
+      . 'ORDER BY `directory`';
+if($oAddons = $database->query($sql)) {
+    while($aAddon = $oAddons->fetchRow( MYSQLI_ASSOC )) {
+        if( !$admin->get_permission( $aAddon['directory'], 'language' )) { continue; }
+        $template->set_var('VALUE', $aAddon['directory']);
+        $template->set_var('NAME', $aAddon['name'].' ('.$aAddon['directory'].')');
+        $template->parse('language_detail_select', 'language_detail_select_block', true);
     }
 }
+$template->set_block('main_block', 'language_uninstall_block', 'language_uninstall');
+    $template->set_block('language_uninstall_block', 'language_uninstall_select_block', 'language_uninstall_select');
+    $oAddons->rewind();
+    while($aAddon = $oAddons->fetchRow( MYSQLI_ASSOC )) {
+        if( !$admin->get_permission( $aAddon['directory'], 'language' )) { continue; }
+        $template->set_var('VALUE', $aAddon['directory']);
+        $template->set_var('NAME', $aAddon['name'].' ('.$aAddon['directory'].')');
+        $template->parse('language_uninstall_select', 'language_uninstall_select_block', true);
+    }
+
 
 // Insert permissions values
+$template->set_block('main_block', 'language_install_block', 'language_install');
 if($admin->get_permission('languages_install') != true) {
-    $template->set_var('DISPLAY_INSTALL', 'hide');
+    $template->set_var('DISPLAY_INSTALL', '');
+    $template->set_block('language_install', '');
+} else {
+    $template->parse('language_install', 'language_install_block', true);
 }
 if($admin->get_permission('languages_uninstall') != true) {
-    $template->set_var('DISPLAY_UNINSTALL', 'hide');
+    $template->set_var('DISPLAY_UNINSTALL', '');
+    $template->set_block('language_uninstall', '');
+} else {
+    $template->parse('language_uninstall', 'language_uninstall_block', true);
 }
 if($admin->get_permission('languages_view') != true) {
-    $template->set_var('DISPLAY_LIST', 'hide');
+    $template->set_var('DISPLAY_LIST', '');
+    $template->set_block('language_detail', '');
+} else {
+    $template->parse('language_detail', 'language_detail_block', true);
+}
+
+$template->set_block('main_block', 'addon_template_block', 'addon_template');
+if($admin->get_permission('templates_view') != true) {
+    $template->set_block ('addon_template', '');
+} else {
+    $template->parse('addon_template', 'addon_template_block', true);
+}
+
+$template->set_block('main_block', 'addon_module_block', 'addon_module');
+if($admin->get_permission('modules_view') != true) {
+    $template->set_block ('addon_module', '');
+} else {
+    $template->parse('addon_module', 'addon_module_block', true);
+}
+
+$template->set_block('main_block', 'addon_language_block', 'addon_language');
+if($admin->get_permission('admintools') != true) {
+    $template->set_block ('addon_language', '');
+} else {
+    $template->parse('addon_language', 'addon_language_block', true);
 }
 
 // Insert language headings

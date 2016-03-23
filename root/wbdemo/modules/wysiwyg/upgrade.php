@@ -14,9 +14,10 @@
  * @lastmodified    $Date: 2012-01-16 18:29:11 +0100 (Mo, 16. Jan 2012) $
  *
  */
+
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 $msg = '';
 $sTable = TABLE_PREFIX.'mod_wysiwyg';
@@ -29,10 +30,38 @@ if(($sOldType = $database->getTableEngine($sTable))) {
 } else {
     $msg .= $database->get_error().'<br />';
 }
-// change internal absolute links into relative links
-$sTable = TABLE_PREFIX.'mod_wysiwyg';
-$sql  = 'UPDATE `'.$sTable.'` ';
-$sql .= 'SET `content` = REPLACE(`content`, \'"'.WB_URL.MEDIA_DIRECTORY.'\', \'"{SYSVAR:MEDIA_REL}\')';
+// sanitize URLs inside mod_wysiwyg.content ----------------------------
+    $msg = '';
+    $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
+    $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
+    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
+    $sql = 'SELECT `content`, `section_id` FROM `'.TABLE_PREFIX.'mod_wysiwyg`';
+    if (($oInstances = $database->query($sql))) {
+        while (($aInstance = $oInstances->fetchRow(MYSQLI_ASSOC))) {
+            // add $sDocumentRootUrl to relative URLs
+            $aPatterns = array(
+                '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
+                '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
+            );
+            $aReplacements = array(
+                '\1'.$sDocumentRootUrl.'/\3',
+                '$1{SYSVAR:MEDIA_REL}$3'
+            );
+            $aInstance['content'] = preg_replace($aPatterns, $aReplacements, $aInstance['content']);
+            $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wysiwyg` '
+                 . 'SET `content`=\''.$database->escapeString($aInstance['content']).'\' '
+                 . 'WHERE `section_id`='.(int)$aInstance['section_id'];
+            if (!$database->query($sql)) {
+                $msg = $database->get_error();
+                break;
+            }
+        }
+    } else { $msg = $database->get_error(); }
+
+// ---------------------------------------------------------------------
+
+$sql  = 'UPDATE `'.$sTable.'` SET '
+      . '`content` = REPLACE(`content`, \'"'.WB_URL.MEDIA_DIRECTORY.'\', \'"{SYSVAR:MEDIA_REL}\')';
 if (!$database->query($sql)) {
     $msg .= $database->get_error().'<br />';
 }

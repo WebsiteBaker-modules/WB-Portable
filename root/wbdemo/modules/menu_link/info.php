@@ -2,31 +2,31 @@
 /**
  *
  * @category        modules
- * @package         Menu Link
+ * @package         menu_link
  * @author          WebsiteBaker Project
- * @copyright       2004-2009, Ryan Djurovich
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       Ryan Djurovich
+ * @copyright       WebsiteBaker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
- * @version         $Id: info.php 1377 2011-01-12 18:10:27Z FrankH $
- * @filesource        $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/wysiwyg/modify.php $
- * @lastmodified    $Date: 2011-01-11 20:29:52 +0100 (Di, 11 Jan 2011) $
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
+ * @version         $Id:  $
+ * @filesource      $HeadURL:  $
+ * @lastmodified    $Date:  $
  *
  */
+
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 
 $module_directory = 'menu_link';
 $module_name = 'Menu Link';
 $module_function = 'page';
-$module_version = '2.8.3';
+$module_version = '2.8.4';
 $module_platform = '2.8.x';
 $module_author = 'Ryan Djurovich, thorn';
 $module_license = 'GNU General Public License';
 $module_description = 'This module allows you to insert a link into the menu.';
 
-?>

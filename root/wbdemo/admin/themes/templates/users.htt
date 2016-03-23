@@ -4,12 +4,12 @@
 <input type="hidden" name="userstatus" value="{USER_STATUS}" />
 {FTAN}
 
-<table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
+<table style="margin-bottom:10px; width: 100%; border-collapse: collapse; white-space-collapsing: collapse; ">
     <tr >
-        <td align="left"><h2>{HEADING_MODIFY_DELETE_USER}</h2></td>
-        <td align="right">
+        <td align="left"><h2 class="page_titel">{HEADING_MODIFY_DELETE_USER}</h2></td>
+        <td class="right">
         <!-- BEGIN manage_groups_block -->
-        <a href="{ADMIN_URL}/groups/index.php">{TEXT_MANAGE_GROUPS}</a>
+        <a class="button" href="{ADMIN_URL}/groups/index.php">{TEXT_MANAGE_GROUPS}</a>
         <!-- END manage_groups_block -->
         </td>
      </tr>

@@ -16,22 +16,10 @@
  *
  */
 
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
-
-$table = TABLE_PREFIX ."mod_menu_link";
-$database->query("DROP TABLE IF EXISTS `$table`");
-$sql = '
-    CREATE TABLE IF NOT EXISTS `'.TABLE_PREFIX.'mod_menu_link` (
-        `section_id` INT(11) NOT NULL DEFAULT \'0\',
-        `page_id` INT(11) NOT NULL DEFAULT \'0\',
-        `target_page_id` INT(11) NOT NULL DEFAULT \'0\',
-        `redirect_type` INT NOT NULL DEFAULT \'301\',
-        `anchor` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci  NOT NULL DEFAULT \'0\' ,
-        `extern` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci  NOT NULL DEFAULT \'\' ,
-        PRIMARY KEY (`section_id`)
-    ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-';
-$database->query($sql);
+if(defined('WB_PATH'))
+{
+    // create tables from sql dump file
+    if (is_readable(__DIR__.'/install-struct.sql')) {
+        $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
+    }
+}

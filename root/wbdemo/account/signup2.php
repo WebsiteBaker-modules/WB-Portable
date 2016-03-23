@@ -22,7 +22,7 @@ print_r( $_POST ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
 if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 // Create new frontend object
 if (!isset($wb) || !($wb instanceof frontend)) {
-    require_once(WB_PATH.'/framework/class.wb.php');
+    if( !class_exists('wb', false) ){ require(WB_PATH."/framework/class.wb.php"); }
     $wb = new frontend();
 }
 
@@ -37,8 +37,8 @@ if (!$wb->checkFTAN())
 // Get details entered
 $groups_id = FRONTEND_SIGNUP;
 $active = 1;
-$username = strtolower(strip_tags($wb->get_post_escaped('username')));
-$display_name = strip_tags($wb->get_post_escaped('display_name'));
+$username = strtolower(strip_tags($wb->get_post('username')));
+$display_name = strip_tags($wb->get_post('display_name'));
 $email = $wb->get_post('email');
 /*
 // Check values
@@ -94,7 +94,7 @@ if($results->numRows() > 0) {
     $error[] = $MESSAGE['USERS_USERNAME_TAKEN']."\n";
 }
 // Check if the email already exists
-$sql = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` WHERE `email` = \''.$wb->add_slashes($email).'\'';
+$sql = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` WHERE `email` = \''.$database->escapeString($email).'\'';
 $results = $database->query($sql);
 if($results->numRows() > 0) {
     if(isset($MESSAGE['USERS_EMAIL_TAKEN'])) {
@@ -106,47 +106,47 @@ if($results->numRows() > 0) {
 
 if(sizeof($error)==0){
 
-// MD5 supplied password
-$md5_password = md5($new_pass);
+    // MD5 supplied password
+    $md5_password = md5($new_pass);
 
-// Inser the user into the database
-$sql = '';
+    // Inser the user into the database
+    $sql = '';
 
-$sql  = 'INSERT INTO `'.TABLE_PREFIX.'users` SET '
-      . '`group_id` = '.$groups_id.', '
-      . '`groups_id` = \''.$groups_id.'\', '
-      . '`active` = '.$active.', '
-      . '`username` = \''.$username.'\', '
-      . '`password` = \''.$md5_password.'\', '
-      . '`display_name` = \''.$display_name.'\', '
-      . '`home_folder` = \'\', '
-      . '`email` = \''.$email.'\', '
-      . '`timezone` = \''.DEFAULT_TIMEZONE.'\', '
-      . '`language` = \''.DEFAULT_LANGUAGE.'\''
-      .'';
+    $sql  = 'INSERT INTO `'.TABLE_PREFIX.'users` SET '
+          . '`group_id` = '.$database->escapeString($groups_id).', '
+          . '`groups_id` = \''.$database->escapeString($groups_id).'\', '
+          . '`active` = '.$database->escapeString($active).', '
+          . '`username` = \''.$database->escapeString($username).'\', '
+          . '`password` = \''.$database->escapeString($md5_password).'\', '
+          . '`display_name` = \''.$database->escapeString($display_name).'\', '
+          . '`home_folder` = \'\', '
+          . '`email` = \''.$database->escapeString($email).'\', '
+          . '`timezone` = \''.$database->escapeString(DEFAULT_TIMEZONE).'\', '
+          . '`language` = \''.$database->escapeString(DEFAULT_LANGUAGE).'\''
+          .'';
 
-$database->query($sql);
+    $database->query($sql);
 
-if($database->is_error()) {
-    // Error updating database
-    $message = $database->get_error();
-} else {
-    // Setup email to send
-    $mail_to = $email;
-    $mail_subject = $MESSAGE['SIGNUP2_SUBJECT_LOGIN_INFO'];
-
-    // Replace placeholders from language variable with values
-    $search = array('{LOGIN_DISPLAY_NAME}', '{LOGIN_WEBSITE_TITLE}', '{LOGIN_NAME}', '{LOGIN_PASSWORD}');
-    $replace = array($display_name, WEBSITE_TITLE, $username, $new_pass); 
-    $mail_message = str_replace($search, $replace, $MESSAGE['SIGNUP2_BODY_LOGIN_INFO']);
-
-    // Try sending the email
-    if($wb->mail(SERVER_EMAIL,$mail_to,$mail_subject,$mail_message)) {
-        $display_form = false;
-        $success[] = $MESSAGE['FORGOT_PASS_PASSWORD_RESET'];
+    if($database->is_error()) {
+        // Error updating database
+        $message = $database->get_error();
     } else {
-        $database->query("DELETE FROM `".TABLE_PREFIX."users` WHERE `username` = '$username'");
-        $error[] = $MESSAGE['FORGOT_PASS_CANNOT_EMAIL']."\n";
+        // Setup email to send
+        $mail_to = $email;
+        $mail_subject = $MESSAGE['SIGNUP2_SUBJECT_LOGIN_INFO'];
+
+        // Replace placeholders from language variable with values
+        $search = array('{LOGIN_DISPLAY_NAME}', '{LOGIN_WEBSITE_TITLE}', '{LOGIN_NAME}', '{LOGIN_PASSWORD}');
+        $replace = array($display_name, WEBSITE_TITLE, $username, $new_pass); 
+        $mail_message = str_replace($search, $replace, $MESSAGE['SIGNUP2_BODY_LOGIN_INFO']);
+
+        // Try sending the email
+        if($wb->mail(SERVER_EMAIL,$mail_to,$mail_subject,$mail_message)) {
+            $display_form = false;
+            $success[] = $MESSAGE['FORGOT_PASS_PASSWORD_RESET'];
+        } else {
+            $database->query("DELETE FROM `".TABLE_PREFIX."users` WHERE `username` = '$username'");
+            $error[] = $MESSAGE['FORGOT_PASS_CANNOT_EMAIL']."\n";
+        }
     }
-}
-}
+    }

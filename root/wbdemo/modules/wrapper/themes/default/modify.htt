@@ -1,0 +1,46 @@
+<!-- BEGIN main_block -->
+
+<!-- available replacements
+    WB_URL
+    THEME_URL
+    THEME_PATH
+    SAVE_URL
+    TEXT_URL
+    CANCEL_URL
+    TEXT_HEIGHT
+    TEXT_SAVE
+    TEXT_CANCEL
+    HEIGHT
+    URL
+    FTAN
+-->
+
+<form action="{SAVE_URL}" method="post" class="wrapper" style="margin: auto 3%; width: 100%;">
+    <input type="hidden" name="page_id" value="{PAGE_ID}" />
+    <input type="hidden" name="section_id" value="{SECTION_ID}" />
+    <input type="hidden" name="cmd" value="save" />
+    {FTAN}
+    <table class="wrapper" style="border-collapse: collapse; width: 95%; white-space: nowrap; vertical-align: central;" >
+        <tr style="line-height: 2.9525em; ">
+            <td align="left" width="50">{TEXT_URL}:</td>
+            <td><input type="text" name="url" value="{URL}" style="width: 100%;" /></td>
+        </tr>
+        <tr>
+            <td align="left" width="50">{TEXT_HEIGHT}:</td>
+            <td><input type="text" name="height" value="{HEIGHT}" maxlength="4" style="width: 100%;" /></td>
+        </tr>
+    </table>
+    <table class="wrapper-submit" >
+        <tr>
+            <td align="left">
+                <input type="submit" value="{TEXT_SAVE}" style="width: 100px; margin-top: 5px;" />
+                <input name="pagetree" type="submit" value="{TEXT_SAVE} &amp; {TEXT_BACK}" style="min-width: 100px; margin-top: 5px;" />
+            </td>
+            <td align="right">
+                <input type="button" value="{TEXT_CANCEL}" onclick="window.location='{CANCEL_URL}';" style="width: 100px; margin-top: 5px;" />
+            </td>
+        </tr>
+    </table>
+</form>
+
+<!-- END main_block -->

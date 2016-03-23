@@ -18,16 +18,14 @@
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 
 // check if module language file exists for the language set by the user (e.g. DE, EN)
-if(!file_exists(WB_PATH .'/modules/menu_link/languages/'.LANGUAGE .'.php')) {
-    // no module language file exists for the language set by the user, include default module language file EN.php
-    require_once(WB_PATH .'/modules/menu_link/languages/EN.php');
-} else {
-    // a module language file exists for the language defined by the user, load it
-    require_once(WB_PATH .'/modules/menu_link/languages/'.LANGUAGE .'.php');
+$sAddonsPath = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonsPath.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonsPath.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonsPath.'/languages/'.LANGUAGE .'.php');
 }
 
 // get target page_id

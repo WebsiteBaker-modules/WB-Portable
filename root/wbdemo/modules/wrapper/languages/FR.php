@@ -31,4 +31,5 @@ $module_description = 'Ce module permet l&apos;int&eacute;gration de contenus ex
 // Ueberschriften und Textausgaben
 $MOD_WRAPPER['NOTICE'] = 'Votre navigateur ne supporte pas les cadres enlign&eacute;<br />Cliquez sur le lien ci-dessous pour vous rendre au site qui &eacute;tais sens&eacute; être affich&eacute; ici...<br />';
 
-?>
+// end of file
+

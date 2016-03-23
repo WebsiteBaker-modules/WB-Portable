@@ -2,15 +2,22 @@
 <table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
     <tr>
         <td align="right">
+<!-- BEGIN addon_template_block -->
             <span><a class="button" href="{URL_TEMPLATES}">{MENU_TEMPLATES}</a> </span>
             -
+<!-- END addon_template_block -->
+<!-- BEGIN addon_language_block -->
             <span ><a class="button" href="{URL_LANGUAGES}">{MENU_LANGUAGES}</a></span>
             -
+<!-- END addon_language_block -->
+<!-- BEGIN addon_module_block -->
             <span ><a class="button" href="{URL_ADVANCED}">{TEXT_ADVANCED}</a></span>
+<!-- END addon_module_block -->
         </td>
      </tr>
 </table>
 
+<!-- BEGIN module_install_block -->
 <form name="install" enctype="multipart/form-data" action="install.php" method="post" class="{DISPLAY_INSTALL}">
 {FTAN}
   <h2>{HEADING_INSTALL_MODULE}</h2>
@@ -31,6 +38,9 @@
   </table>
   <br />
 </form>
+<!-- END module_install_block -->
+
+<!-- BEGIN module_uninstall_block -->
 <form name="uninstall" action="uninstall.php" method="post" class="{DISPLAY_UNINSTALL}">
 {FTAN}
   <h2>{HEADING_UNINSTALL_MODULE}</h2>
@@ -39,9 +49,9 @@
       <td>
         <select name="file" style="width: 77%;">
         <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-        <!-- BEGIN module_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-          <!-- END module_list_block -->
+        <!-- BEGIN module_uninstall_select_block -->
+            <option value="{UNINSTALL_VALUE}">{UNINSTALL_NAME}</option>
+          <!-- END module_uninstall_select_block -->
         </select>
       </td>
       <td width="110">
@@ -51,6 +61,9 @@
   </table>
   <br />
 </form>
+<!-- END module_uninstall_block -->
+
+<!-- BEGIN module_detail_block -->
 <form name="details" action="details.php" method="post" class="{DISPLAY_LIST}">
 {FTAN}
   <h2>{HEADING_MODULE_DETAILS}</h2>
@@ -59,9 +72,9 @@
       <td>
         <select name="file" style="width: 77%;">
         <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-        <!-- BEGIN module_list_block -->
+        <!-- BEGIN module_detail_select_block -->
             <option value="{VALUE}">{NAME}</option>
-          <!-- END module_list_block -->
+          <!-- END module_detail_select_block -->
         </select>
       </td>
       <td width="110">
@@ -71,9 +84,13 @@
   </table>
   <br />
 </form>
+<!-- END module_detail_block -->
+
+<!-- BEGIN module_advanced_block -->
 <div class="{DISPLAY_MANUAL_INSTALL}">
   <h2>{HEADING_INVOKE_MODULE_FILES}</h2>
   <p>{TEXT_MANUAL_INSTALLATION}</p>
+<!-- BEGIN manuell_install_block -->
   <form name="manual_install" action="manual_install.php" method="post" class="{INSTALL_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
@@ -83,16 +100,18 @@
             <input type="hidden" name="action" value="install" />
             <select name="file" style="width: 250px;">
             <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-            <!-- BEGIN install_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-            <!-- END install_list_block -->
+            <!-- BEGIN manuell_install_select_block -->
+            <option value="{INSTALL_VALUE}">{INSTALL_NAME}</option>
+            <!-- END manuell_install_select_block -->
             </select>
             <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
         </td>
       </tr>
   </table>
   </form>
-  
+<!-- END manuell_install_block -->
+
+<!-- BEGIN manuell_upgrade_block -->
   <form name="manual_upgrade" action="manual_install.php" method="post" class="{UPGRADE_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
@@ -102,16 +121,18 @@
             <input type="hidden" name="action" value="upgrade" />
             <select name="file" style="width: 250px;">
             <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-            <!-- BEGIN install_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-            <!-- END install_list_block -->
+            <!-- BEGIN manuell_upgrade_select_block -->
+            <option value="{UPGRADE_VALUE}">{UPGRADE_NAME}</option>
+            <!-- END manuell_upgrade_select_block -->
             </select>
             <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
         </td>
       </tr>
   </table>
   </form>
+<!-- END manuell_upgrade_block -->
 
+<!-- BEGIN manuell_uninstall_block -->
   <form name="manual_uninstall" action="manual_install.php" method="post" class="{UNINSTALL_VISIBLE}">
 {FTAN}
   <table summary="" cellpadding="0" cellspacing="2" border="0" width="80%">
@@ -121,16 +142,19 @@
             <input type="hidden" name="action" value="uninstall" />
             <select name="file" style="width: 250px;">
             <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
-            <!-- BEGIN install_list_block -->
-            <option value="{VALUE}">{NAME}</option>
-            <!-- END install_list_block -->
+            <!-- BEGIN manuell_uninstall_select_block -->
+            <option value="{UNINSTALL_VALUE}">{UNINSTALL_NAME}</option>
+            <!-- END manuell_uninstall_select_block -->
             </select>
             <input type="submit" name="submit" value="{TEXT_EXECUTE}" style="width:100px;" />
             </td>
       </tr>
   </table>
   </form>
+<!-- END manuell_uninstall_block -->
 
   <p style="color:red;">{TEXT_MANUAL_INSTALLATION_WARNING}</p>
 </div>
+<!-- END module_advanced_block -->
+
 <!-- END main_block -->

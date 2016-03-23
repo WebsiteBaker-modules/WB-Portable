@@ -15,39 +15,13 @@
  *
 */
 
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
-
-// add new rows to table "settings"
-
-$msg = array ();
-$table = TABLE_PREFIX ."mod_jsadmin";
-$jsadminDefault = array (
-    array ( 'id' => '1','name' => 'mod_jsadmin_persist_order','value' => '1' ),
-    array ( 'id' => '2','name' => 'mod_jsadmin_ajax_order_pages','value' => '1' ),
-    array ( 'id' => '3','name' => 'mod_jsadmin_ajax_order_sections','value' => '1' ),
-);
-
-$database->query("DROP TABLE IF EXISTS `$table`");
-$sql = 'CREATE TABLE IF NOT EXISTS `'.TABLE_PREFIX.'mod_jsadmin` ('
-    . ' `id` INT(11) NOT NULL DEFAULT \'0\','
-    . ' `name` VARCHAR(255) NOT NULL DEFAULT \'0\','
-    . ' `value` INT(11) NOT NULL DEFAULT \'0\','
-    . ' PRIMARY KEY ( `id` )'
-    . ' ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
-
-if($database->query($sql) ) {
-
-    for($x=0;$x<sizeof($jsadminDefault); $x++) {
-        $sql  = 'INSERT INTO `'.TABLE_PREFIX.'mod_jsadmin` SET '
-              . '`id`=\''.$jsadminDefault[$x]['id'].'\', '
-              .'`name`=\''.$jsadminDefault[$x]['name'].'\', '
-             . '`value`=\''.$jsadminDefault[$x]['value'].'\' ';
-        if(!$database->query($sql) ) { $msg[] = $database->get_error();}
+if(defined('WB_PATH'))
+{
+    // create tables from sql dump file
+    if (is_readable(__DIR__.'/install-struct.sql')) {
+        $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
+        $database->SqlImport(__DIR__.'/install-data.sql', TABLE_PREFIX, __FILE__ );
     }
-} else {
-    $msg[] = $database->get_error();
+
 }
 

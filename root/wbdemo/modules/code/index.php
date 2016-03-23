@@ -1,21 +1,21 @@
 <?php
 /**
  *
- * @category        modules
- * @package         code
- * @author          WebsiteBaker Project
- * @copyright       2004-2009, Ryan Djurovich
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link			http://www.websitebaker2.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
- * @version         $Id: index.php 1374 2011-01-10 12:21:47Z Luisehahne $
- * @filesource		$HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/code/index.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10. Jan 2011) $
+ * @category       modules
+ * @package        code
+ * @authors        WebsiteBaker Project
+ * @copyright      WebsiteBaker Org. e.V.
+ * @link           http://websitebaker.org/
+ * @license        http://www.gnu.org/licenses/gpl.html
+ * @platform       WebsiteBaker 2.8.3
+ * @requirements   PHP 5.3.6 and higher
+ * @version        $Id:  $
+ * @filesource     $HeadURL:  $
+ * @lastmodified   $Date:  $
  *
-*/
+ */
 
-header('Location: ../index.php');
-
-?>
+/* -------------------------------------------------------- */
+// Must include code to stop this file being accessed directly
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
+/* -------------------------------------------------------- */

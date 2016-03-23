@@ -16,11 +16,9 @@
  *
  */
 
-require('../../config.php');
-
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('admintools', 'admintools');
-
 // Include the WB functions file
 require_once(WB_PATH.'/framework/functions.php');
 

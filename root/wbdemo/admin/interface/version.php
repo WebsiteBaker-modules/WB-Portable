@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * About WebsiteBaker
  *
  * Website Baker is a PHP-based Content Management System (CMS)
@@ -26,8 +26,6 @@
  *
  * This file is where the WB release version is stored.
  *
- */
-/**
  *
  * @category        admin
  * @package         interface
@@ -37,19 +35,19 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @revision        $Revision: 1638 $
+ * @revision        $Revision: 1645 $
  * @version         $Id: version.php 1638 2012-03-13 23:01:47Z darkviper $
  * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/admin/interface/version.php $
  * @lastmodified    $Date: 2012-03-14 00:01:47 +0100 (Mi, 14. Mrz 2012) $
  * 
  */
 
-if(!defined('WB_URL')) {
-    header('Location: ../index.php');
-    exit(0);
-}
+/* -------------------------------------------------------- */
+// Must include code to stop this file being accessed directly
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
+/* -------------------------------------------------------- */
 
 // check if defined to avoid errors during installation (redirect to admin panel fails if PHP error/warnings are enabled)
 if(!defined('VERSION')) define('VERSION', '2.8.3');
-if(!defined('REVISION')) define('REVISION', '1644');
-if(!defined('SP')) define('SP', 'SP5');
+if(!defined('REVISION')) define('REVISION', '1645');
+if(!defined('SP')) define('SP', 'SP6');

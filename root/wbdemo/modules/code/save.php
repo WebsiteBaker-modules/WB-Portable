@@ -15,7 +15,7 @@
  *
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -32,20 +32,20 @@ $admin->print_header();
 // Update the mod_wysiwygs table with the contents
 if(isset($_POST['content'])) {
     $tags = array('<?php', '?>' , '<?', '<?=');
-    $content = $admin->add_slashes(str_replace($tags, '', $_POST['content']));
+    $content = (str_replace($tags, '', $_POST['content']));
 
     $query = 'UPDATE `'.TABLE_PREFIX.'mod_code` SET '
-           .'`content` = \''.$content.'\' '
+           .'`content` = \''.$database->escapeString($content).'\' '
            .'WHERE `section_id` = '.$section_id;
 
-    $database->query($query);    
+    $database->query($query);
 }
 
 // Check if there is a database error, otherwise say successful
 if($database->is_error()) {
     $admin->print_error($database->get_error(), $js_back);
 } else {
-    $admin->print_success($MESSAGE['PAGES']['SAVED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
+    $admin->print_success($MESSAGE['PAGES_SAVED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
 }
 
 // Print admin footer

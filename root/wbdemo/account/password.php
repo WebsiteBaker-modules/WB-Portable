@@ -47,9 +47,9 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 // generate new password hash
                     $sPwHashNew = md5($sNewPassword);
 // Update the database
-                    $sql  = 'UPDATE `'.TABLE_PREFIX.'users` ';
-                    $sql .= 'SET `password`=\''.$sPwHashNew.'\' ';
-                    $sql .= 'WHERE `user_id`='.$wb->get_user_id();
+                    $sql  = 'UPDATE `'.TABLE_PREFIX.'users` '
+                          . 'SET `password`=\''.$database->escapeString($sPwHashNew).'\' '
+                          . 'WHERE `user_id`='.$wb->get_user_id();
                     if ($database->query($sql)) {
                         $success[] = $MESSAGE['PREFERENCES_PASSWORD_CHANGED'];
                     }else {

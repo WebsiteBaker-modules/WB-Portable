@@ -21,10 +21,11 @@ $module_description = 'Ce module g&egrave;re le filtrage des donn&eacute;es avan
 
 // Headings and text outputs
 $MOD_MAIL_FILTER['HEADING'] = 'Options: Output Filter';
-$MOD_MAIL_FILTER['HOWTO'] = 'Vous pouvez configurer le filtrage des donn&eacute;es avant affichage gr&acirc;ce aux options ci-dessous.<p style="line-height:1.5em;"><strong>Conseil: </strong>Les liens Mailto peuvent &ecirc;tre crypt&eacute;s &agrave; l&apos;aide d&apos;une fonction Javascript. Pour utiliser cette fonctionnalit&eacute;, vous devez ajouter le code PHP <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(&apos;js&apos;);?&gt;</code> dans la partie &lt;head&gt; de index.php de votre fichier mod&egrave;le. Sans cette modification, seulement le caract&egrave;re @ sera remplac&eacute; dans le champ mailto.</p>';
+$MOD_MAIL_FILTER['HOWTO'] = 'Vous pouvez configurer le filtrage des donn&eacute;es avant affichage gr&acirc;ce aux options ci-dessous.<strong>Conseil: </strong>Les liens Mailto peuvent &ecirc;tre crypt&eacute;s &agrave; l&apos;aide d&apos;une fonction Javascript. Pour utiliser cette fonctionnalit&eacute;, vous devez ajouter le code PHP <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(&apos;js&apos;);?&gt;</code> dans la partie &lt;head&gt; de index.php de votre fichier mod&egrave;le. Sans cette modification, seulement le caract&egrave;re @ sera remplac&eacute; dans le champ mailto.';
 $MOD_MAIL_FILTER['WARNING'] = '';
 
 // Text and captions of form elements
+$MOD_MAIL_FILTER['SET_ACTIVE']            = 'Activate Filter';
 $MOD_MAIL_FILTER['BASIC_CONF'] = 'Configuration de base des Emails';
 $MOD_MAIL_FILTER['SYS_REL'] = 'Frontendoutput with  relative Urls';
 $MOD_MAIL_FILTER['opf']        = 'Output filter Dashboard';

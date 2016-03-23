@@ -17,7 +17,7 @@
 */
 
  // Include config file and admin class file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $action = 'cancel';
@@ -50,10 +50,12 @@ switch ($action):
             $user = $results->fetchRow(MYSQLI_ASSOC);
             // Setup template object, parse vars to it, then parse it
             // Create new template object
-            $template = new Template(dirname($admin->correct_theme_source('users_form.htt')));
+            $template = new Template(dirname($admin->correct_theme_source('users_form.htt')), 'remove');
             // $template->debug = true;
             $template->set_file('page', 'users_form.htt');
             $template->set_block('page', 'main_block', 'main');
+            $template->set_block('main_block', 'user_add_block', 'user_add');
+
             $template->set_var(    array(
                                 'ACTION_URL' => ADMIN_URL.'/users/save.php',
                                 'SUBMIT_TITLE' => $TEXT['SAVE'],
@@ -179,6 +181,7 @@ switch ($action):
                                 )
                         );
 
+            $template->set_block( 'user_add_block', '');
             // Parse template object
             $template->parse('main', 'main_block', false);
             $template->pparse('output', 'page');

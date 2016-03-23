@@ -51,6 +51,7 @@ class frontend extends wb {
         parent::__construct(1);
     }
 
+
     public function page_select() {
         global $page_id, $no_intro, $database;
         // We have no page id and are supposed to show the intro page
@@ -74,9 +75,9 @@ class frontend extends wb {
              . 'FROM `'.TABLE_PREFIX.'pages` `p` '
              .       'INNER JOIN `'.TABLE_PREFIX.'sections` '
              .       'USING(`page_id`) '
-             . 'WHERE `parent`=0 AND '
-             .        '`visibility`=\'public\' AND '
-             .        '('
+             . 'WHERE `parent`=0 '
+             .   'AND `visibility`=\'public\' '
+             .   'AND ('
              .            '('.$now.'>=`publ_start` OR `publ_start`=0) AND '
              .            '('.$now.'<=`publ_end` OR `publ_end`=0) '
              .        ')'
@@ -90,8 +91,10 @@ class frontend extends wb {
             );
             exit;
         }
-        if (!($aDefaultPage = $oPages->fetchRow(MYSQLI_ASSOC))) {
-        // No active page found, so show the "under construction page"
+        if (
+            !($aDefaultPage = $oPages->fetchRow(MYSQLI_ASSOC)) &&
+            (!isset($page_id) || !intval($page_id))
+        ) {        // No active page found, so show the "under construction page"
             $this->print_under_construction();
             exit;
         }
@@ -123,15 +126,17 @@ class frontend extends wb {
             // Make sure page was found in database
             if($get_page->numRows() == 0) {
                 // Print page not found message
-                exit("Page not found");
+                exit('Page '.$this->page_id.' not found');
             }
             // Fetch page details
-            $this->page = $get_page->fetchRow();
+            $this->page = $get_page->fetchRow( MYSQLI_ASSOC );
             // Check if the page language is also the selected language. If not, send headers again.
             if ($this->page['language']!=LANGUAGE) {
                 if(isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] != '') { // check if there is an query-string
+                    header("HTTP/1.1 301 Moved Permanently"); // ADDED
                     header('Location: '.$this->page_link($this->page['link']).'?'.$_SERVER['QUERY_STRING'].'&lang='.$this->page['language']);
                 } else {
+                    header("HTTP/1.1 301 Moved Permanently"); // ADDED
                     header('Location: '.$this->page_link($this->page['link']).'?lang='.$this->page['language']);
                 }
                 exit();
@@ -181,7 +186,6 @@ class frontend extends wb {
             $this->link=$this->page_link($this->page['link']);
             $_SESSION['PAGE_ID'] = $this->page_id;
             $_SESSION['HTTP_REFERER'] = $this->link;
-
         // End code to set details as either variables of constants
         }
 
@@ -202,10 +206,10 @@ class frontend extends wb {
 
         // Check if user is allowed to view this page
         if($this->page && $this->page_is_visible($this->page) == false) {
-            if(VISIBILITY == 'deleted' OR VISIBILITY == 'none') {
+            if(VISIBILITY == 'deleted' || VISIBILITY == 'none') {
                 // User isnt allowed on this page so tell them
                 $this->page_access_denied=true;
-            } elseif(VISIBILITY == 'private' OR VISIBILITY == 'registered') {
+            } elseif(VISIBILITY == 'private' || VISIBILITY == 'registered') {
                 // Check if the user is authenticated
                 if($this->is_authenticated() == false) {
                     // User needs to login first
@@ -277,6 +281,8 @@ class frontend extends wb {
  */
     public function preprocess(&$content)
     {
+/**
+ * 
         global $database;
         $replace_list = array();
         $pattern = '/\[wblink([0-9]+)\]/isU';
@@ -297,6 +303,7 @@ class frontend extends wb {
                 }
             }
         }
+ */
     }
 
 /*
@@ -431,12 +438,25 @@ class frontend extends wb {
         global $MESSAGE;
         require_once(WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
         echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <head><title>'.$MESSAGE['GENERIC']['WEBSITE_UNDER_CONSTRUCTION'].'</title>
+        <head><title>'.$MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'].'</title>
         <style type="text/css"><!-- body{ font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 12px; background-image: url("'.THEME_URL.'/images/background.png");background-repeat: repeat-x; background-color: #A8BCCB; text-align: center; }
         h1 { margin: 0; padding: 0; font-size: 18px; color: #000; text-transform: uppercase;
 }--></style></head><body>
-        <br /><h1>'.$MESSAGE['GENERIC']['WEBSITE_UNDER_CONSTRUCTION'].'</h1><br />
-        '.$MESSAGE['GENERIC']['PLEASE_CHECK_BACK_SOON'].'</body></html>';
+        <br /><h1>'.$MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'].'</h1><br />
+        '.$MESSAGE['GENERIC_PLEASE_CHECK_BACK_SOON'].'</body></html>';
     }
-}
 
+    // Function to show the "Under Construction" page
+    public function print_missing_frontend_login() {
+        global $MESSAGE, $MENU, $TEXT;
+        require_once(WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
+        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <head><title>'.$MENU['LOGIN'].' '.$TEXT['DISABLED'].'</title>
+        <style type="text/css"><!-- body{ font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 12px; background-image: url("'.THEME_URL.'/images/background.png");background-repeat: repeat-x; background-color: #A8BCCB; text-align: center; }
+        h1 { margin: 0; padding: 0; font-size: 18px; color: #000; text-transform: uppercase;
+}--></style></head><body>
+        <br /><h1>'.($MENU['LOGIN'].' '.$TEXT['DISABLED']).'</h1><br />
+        '.$MESSAGE['GENERIC_PLEASE_CHECK_BACK_SOON'].'</body></html>';
+    }
+
+}

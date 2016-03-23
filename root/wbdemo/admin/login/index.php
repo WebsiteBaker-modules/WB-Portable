@@ -16,7 +16,7 @@
 */
 
 if ( !defined('WB_PATH') ){ require(dirname(dirname(__DIR__))."/config.php"); }
-if( !class_exists('Login', false) ){ require(WB_PATH."/framework/class.Login.php"); }
+if( !class_exists('Login', false) ){ require(WB_PATH."/framework/Login.php"); }
 if( !class_exists('frontend', false) ){ require(WB_PATH."/framework/class.frontend.php"); }
 
 $username_fieldname = 'username';
@@ -45,6 +45,7 @@ $thisApp = new Login( array(
         'MAX_PASSWORD_LEN'      => 100,
         'LOGIN_URL'             => ADMIN_URL."/login/index.php",
         'DEFAULT_URL'           => ADMIN_URL."/start/index.php",
+//        'REDIRECT_URL'          => ADMIN_URL."/pages/index.php",
         'TEMPLATE_DIR'          => $ThemePath,
         'TEMPLATE_FILE'         => $LoginTpl,
         'FRONTEND'              => false,

@@ -1,33 +1,39 @@
 <?php
-/**
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * @category        modules
- * @package         wrapper
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: upgrade.php 1538 2011-12-10 15:06:15Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/wrapper/upgrade.php $
- * @lastmodified    $Date: 2011-12-10 16:06:15 +0100 (Sa, 10. Dez 2011) $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* -------------------------------------------------------- */
-// Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
 
-$msg = '';
-$sTable = TABLE_PREFIX.'mod_wrapper';
-if(($sOldType = $database->getTableEngine($sTable))) {
-    if(('myisam' != strtolower($sOldType))) {
-        if(!$database->query('ALTER TABLE `'.$sTable.'` Engine = \'MyISAM\' ')) {
-            $msg = $database->get_error();
-        }
-    }
-} else {
-    $msg = $database->get_error();
-}
-// ------------------------------------
+/**
+ * upgrade.php
+ *
+ * @category     Addons
+ * @package      Addons_wrapper
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      http://www.gnu.org/licenses/gpl.html   GPL License
+ * @version      3.0.1
+ * @lastmodified $Date: $
+ * @since        File available since 2015-12-17
+ * @deprecated   This interface is deprecated since 2015-12-17
+ * @description  xyz
+ */
+
+    // forwarding to the dispatcher
+    $sCommand = 'upgrade';
+    include __DIR__.'/addon.php';
+
+// end of file
+

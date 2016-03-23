@@ -4,18 +4,18 @@
  * @category        module
  * @package         Form
  * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
+ * @copyright       2009-2013, WebsiteBaker Org. e.V.
+ * @link            http://www.websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: modify_field.php 1553 2011-12-31 15:03:03Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/form/modify_field.php $
- * @lastmodified    $Date: 2011-12-31 16:03:03 +0100 (Sa, 31. Dez 2011) $
- * @description     
+ * @platform        WebsiteBaker 2.8.x
+ * @requirements    PHP 5.2.2 and higher
+ * @version         $Id: modify_field.php 1919 2013-06-07 04:21:49Z Luisehahne $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/form/modify_field.php $
+ * @lastmodified    $Date: 2013-06-07 06:21:49 +0200 (Fr, 07. Jun 2013) $
+ * @description
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 $print_info_banner = true;
 // Tells script to update when this page was last updated
@@ -23,18 +23,19 @@ $update_when_modified = false;
 // Include WB admin wrapper script
 require(WB_PATH.'/modules/admin.php');
 
-$sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR.$section['section_id'] : '' );
+$sSectionIdPrefix = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? SEC_ANCHOR : 'Sec' );
 /* */
 // Get id
 $field_id = intval($admin->checkIDKEY('field_id', false, 'GET'));
-
 if (!$field_id) {
- $admin->print_error( 'IDKEY::'.$MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id.$sec_anchor);
- exit();
+ $admin->print_error('IDKEY:: '.$MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id.'#'.$sSectionIdPrefix.$section_id);
 }
 // load module language file
-$lang = (dirname(__FILE__)) . '/languages/' . LANGUAGE . '.php';
-require_once(!file_exists($lang) ? (dirname(__FILE__)) . '/languages/EN.php' : $lang );
+$sAddonName = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+}
 
 $type = 'none';
 // Get header and footer
@@ -50,13 +51,15 @@ $field_id = $admin->getIDKEY($form['field_id']);
 // Set raw html <'s and >'s to be replaced by friendly html code
 $raw = array('<', '>');
 $friendly = array('&lt;', '&gt;');
+$aFtan = $admin->getFTAN('');
+$sToken = $aFtan['name'].'='.$aFtan['value'];
 ?><form name="modify" action="<?php echo WB_URL; ?>/modules/form/save_field_new.php" method="post" style="margin: 0;">
-    <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
-    <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
-    <input type="hidden" name="field_id" value="<?php echo $field_id; ?>" />
-    <?php echo $admin->getFTAN(); ?>
+<input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
+<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
+<input type="hidden" name="field_id" value="<?php echo $field_id; ?>" />
+<input type="hidden" name="<?php echo $aFtan['name']; ?>" value="<?php echo $aFtan['value']; ?>">
 
-<table style="border-collapse: collapse; width: 100%;" >
+<table summary="" class="row_a" cellpadding="2" cellspacing="0" border="0" width="100%">
     <tr>
         <td colspan="2"><strong><?php echo $TEXT['MODIFY'].' '.$TEXT['FIELD']; ?></strong></td>
     </tr>
@@ -157,12 +160,12 @@ $friendly = array('&lt;', '&gt;');
         <td><?php echo $TEXT['ALLOW_MULTIPLE_SELECTIONS']; ?>:</td>
         <td>
             <input type="radio" name="multiselect" id="multiselect_true" value="multiple" <?php if($form['extra'][1] == 'multiple') { echo ' checked="checked"'; } ?> />
-            <a href="#" onclick="javascript: document.getElementById('multiselect_true').checked = true;">
+            <a href="#" onclick="javascript:document.getElementById('multiselect_true').checked = true;">
             <?php echo $TEXT['YES']; ?>
             </a>
             &nbsp;
             <input type="radio" name="multiselect" id="multiselect_false" value="" <?php if($form['extra'][1] == '') { echo ' checked="checked"'; } ?> />
-            <a href="#" onclick="javascript: document.getElementById('multiselect_false').checked = true;">
+            <a href="#" onclick="javascript:document.getElementById('multiselect_false').checked = true;">
             <?php echo $TEXT['NO']; ?>
             </a>
         </td>
@@ -181,36 +184,26 @@ $friendly = array('&lt;', '&gt;');
         <td><?php echo $TEXT['REQUIRED']; ?>:</td>
         <td>
             <input type="radio" name="required" id="required_true" value="1" <?php if($form['required'] == 1) { echo ' checked="checked"'; } ?> />
-            <a href="#" onclick="document.getElementById('required_true').checked = true;">
+            <label for="required_true">
             <?php echo $TEXT['YES']; ?>
-            </a>
+            </label>
             &nbsp;
             <input type="radio" name="required" id="required_false" value="0" <?php if($form['required'] == 0) { echo ' checked="checked"'; } ?> />
-            <a href="#" onclick="document.getElementById('required_false').checked = true;">
+            <label for="required_false">
             <?php echo $TEXT['NO']; ?>
-            </a>
+            </label>
         </td>
     </tr>
 <?php } ?>
 </table>
 
-<table class="mod_form" >
+<table>
     <tr>
         <td align="left">
-            <input name="save" type="submit" value="<?php echo $TEXT['SAVE']; ?>" style="width: 100%; margin-top: 5px;" />
+            <input name="save" type="submit" value="<?php echo $TEXT['SAVE']; ?>" style="width: 100px; margin-top: 5px;" />
         </td>
-        <?php
-        // added by John Maats, PCWacht, 12 januar 2006
-        if ($type<>'none') {
-        ?>
-        <td align="center">
-            <input type="button" value="<?php echo $TEXT['ADD'].' '.$TEXT['FIELD']; ?>" onclick="window.location='<?php echo WB_URL; ?>/modules/form/add_field.php?page_id=<?php echo $page_id; ?>&section_id=<?php echo $section_id; ?>&<?php echo $admin->getFTAN('get'); ?>';" style="width: 100%; margin-top: 5px;" />
-        </td>
-        <?php } 
-        // end addition
-        ?>
         <td align="right">
-            <input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="window.location='<?php echo ADMIN_URL; ?>/pages/modify.php?page_id=<?php echo $page_id.$sec_anchor; ?>';" style="width: 100%; margin-top: 5px;" />
+            <input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="window.location = '<?php echo ADMIN_URL; ?>/pages/modify.php?page_id=<?php echo $page_id.'#'.$sSectionIdPrefix.$section_id; ?>';" style="width: 100px; margin-top: 5px;" />
         </td>
     </tr>
 </table>

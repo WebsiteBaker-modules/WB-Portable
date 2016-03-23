@@ -21,9 +21,6 @@ require_once('../config.php');
 if(!( intval(FRONTEND_SIGNUP) && (  0 == (isset($_SESSION['USER_ID']) ? intval($_SESSION['USER_ID']) : 0) )))
 {
     if(INTRO_PAGE) {
-        header('Location: '.WB_URL.PAGES_DIRECTORY.'/index.php');
-        exit(0);
-    } else {
         header('Location: '.WB_URL.'/index.php');
         exit(0);
     }
@@ -36,7 +33,7 @@ if(ENABLED_ASP && isset($_POST['username']) && ( // form faked? Check the honeyp
     (!isset($_POST['name']) OR $_POST['name']) OR
     (!isset($_POST['full_name']) OR $_POST['full_name'])
 )) {
-    exit(header("Location: ".WB_URL.PAGES_DIRECTORY.""));
+    exit(header("Location: ".WB_URL."/index.php"));
 }
 
 // Load the language file

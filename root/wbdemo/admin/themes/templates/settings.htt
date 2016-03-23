@@ -208,7 +208,7 @@
         <input type="reset" name="reset" value="{TEXT_RESET}" class="reset" />
     </td>
     <td class="setting_value_permissions" style="text-align: right;">
-        <button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
+        <button type="button" title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
     </td>
 </tr>
 <tr>
@@ -297,7 +297,7 @@
         <input type="reset" name="reset" value="{TEXT_RESET}" class="reset" />
     </td>
     <td class="setting_value_permissions" style="text-align: right;">
-        <button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
+        <button type="button" title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
     </td>
 </tr>
 <tr>
@@ -388,7 +388,7 @@
         <input type="reset" name="reset" value="{TEXT_RESET}" class="reset" />
     </td>
     <td class="setting_value_permissions" style="text-align: right;">
-        <button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
+        <button type="button" title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
     </td>
 </tr>
 <tr>
@@ -575,6 +575,7 @@
     <td class="setting_value" colspan="2"><input type="text" name="sec_anchor" value="{SEC_ANCHOR}" /></td>
 </tr>
 <!-- BASIC MAILER SETTINGS -->
+<!-- https://de.ssl-tools.net/mailservers -->
 <tr>
     <td colspan="3" style="padding-top: 10px;">
         <h2>{HEADING_WBMAILER_SETTINGS}</h2>
@@ -592,10 +593,10 @@
 <tr>
     <td class="setting_name">{TEXT_WBMAILER_FUNCTION}:</td>
     <td class="setting_value" colspan="2">
-        <input type="radio" name="wbmailer_routine" id="wbmailer_routine_phpmail" onclick="javascript: change_wbmailer('phpmail');" style="width: 14px; height: 14px;" value="phpmail"{PHPMAIL_SELECTED} />
-        <label for="wbmailer_routine_phpmail" onclick="javascript: change_wbmailer('phpmail');">{TEXT_WBMAILER_PHP}</label>
-        <input type="radio" name="wbmailer_routine" id="wbmailer_routine_smtp" onclick="javascript: change_wbmailer('smtp');" style="width: 14px; height: 14px;" value="smtp"{SMTPMAIL_SELECTED} />
-        <label for="wbmailer_routine_smtp" onclick="javascript: change_wbmailer('smtp');">{TEXT_WBMAILER_SMTP}</label>
+        <input type="radio" name="wbmailer_routine" id="wbmailer_routine_phpmail" style="width: 14px; " value="phpmail"{PHPMAIL_SELECTED} />
+        <label for="wbmailer_routine_phpmail" >{TEXT_WBMAILER_PHP}</label>
+        <input type="radio" name="wbmailer_routine" id="wbmailer_routine_smtp" style="width: 14px; " value="smtp"{SMTPMAIL_SELECTED} />
+        <label for="wbmailer_routine_smtp" >{TEXT_WBMAILER_SMTP}</label>
     </td>
 </tr>
 <!-- MORE ADVANCED SMTP MAILER SETTINGS -->
@@ -610,13 +611,41 @@
     <input type="text" style="width: 250px" name="wbmailer_smtp_host" value="{WBMAILER_SMTP_HOST}" />
     </td>
 </tr>
+
+<tr id="row_wbmailer_smtp_port"{SMTP_VISIBILITY}>
+    <td class="setting_name">Smtp Port:</td>
+    <td class="setting_value" >
+        <select name="wbmailer_smtp_port" id="wbmailer_smtp_port" style="width: 255px;">
+            <option value="25">{TEXT_PLEASE_SELECT}</option>
+            <!-- BEGIN smtp_port_list_block -->
+                <option value="{VALUE}" {SELECTED}>{PNAME}</option>
+            <!-- END smtp_port_list_block -->
+        </select>
+    </td>
+    <td></td>
+</tr>
+
+
 <!--  -->
 <tr id="row_wbmailer_smtp_auth_mode"{SMTP_VISIBILITY}>
     <td class="setting_name">{TEXT_WBMAILER_SMTP_AUTH}:</td>
     <td class="setting_value" colspan="2">
-        <input type="checkbox" name="wbmailer_smtp_auth" id="wbmailer_smtp_auth" onclick="javascript: toggle_wbmailer_auth();" style="width: 14px; height: 14px;" value="true" disabled="disabled" {SMTP_AUTH_SELECTED} />
-        <label for="wbmailer_smtp_auth" onclick="javascript: toggle_wbmailer_auth(this.value);">({TEXT_WBMAILER_SMTP_AUTH_NOTICE})</label>
+        <input type="checkbox" disabled="disabled" name="wbmailer_smtp_auth" id="wbmailer_smtp_auth" value="1" {SMTP_AUTH_SELECTED} style="width: 14px; " />
+        <label for="wbmailer_smtp_auth">({TEXT_WBMAILER_SMTP_AUTH_NOTICE})</label>
     </td>
+</tr>
+
+<tr id="row_wbmailer_smtp_secure"{SMTP_VISIBILITY}>
+    <td class="setting_name">Smtp Secure:</td>
+    <td class="setting_value" >
+        <select name="wbmailer_smtp_secure" id="wbmailer_smtp_secure" style="width: 255px;">
+            <option value="">{TEXT_PLEASE_SELECT}</option>
+            <!-- BEGIN smtp_secure_list_block -->
+                <option value="{VALUE}" {SELECTED}>{SNAME}</option>
+            <!-- END smtp_secure_list_block -->
+        </select>
+    </td>
+    <td></td>
 </tr>
 
 <tr id="row_wbmailer_smtp_username"{SMTP_VISIBILITY}>
@@ -639,7 +668,7 @@
         <input type="reset" name="reset" value="{TEXT_RESET}" class="reset" />
     </td>
     <td class="setting_value_permissions" style="text-align: right;">
-        <button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
+        <button type="button" title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
     </td>
 </tr>
 </table>
@@ -648,7 +677,7 @@
 
 <hr size="1" />
 
-<button title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
+<button type="button" title="{MODE_SWITCH_WARNING}" onclick="window.location = '{ADVANCED_LINK}'; return false;" class="{DISPLAY_ADVANCED_BUTTON}">{ADVANCED_BUTTON}</button>
 <br />
 <font class="{DISPLAY_ADVANCED_BUTTON}">{MODE_SWITCH_WARNING}</font>
 <script src="{THEME_URL}/js/setting.js" type="text/javascript"></script>

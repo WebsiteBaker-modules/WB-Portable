@@ -17,7 +17,7 @@
  */
 
 // Print admin header
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 // suppress to print the header, so no new FTAN will be set
@@ -50,11 +50,11 @@ $system_permissions = array();
 require(ADMIN_PATH.'/groups/get_permissions.php');
 
 // Update the database
-$sql = 'INSERT INTO `'.TABLE_PREFIX.'groups` '
-     . 'SET `name`=\''.$group_name.'\', '
-     .     '`system_permissions`=\''.$system_permissions.'\', '
-     .     '`module_permissions`=\''.$module_permissions.'\', '
-     .     '`template_permissions`=\''.$template_permissions.'\'';
+$sql = 'INSERT INTO `'.TABLE_PREFIX.'groups` SET '
+     .     '`name`=\''.$group_name.'\', '
+     .     '`system_permissions`=\''.$database->escapeString($system_permissions).'\', '
+     .     '`module_permissions`=\''.$database->escapeString($module_permissions).'\', '
+     .     '`template_permissions`=\''.$database->escapeString($template_permissions).'\'';
 if (($database->query($sql))) {
     $admin->print_success($MESSAGE['GROUPS_ADDED'], ADMIN_URL.'/groups/index.php');
 } else {

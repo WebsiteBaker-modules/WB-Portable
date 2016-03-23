@@ -20,8 +20,6 @@
 if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
-
-$sql = 'DELETE FROM '.TABLE_PREFIX .'mod_menu_link '
-     . 'WHERE section_id ='.$section_id;
-
+$sql = 'DELETE FROM `'.TABLE_PREFIX .'mod_menu_link` '
+     . 'WHERE `section_id` ='.$database->escapeString($section_id);
 $database->query( $sql );

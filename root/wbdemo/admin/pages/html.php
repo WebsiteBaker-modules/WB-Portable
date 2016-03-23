@@ -28,8 +28,8 @@
     <meta http-equiv="Content-Encoding" content="gzip" />
     <meta http-equiv="Accept-Encoding" content="gzip, deflate" />
 <!-- site stylesheet (site colors and layout definitions) -->
-    <link rel="stylesheet" type="text/css" href="" media="screen,projection" />
-    <script src="" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="" media="screen" />
+    <script src="" ></script>
 </head>
 <body>
     <div class="content">

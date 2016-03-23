@@ -7,7 +7,7 @@
  * @author          Manuela v.d.Decken <manuela@isteam.de>
  * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3-SP4
+ * @platform        WebsiteBaker 2.8.3-SP4 and higher
  * @requirements    PHP 5.3.6 and higher
  *
  */
@@ -28,15 +28,20 @@
 /* ****************************************************************** */
 /* *** from here insert ordered requests of individual filters    *** */
 /* ***                                                            *** */
+                'ScriptVars',
+                'LoadOnFly',
+                'Jquery',
+                'SnippetJs',
+                'FrontendJs',
                 'Droplets',
                 'Email',
-                'Opf',
+                'OpF',
 /* ***                                                            *** */
 /* *** end of individual filters                                  *** */
 /* ****************************************************************** */
                 'WbLink',
+                'SysvarMedia',
                 'RelUrl',
-//                'Canonical',
                 'CssToHead',
             ),
             $sContent

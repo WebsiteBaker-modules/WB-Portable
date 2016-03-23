@@ -64,9 +64,11 @@
                     <td>{VAR_MOVE_DOWN_URL}</td>
 
                     <td>
+          <!-- BEGIN can_delete_block -->
                         <a href="#" onclick="javascript: confirm_link('{TEXT_ARE_YOU_SURE}', '{ADMIN_URL}/pages/sections.php?page_id={PAGE_IDKEY}&amp;section_id={VAR_SECTION_IDKEY}');">
                         <img src="{THEME_URL}/images/{DELETE_16_PNG}" alt="{TEXT_DELETE}" border="0" />
                         </a>
+          <!-- END can_delete_block -->
                     </td>
 
                     <td class="list_section_id">{VAR_SECTION_ID}</td>

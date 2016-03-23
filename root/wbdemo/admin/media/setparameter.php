@@ -15,24 +15,21 @@
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
  */
-
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Media', 'media', false);
 // Include the WB functions file
 require_once(WB_PATH.'/framework/functions.php');
 
 // check if theme language file exists for the language set by the user (e.g. DE, EN)
-if(!file_exists(THEME_PATH .'/languages/'.LANGUAGE .'.php')) {
-    // no theme language file exists for the language set by the user, include default theme language file EN.php
-    require_once(THEME_PATH .'/languages/EN.php');
-} else {
-    // a theme language file exists for the language defined by the user, load it
-    require_once(THEME_PATH .'/languages/'.LANGUAGE .'.php');
+$sAddonName = basename(__DIR__);
+require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
+if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
 }
 
 //Save post vars to the parameters file
-if ( !is_null($admin->get_post_escaped("save"))) {
+if ( !is_null($admin->get_post("save"))) {
 /*
     if (!$admin->checkFTAN())
     {
@@ -54,13 +51,13 @@ if ( !is_null($admin->get_post_escaped("save"))) {
     foreach($dirs AS $name) {
         $r = str_replace(WB_PATH, '', $name);
         $r = str_replace(array('/',' '),'_',$r);
-        $w = (int)$admin->get_post_escaped($r.'-w');
-        $h = (int)$admin->get_post_escaped($r.'-h');
+        $w = (int)$admin->get_post($r.'-w');
+        $h = (int)$admin->get_post($r.'-h');
         $pathsettings[$r]['width']=$w; 
         $pathsettings[$r]['height']=$h;
     }
-    $pathsettings['global']['admin_only'] = ($admin->get_post_escaped('admin_only')!=''?'checked':'');
-    $pathsettings['global']['show_thumbs'] = ($admin->get_post_escaped('show_thumbs')!=''?'checked':'');
+    $pathsettings['global']['admin_only'] = ($admin->get_post('admin_only')!=''?'checked':'');
+    $pathsettings['global']['show_thumbs'] = ($admin->get_post('show_thumbs')!=''?'checked':'');
     $fieldSerialized = serialize($pathsettings);
     $database->query ( "UPDATE ".TABLE_PREFIX."settings SET `value` = '$fieldSerialized' WHERE `name`='mediasettings'" );
     header ("Location: browse.php");

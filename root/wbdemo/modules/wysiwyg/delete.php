@@ -16,7 +16,12 @@
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-/* -------------------------------------------------------- */
+if(!defined('WB_PATH')) {
+    require_once(dirname(dirname(dirname(__FILE__))).'/framework/globalExceptionHandler.php');
+    throw new IllegalFileException();
+} else {
 // Delete record from the database
-$database->query("DELETE FROM `".TABLE_PREFIX."mod_wysiwyg` WHERE `section_id` = '$section_id'");
+    $sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_wysiwyg` '
+          . 'WHERE `section_id` = '.$database->escapeString($section_id);
+    $database->query($sql);
+}

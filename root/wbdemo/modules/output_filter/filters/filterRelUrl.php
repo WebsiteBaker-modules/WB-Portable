@@ -8,11 +8,12 @@
  */
     function doFilterRelUrl($sContent) {
         $aFilterSettings = getOutputFilterSettings();
-        if ($aFilterSettings['sys_rel']) {
+        $key = preg_replace('=^.*?filter([^\.\/\\\\]+)(\.[^\.]+)?$=is', '\1', __FILE__);
+        if ($aFilterSettings[$key]) {
             $sAppUrl  = rtrim(str_replace('\\', '/', WB_URL), '/').'/';
             $sAppPath = rtrim(str_replace('\\', '/', WB_PATH), '/').'/';
             $sContent = preg_replace_callback(
-                '/((?:href|src)\s*=\s*")([^\?\"]*?)/isU',
+                '/((?:href|src)\s*=\s*")([^\?\"]+?)/isU',
                 function ($aMatches) use ($sAppUrl, $sAppPath) {
                     $sAppRel = preg_replace('/^https?:\/\/[^\/]*(.*)$/is', '$1', $sAppUrl);
                     $aMatches[2] = str_replace('\\', '/', $aMatches[2]);

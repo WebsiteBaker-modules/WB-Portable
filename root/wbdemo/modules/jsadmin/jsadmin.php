@@ -21,8 +21,8 @@ if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.bas
 /* -------------------------------------------------------- */
 function get_setting($name, $default = '') {
     global $database, $sql;
-    $sql = 'SELECT `value` FROM `'.TABLE_PREFIX.'mod_jsadmin` '
-    . 'WHERE `name` = \''.$name.'\'';
+    $sql  = 'SELECT `value` FROM `'.TABLE_PREFIX.'mod_jsadmin` '
+          . 'WHERE `name` = \''.$database->escapeString($name).'\'';
     if( $rs = $database->get_one($sql) ) {
         return $rs;
     } else {
@@ -35,13 +35,13 @@ function save_setting($name, $value) {
     global $database;
     $prev_value = get_setting ( $name, '' );
     if($prev_value === false) {
-        $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_jsadmin` SET ';
+        $sql   = 'INSERT INTO `'.TABLE_PREFIX.'mod_jsadmin` SET ';
     } else {
-        $sql = 'UPDATE `'.TABLE_PREFIX.'mod_jsadmin` SET ';
+        $sql   = 'UPDATE `'.TABLE_PREFIX.'mod_jsadmin` SET ';
     }
-        $sql .= '`name`  = \''.$name.'\', '
-             . '`value`  = '.(int)$value.' '
-             . 'WHERE `name` = \''.$name.'\'';
+        $sql  .= '`name`  = \''.$database->escapeString($name).'\', '
+              . '`value`  = '.(int)$value.' '
+              . 'WHERE `name` = \''.$database->escapeString($name).'\'';
         $database->query($sql);
         return $sql;
 }

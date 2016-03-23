@@ -29,4 +29,4 @@
 // Headings and text outputs
 $MOD_WRAPPER['NOTICE']         =    'Your browser does not support inline frames.<br />Click on the link below to visit the website that was meant to be shown here...<br />';
 
-?>
+// end of file

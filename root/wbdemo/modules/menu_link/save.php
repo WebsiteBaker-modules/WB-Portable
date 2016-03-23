@@ -15,7 +15,7 @@
  *
 */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 $admin_header = false;
 // Tells script to update when this page was last updated
@@ -38,8 +38,13 @@ if(isset($_POST['menu_link'])) {
     $sTarget = $admin->get_post('target');
     $extern='';
     if(isset($_POST['extern'])) {
-        $extern = $admin->get_post('extern');
-    }
+        include_once WB_PATH.'/include/idna_convert/idna_convert.class.php';
+        $oIdn = new idna_convert();
+        $extern = $oIdn->encode($_POST['extern']);
+        $extern = (filter_var($extern, FILTER_VALIDATE_URL) === false ? '' : $extern);
+        $extern = $oIdn->decode($extern);
+        unset($oIdn);
+    } else { $extern = ''; }
 
     $table_pages = TABLE_PREFIX.'pages';
     $sql = 'UPDATE `'.TABLE_PREFIX.'pages` SET '
@@ -60,7 +65,7 @@ if(isset($_POST['menu_link'])) {
 if($database->is_error()) {
     $admin->print_error($database->get_error(), $js_back);
 } else {
-    $admin->print_success($MESSAGE['PAGES']['SAVED'],$backlink );
+    $admin->print_success($MESSAGE['PAGES_SAVED'],$backlink );
 }
 
 // Print admin footer

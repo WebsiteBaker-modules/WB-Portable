@@ -36,11 +36,11 @@
  * This class is a replacement for the former class SecureForm using the SecureTokensInterface
  *
  * Settings for this class
- * TYPE    KONSTANTE             REGISTY-VAR                  DEFAULTWERT
- * boolean SEC_TOKEN_FINGERPRINT ($oReg->SecTokenFingerprint) [default=true]
- * integer SEC_TOKEN_NETMASK4    ($oReg->SecTokenNetmask4)    0-255 [default=24]
- * integer SEC_TOKEN_NETMASK6    ($oReg->SecTokenNetmask6)    0-128 [default=64]
- * integer SEC_TOKEN_LIFE_TIME   ($oReg->SecTokenLifeTime)    1800 | 2700 | 3600[default] | 7200
+ * TYPE    KONSTANTE                    REGISTY-VAR                       DEFAULTWERT
+ * boolean SEC_TOKEN_FINGERPRINT        ($oReg->SecTokenFingerprint)      [default=true]
+ * integer SEC_TOKEN_IPV4_NETMASK       ($oReg->SecTokenIpv4Netmask)      0-255 [default=24]
+ * integer SEC_TOKEN_IPV6_PREFIX_LENGTH ($oReg->SecTokenIpv6PrefixLength) 0-128 [default=64]
+ * integer SEC_TOKEN_LIFE_TIME          ($oReg->SecTokenLifeTime)         1800 | 2700 | 3600[default] | 7200
 */
 
 class SecureTokens
@@ -61,14 +61,16 @@ class SecureTokens
     private $aTokens = array(
         'default' => array('value' => 0, 'expire' => 0, 'instance' => 0)
     );
-/** the salt for this run */
-    private $sSalt            = '';
+/** the salt for this instance */
+    private $sSalt             = '';
 /** fingerprint of the current connection */
-    private $sFingerprint     = '';
-/** the FTAN token which is valid for this run */
-    private $aLastCreatedFtan = null;
-/** the time when tokens expired if they created in this run */
-    private $iExpireTime      = 0;
+    private $sFingerprint      = '';
+/** the FTAN token which is valid for this instance */
+    private $aLastCreatedFtan  = null;
+/** the time when tokens expired if they created in this instance */
+    private $iExpireTime       = 0;
+/** remove selected tokens only and update all others */
+    private $bPreserveAllOtherTokens = false;
 /** id of the current instance */
     private $sCurrentInstance  = null;
 /** id of the instance to remove */
@@ -77,14 +79,15 @@ class SecureTokens
     private $sInstanceToUpdate = null;
 /* --- settings for SecureTokens ------------------------------------------------------ */
 /** use fingerprinting to encode */
-    private $bUseFingerprint = true;
+    private $bUseFingerprint   = true;
 /** maximum lifetime of a token in seconds */
-    private $iTokenLifeTime   = 1800; // 30min / 45min / 1h / 2h (default = 30min)
+    private $iTokenLifeTime    = 1800; // between LIFETIME_MIN and LIFETIME_MAX (default = 30min)
 /** bit length of the IPv4 Netmask (0-32 // 0 = off  default = 24) */
-    private $iNetmaskLengthV4 = 0;
+    private $iNetmaskLengthV4  = 0;
 /** bit length of the IPv6 Netmask (0-128 // 0 = off  default = 64) */
-    private $iNetmaskLengthV6 = 0;
+    private $iNetmaskLengthV6  = 0;
 
+    private static $oInstance = null;
 /**
  * constructor
  * @param (void)
@@ -93,19 +96,30 @@ class SecureTokens
     {
     // load settings if available
         $this->getSettings();
-    // generate salt for calculations in this run
-        $this->sSalt        = $this->generateSalt();
+    // generate salt for calculations in this instance
+        $this->sSalt            = $this->generateSalt();
     // generate fingerprint for the current connection
-        $this->sFingerprint = $this->buildFingerprint();
-    // define the expiretime for this run
-        $this->iExpireTime  = time() + $this->iTokenLifeTime;
-    // calculate the instance id for this run
-        $this->sCurrentInstance = $this->encode64(md5($this->iExpireTime.$this->sSalt));
+        $this->sFingerprint     = $this->buildFingerprint();
+    // define the expiretime for this instance
+        $this->iExpireTime      = time() + $this->iTokenLifeTime;
+    // calculate the instance id for this instance
+        $this->sCurrentInstance = $this->encodeHash(md5($this->iExpireTime.$this->sSalt));
     // load array of tokens from session
         $this->loadTokens();
     // at first of all remove expired tokens
         $this->removeExpiredTokens();
     }
+
+    public static function getInstance()
+    {
+        if (self::$oInstance == null) {
+            $sClass = __CLASS__;
+            self::$oInstance = new $sClass();
+        }
+        return self::$oInstance;
+    }
+
+    private function __clone() {}
 
 /**
  * destructor
@@ -122,34 +136,6 @@ class SecureTokens
         }
         $this->saveTokens();
     }
-
-/**
- * returns all TokenLifeTime values
- * @return array
- */
-    final public function getTokenLifeTime()
-    {
-        return array(
-            'min'   => self::LIFETIME_MIN,
-            'max'   => self::LIFETIME_MAX,
-            'step'  => self::LIFETIME_STEP,
-            'value' => $this->iTokenLifeTime
-        );
-    }
-
-/**
- * Dummy method for backward compatibility
- * @return void
- * @deprecated from WB-2.8.3-SP5
- */
-    final public function createFTAN() { ; } // do nothing
-
-/**
- * Dummy method for backward compatibility
- * @return void
- * @deprecated from WB-2.8.3-SP5
- */
-    final public function clearIDKEY() { ; } // do nothing
 
 /**
  * returns the current FTAN
@@ -170,7 +156,7 @@ class SecureTokens
         }
         $aFtan = $this->aTokens[$this->aLastCreatedFtan];
         $aFtan['name']  = $this->aLastCreatedFtan;
-        $aFtan['value'] = $this->encode64(md5($aFtan['value'].$this->sFingerprint));
+        $aFtan['value'] = $this->encodeHash(md5($aFtan['value'].$this->sFingerprint));
         if (is_string($mMode)) {
             $mMode = strtoupper($mMode);
         } else {
@@ -192,13 +178,14 @@ class SecureTokens
 /**
  * checks received form-transactionnumbers against session-stored one
  * @param string $mode: requestmethode POST(default) or GET
+ * @param bool $bPreserve (default=false)
  * @return bool:    true if numbers matches against stored ones
  *
  * requirements: an active session must be available
  * this check will prevent from multiple sending a form. history.back() also will never work
  */
-final public function checkFTAN($mMode = 'POST')
-{
+    final public function checkFTAN($mMode = 'POST')
+    {
         $bRetval = false;
         // get the POST/GET arguments
         $aArguments = (strtoupper($mMode) == 'POST' ? $_POST : $_GET);
@@ -234,7 +221,7 @@ final public function checkFTAN($mMode = 'POST')
         }
         // crypt value with salt into md5-hash and return a 16-digit block from random start position
         $sTokenName = $this->addToken(
-            substr(md5($this->sSalt.(string)$mValue), mt_rand(0,15), 16),
+            substr(md5($this->sSalt.(string)$mValue), rand(0,15), 16),
             $mValue
         );
         return $sTokenName;
@@ -245,27 +232,31 @@ final public function checkFTAN($mMode = 'POST')
  * @param string $sFieldname: name of the POST/GET-Field containing the key or hex-key itself
  * @param mixed $mDefault: returnvalue if key not exist (default 0)
  * @param string $sRequest: requestmethode can be POST or GET or '' (default POST)
+ * @param bool $bPreserve (default=false)
  * @return mixed: the original value (string, numeric, array) or DEFAULT if request fails
  * @description: each IDKEY can be checked only once. Unused Keys stay in list until they expire
  */
     final public function checkIDKEY($sFieldname, $mDefault = 0, $sRequest = 'POST', $bPreserve = false)
     {
         $mReturnValue = $mDefault; // set returnvalue to default
+        $this->bPreserveAllOtherTokens = $bPreserve ?: $this->bPreserveAllOtherTokens;
         $sRequest = strtoupper($sRequest);
         switch ($sRequest) {
             case 'POST':
+                $sTokenName = @$_POST[$sFieldname] ?: $sFieldname;
+                break;
             case 'GET':
-                $sTokenName = $GLOBALS['_'.$sRequest][$sFieldname] ?: $sFieldname;
+                $sTokenName = @$_GET[$sFieldname] ?: $sFieldname;
                 break;
             default:
                 $sTokenName = $sFieldname;
         }
-         if (preg_match('/^[0-9a-f]{16}$/i', $sTokenName)) {
+        if (preg_match('/^[0-9a-f]{16}$/i', $sTokenName)) {
         // key must be a 16-digit hexvalue
             if (array_key_exists($sTokenName, $this->aTokens)) {
             // check if key is stored in IDKEYs-list
                 $mReturnValue = $this->aTokens[$sTokenName]['value']; // get stored value
-                $this->removeToken($sTokenName, $bPreserve);   // remove from list to prevent multiuse
+                $this->removeToken($sTokenName);   // remove from list to prevent multiuse
                 if (preg_match('/.*(?<!\{).*(\d:\{.*;\}).*(?!\}).*/', $mReturnValue)) {
                 // if value is a serialized array, then deserialize it
                     $mReturnValue = unserialize($mReturnValue);
@@ -295,9 +286,24 @@ final public function checkFTAN($mMode = 'POST')
         }
         return $iRetval;
     }
-// ***************************************************************************************
-// *** from here private methods only                                                  ***
-// ***************************************************************************************
+
+/**
+ * returns all TokenLifeTime values
+ * @return array
+ */
+    final public function getTokenLifeTime()
+    {
+        return array(
+            'min'   => self::LIFETIME_MIN,
+            'max'   => self::LIFETIME_MAX,
+            'step'  => self::LIFETIME_STEP,
+            'value' => $this->iTokenLifeTime
+        );
+    }
+
+/* ************************************************************************************ */
+/* *** from here private methods only                                               *** */
+/* ************************************************************************************ */
 /**
  * load all tokens from session
  */
@@ -327,15 +333,19 @@ final public function checkFTAN($mMode = 'POST')
     private function addToken($sTokenName, $sValue)
     {
         // limit TokenName to 16 digits
-        $sTokenName = substr($sTokenName, 0, 16);
+        $sTokenName = substr(str_pad($sTokenName, 16, '0', STR_PAD_LEFT), -16);
         // make sure, first digit is a alpha char [a-f]
         $sTokenName[0] = dechex(10 + (hexdec($sTokenName[0]) % 5));
         // loop as long the generated TokenName already exists in list
         while (isset($this->aTokens[$sTokenName])) {
-            $aTmp = str_split($sTokenName, 8);
-            // increment lower word of Tokenname
-            $aTmp[1] = sprintf('%08x', hexdec($aTmp[1])+1);
-            $sTokenName = implode('', $aTmp);
+            // split TokenName into 4 words
+            $aWords = str_split($sTokenName, 4);
+            // get lowest word and increment it
+            $iWord = hexdec($aWords[3]) + 1;
+            // reformat integer into a 4 digit hex string
+            $aWords[3] = sprintf('%04x', ($iWord > 0xffff ? 1 : $iWord));
+            // rebuild the TokenName
+            $sTokenName = implode('', $aWords);
         }
         // store Token in list
         $this->aTokens[$sTokenName] = array(
@@ -344,16 +354,22 @@ final public function checkFTAN($mMode = 'POST')
             'instance' => $this->sCurrentInstance
         );
         return $sTokenName;
-     }
+    }
+
 /**
  * remove the token, called sTokenName from list
  * @param type $sTokenName
  */
-    private function removeToken($sTokenName, $bPreserve = false)
+    private function removeToken($sTokenName)
     {
         if (isset($this->aTokens[$sTokenName])) {
-            if ($bPreserve) {
-                $this->sInstanceToUpdate = $this->aTokens[$sTokenName]['instance'];
+            if ($this->bPreserveAllOtherTokens) {
+                if ($this->sInstanceToDelete) {
+                    $this->sInstanceToUpdate = $this->sInstanceToDelete;
+                    $this->sInstanceToDelete = null;
+                } else {
+                    $this->sInstanceToUpdate = $this->aTokens[$sTokenName]['instance'];
+                }
             } else {
                 $this->sInstanceToDelete = $this->aTokens[$sTokenName]['instance'];
             }
@@ -396,22 +412,21 @@ final public function checkFTAN($mMode = 'POST')
         if (!$this->bUseFingerprint) { return md5('this_is_a_dummy_only'); }
         $sClientIp = '127.0.0.1';
         if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)){
-            $aTmp = preg_split('/\s*?,\s*?/', $_SERVER['HTTP_X_FORWARDED_FOR'], null, PREG_SPLIT_NO_EMPTY);
+            $aTmp = preg_split('/\s*,\s*/', $_SERVER['HTTP_X_FORWARDED_FOR'], null, PREG_SPLIT_NO_EMPTY);
             $sClientIp = array_pop($aTmp);
         }else if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
             $sClientIp = $_SERVER['REMOTE_ADDR'];
         }else if (array_key_exists('HTTP_CLIENT_IP', $_SERVER)) {
             $sClientIp = $_SERVER['HTTP_CLIENT_IP'];
         }
-        $aSelfTest = array_chunk(stat(__FILE__), 11);
-        unset($aSelfTest[0][8]);
+        $aTmp = array_chunk(stat(__FILE__), 11);
+        unset($aTmp[0][8]);
         return md5(
-            __FILE__ . PHP_VERSION . implode('', $aSelfTest[0])
+            __FILE__ . PHP_VERSION . implode('', $aTmp[0])
             . (array_key_exists('HTTP_USER_AGENT', $_SERVER) ? $_SERVER['HTTP_USER_AGENT'] : 'AGENT')
             . $this->calcClientIpHash($sClientIp)
         );
     }
-
 
 /**
  * mask IPv4 as well IPv6 addresses with netmask and make a md5 hash from
@@ -422,31 +437,49 @@ final public function checkFTAN($mMode = 'POST')
  */
     private function calcClientIpHash($sRawIp)
     {
+        // clean address from netmask/prefix and port
+        $sPattern = '/^\[?([.:a-f0-9]*)(?:\/[0-1]*)?(?:\]?.*)$/im';
+        $sRawIp = preg_replace($sPattern, '$1', $sRawIp);
         if (strpos($sRawIp, ':') === false) {
-        // calculate IPv4
+// sanitize IPv4 ---------------------------------------------------------------------- //
             $iIpV4 = ip2long($sRawIp);
-        // calculate netmask
+            // calculate netmask
             $iMask = ($this->iNetmaskLengthV4 < 1)
                 ? 0
                 : bindec(
                     str_repeat('1', $this->iNetmaskLengthV4).
                     str_repeat('0', 32 - $this->iNetmaskLengthV4)
                 );
-        // apply mask
+            // apply mask and reformat to IPv4 string notation.
             $sIp = long2ip($iIpV4 & $iMask);
         } else {
-        // sanitize IPv6
+// sanitize IPv6 ---------------------------------------------------------------------- //
+            // check if IP includes a IPv4 part and convert this into IPv6 format
+            $sPattern = '/^([:a-f0-9]*?)\:([0-9]{1,3}(?:\.[0-9]{1,3}){3})$/is';
+            if (preg_match($sPattern, $sRawIp, $aMatches)) {
+                // convert IPv4 into full size 32bit binary string
+                $sIpV4Bin = str_pad((string)decbin(ip2long($aMatches[2])), 32, '0', STR_PAD_LEFT) ;
+                // split into 2 parts of 16bit
+                $aIpV6Hex = str_split($sIpV4Bin, 16);
+                // concate the IPv6/96 part and hex of both IPv4 parts
+                $sRawIp = $aMatches[1].':'.dechex(bindec($aIpV6Hex[0])).':'.dechex(bindec($aIpV6Hex[1]));
+            }
+            // calculate number of missing IPv6 words
             $iWords = 8 - count(preg_split('/:/', $sRawIp, null, PREG_SPLIT_NO_EMPTY));
+            // build multiple ':0000:' replacements for '::'
             $sReplacement = $iWords ? implode(':', array_fill(0, $iWords, '0000')) : '';
+            // insert replacements and remove trailing/leading ':'
             $sClientIp = trim(preg_replace('/\:\:/', ':'.$sReplacement.':', $sRawIp), ':');
+            // split all 8 parts from IP into an array
             $aIpV6 = array_map(
                 function($sPart) {
+                    // expand all parts to 4 hex digits using leading '0'
                     return str_pad($sPart, 4, '0', STR_PAD_LEFT);
                 },
                 preg_split('/:/', $sClientIp)
             );
-        // calculate netmask
-            $iMask = $this->iNetmaskLengthV6;
+            // build binary netmask from iNetmaskLengthV6
+            // and split all 8 parts into an array
             if ($this->iNetmaskLengthV6 < 1) {
                 $aMask = array_fill(0, 8, str_repeat('0', 16));
             } else {
@@ -456,16 +489,18 @@ final public function checkFTAN($mMode = 'POST')
                     16
                 );
             }
-        // apply mask
+            // iterate all IP parts, apply its mask and reformat to IPv6 string notation.
             array_walk(
                 $aIpV6,
                 function(&$sWord, $iIndex) use ($aMask) {
                     $sWord = sprintf('%04x', hexdec($sWord) & bindec($aMask[$iIndex]));
                 }
             );
+            // reformat to IPv6 string notation.
             $sIp = implode(':', $aIpV6);
+// ------------------------------------------------------------------------------------ //
         }
-        return md5($sIp); // return the hash
+        return md5($sIp); // return the hashed IP string
     }
 
 /**
@@ -474,15 +509,15 @@ final public function checkFTAN($mMode = 'POST')
  * @return string
  * @description reduce the 32char length of a MD5 to 22 chars
  */
-    private function encode64($sMd5Hash)
+    private function encodeHash($sMd5Hash)
     {
         return rtrim(base64_encode(pack('h*',$sMd5Hash)), '+-= ');
     }
 
 // callback method, needed for PHP-5.3.x only    
-   private function checkFtanCallback($aToken)
+    private function checkFtanCallback($aToken)
     {
-        return $this->encode64(md5($aToken['value'].$this->sFingerprint));
+        return $this->encodeHash(md5($aToken['value'].$this->sFingerprint));
     }
 
 /**
@@ -506,17 +541,18 @@ final public function checkFTAN($mMode = 'POST')
                                       : $this->iTokenLifeTime;
         } else {
         // for WB from 2.8.4 and up
-            $this->bUseFingerprint  = isset($this->oReg->SecTokenFingerprint)
-                                      ? $this->oReg->SecTokenFingerprint
+            $oReg = WbAdaptor::getInstance();
+            $this->bUseFingerprint  = isset($oReg->SecTokenFingerprint)
+                                      ? $oReg->SecTokenFingerprint
                                       : $this->bUseFingerprint;
-            $this->iNetmaskLengthV4 = isset($this->oReg->SecTokenNetmask4)
-                                      ? $this->oReg->SecTokenNetmask4
+            $this->iNetmaskLengthV4 = isset($oReg->SecTokenIpv4Netmask)
+                                      ? $oReg->SecTokenIpv4Netmask
                                       : $this->iNetmaskLengthV4;
-            $this->iNetmaskLengthV6 = isset($this->oReg->SecTokenNetmask6)
-                                      ? $this->oReg->SecTokenNetmask6
+            $this->iNetmaskLengthV6 = isset($oReg->SecTokenIpv6PrefixLength)
+                                      ? $oReg->SecTokenIpv6PrefixLength
                                       : $this->iNetmaskLengthV6;
-            $this->iTokenLifeTime   = isset($this->oReg->SecTokenLifeTime)
-                                      ? $this->oReg->SecTokenLifeTime
+            $this->iTokenLifeTime   = isset($oReg->SecTokenLifeTime)
+                                      ? $oReg->SecTokenLifeTime
                                       : $this->iTokenLifeTime;
         }
         $this->iNetmaskLengthV4 = ($this->iNetmaskLengthV4 < 1 || $this->iNetmaskLengthV4 > 32)

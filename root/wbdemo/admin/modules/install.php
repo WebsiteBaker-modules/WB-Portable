@@ -20,7 +20,7 @@
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
 // Include config file and admin class file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 $admin = new admin('Addons', 'modules_install', false);
@@ -108,7 +108,7 @@ rm_full_dir($temp_unzip);
 if(!isset($module_directory))
 {
     if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
-    $admin->print_error($MESSAGE['GENERIC']['INVALID']);
+    $admin->print_error($MESSAGE['GENERIC_INVALID']);
 }
 
 // Check if this module is already installed
@@ -123,13 +123,10 @@ if(is_dir(WB_PATH.'/modules/'.$module_directory))
         // Version to be installed is older than currently installed version
         if (versionCompare($module_version, $new_module_version, '>='))
         {
-
             if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
-            $admin->print_error($MESSAGE['GENERIC']['ALREADY_INSTALLED']);
+            $admin->print_error($MESSAGE['GENERIC_ALREADY_INSTALLED']);
         }
-
         $action="upgrade";
-
     }
 }
 
@@ -137,7 +134,7 @@ if(is_dir(WB_PATH.'/modules/'.$module_directory))
 if(!is_writable(WB_PATH.'/modules/'))
 {
     if(file_exists($temp_file)) { unlink($temp_file); } // Remove temp file
-    $admin->print_error($MESSAGE['GENERIC']['BAD_PERMISSIONS']);
+    $admin->print_error($MESSAGE['GENERIC_BAD_PERMISSIONS']);
 }
 
 // Set module directory
@@ -155,7 +152,7 @@ if(isset($_POST['overwrite'])){
 
 if(!$list)
 {
-    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UNZIP']);
+    $admin->print_error($MESSAGE['GENERIC_CANNOT_UNZIP']);
 }
 /*
 
@@ -189,12 +186,12 @@ if ($action=="install")
 {
     // Load module info into DB
     load_module(WB_PATH.'/modules/'.$module_directory, false);
-    $admin->print_success($MESSAGE['GENERIC']['INSTALLED']);
+    $admin->print_success($MESSAGE['GENERIC_INSTALLED']);
 } elseif ($action=="upgrade")
 {
 
     upgrade_module($module_directory, false);
-    $admin->print_success($MESSAGE['GENERIC']['UPGRADED']);
+    $admin->print_success($MESSAGE['GENERIC_UPGRADED']);
 }
 
 // Print admin footer

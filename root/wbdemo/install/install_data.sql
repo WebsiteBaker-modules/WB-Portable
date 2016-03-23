@@ -20,7 +20,7 @@ INSERT INTO `{TABLE_PREFIX}search` (`search_id`, `name`, `value`, `extra`) VALUE
 (1, 'header', '\n<h1>[TEXT_SEARCH]</h1>\n\n<form name="searchpage" action="[WB_URL]/search/index.php" method="get">\n<table cellpadding="3" cellspacing="0" border="0" width="500">\n<tr>\n<td>\n<input type="hidden" name="search_path" value="[SEARCH_PATH]" />\n<input type="text" name="string" value="[SEARCH_STRING]" style="width: 100%;" />\n</td>\n<td width="150">\n<input type="submit" value="[TEXT_SEARCH]" style="width: 100%;" />\n</td>\n</tr>\n<tr>\n<td colspan="2">\n<input type="radio" name="match" id="match_all" value="all"[ALL_CHECKED] />\n<label for="match_all">[TEXT_ALL_WORDS]</label>\n<input type="radio" name="match" id="match_any" value="any"[ANY_CHECKED] />\n<label for="match_any">[TEXT_ANY_WORDS]</label>\n<input type="radio" name="match" id="match_exact" value="exact"[EXACT_CHECKED] />\n<label for="match_exact">[TEXT_EXACT_MATCH]</label>\n</td>\n</tr>\n</table>\n\n</form>\n\n<hr />\n    ', ''),
 (2, 'footer', '', ''),
 (3, 'results_header', '[TEXT_RESULTS_FOR] ''<b>[SEARCH_STRING]</b>'':\n<table cellpadding="2" cellspacing="0" border="0" width="100%" style="padding-top: 10px;">', ''),
-(4, 'results_loop', '<tr style="background-color: #F0F0F0;">\n<td><a href="[LINK]">[TITLE]</a></td>\n<td align="right">[TEXT_LAST_UPDATED_BY] [DISPLAY_NAME] ([USERNAME]) [TEXT_ON] [DATE]</td>\n</tr>\n<tr><td colspan="2" style="text-align: justify; padding-bottom: 5px;">[DESCRIPTION]</td></tr>\n<tr><td colspan="2" style="text-align: justify; padding-bottom: 10px;">[EXCERPT]</td></tr>', ''),
+(4, 'results_loop', '<tr style="background-color: #F0F0F0;">\n<td><a href="[LINK]">[TITLE]</a></td>\n<td align="right">[TEXT_LAST_UPDATED_BY] [DISPLAY_NAME] [TEXT_ON] [DATE]</td>\n</tr>\n<tr><td colspan="2" style="text-align: justify; padding-bottom: 5px;">[DESCRIPTION]</td></tr>\n<tr><td colspan="2" style="text-align: justify; padding-bottom: 10px;">[EXCERPT]</td></tr>', ''),
 (5, 'results_footer', '</table>', ''),
 (6, 'no_results', '<tr><td><p>[TEXT_NO_RESULTS]</p></td></tr>', ''),
 (7, 'module_order', 'faqbaker,manual,wysiwyg', ''),
@@ -36,15 +36,15 @@ INSERT INTO `{TABLE_PREFIX}search` (`search_id`, `name`, `value`, `extra`) VALUE
 -- Daten für Tabelle `settings`
 --
 INSERT INTO `{TABLE_PREFIX}settings` (`setting_id`, `name`, `value`) VALUES
-(1, 'website_description', ''),
-(2, 'website_keywords', ''),
-(3, 'website_header', ''),
-(4, 'website_footer', ''),
-(5, 'wysiwyg_style', 'font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px;'),
-(6, 'er_level', ''),
-(7, 'sec_anchor', 'wb_'),
-(8, 'default_date_format', 'M d Y'),
-(9, 'default_time_format', 'g:i A'),
+( 1, 'website_description', ''),
+( 2, 'website_keywords', ''),
+( 3, 'website_header', ''),
+( 4, 'website_footer', ''),
+( 5, 'wysiwyg_style', 'font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px;'),
+( 6, 'er_level', ''),
+( 7, 'sec_anchor', 'wb_'),
+( 8, 'default_date_format', 'M d Y'),
+( 9, 'default_time_format', 'g:i A'),
 (10, 'redirect_timer', '1500'),
 (11, 'home_folders', 'true'),
 (12, 'warn_page_leave', '1'),
@@ -78,8 +78,10 @@ INSERT INTO `{TABLE_PREFIX}settings` (`setting_id`, `name`, `value`) VALUES
 (40, 'sec_token_fingerprint', 'true'),
 (41, 'sec_token_netmask4', '24'),
 (42, 'sec_token_netmask6', '64'),
-(43, 'sec_token_life_time', '7200'),
+(43, 'sec_token_life_time', '1800'),
 (44, 'secure_form_module', ''),
-(45, 'debug', 'false');
-
+(45, 'debug', 'false'),
+(46, 'wbmailer_smtp_port', '25')
+(47, 'wbmailer_smtp_secure', 'TLS')
+(48, 'mediasettings', '')
 

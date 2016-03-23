@@ -30,4 +30,3 @@
 $MOD_MENU_LINK['TEXT']                = 'Cliquez ICI pour retourn&eacute; &agrave; la page principale';
 $MOD_MENU_LINK['EXTERNAL_LINK'] = 'Lien externe';
 
-?>

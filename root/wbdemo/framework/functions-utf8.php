@@ -1,10 +1,11 @@
 <?php
+
 // $Id: functions-utf8.php 1499 2011-08-12 11:21:25Z DarkViper $
 
 /*
 
- WebsiteBaker Project <http://websitebaker.org/>
- Copyright (C) Ryan Djurovich
+ Website Baker Project <http://www.websitebaker.org/>
+ Copyright (C) 2004-2009, Ryan Djurovich
 
  Website Baker is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -405,17 +406,9 @@ function entities_to_7bit($str) {
     // convert to HTML-entities, and replace entites by hex-numbers
     $str = utf8_fast_umlauts_to_entities($str, false);
     $str = str_replace('&#039;', '&apos;', $str);
-//    $str = preg_replace_callback('/&#([0-9]+);/', function($matches) {return "dechex($matches[1])";}, $str);
-//    $str = preg_replace_callback('/&#38;#([0-9]+);/', function($matches) {return dechex($matches[1]);}, $str);
-    if (version_compare(PHP_VERSION, '5.3', '<')) {
-        $str = preg_replace('/&#([0-9]+);/e', "dechex('$1')",  $str);
-    } else {
-        $str = preg_replace_callback('/&#([0-9]+);/', create_function('$aMatches', 'return dechex($aMatches[1]);'),  $str);
-    }
+    $str = preg_replace_callback('/&#([0-9]+);/', function($matches) {return dechex($matches[1]);}, $str);
     // maybe there are some &gt; &lt; &apos; &quot; &amp; &nbsp; left, replace them too
     $str = str_replace(array('&gt;', '&lt;', '&apos;', '\'', '&quot;', '&amp;'), '', $str);
-    $str = str_replace('&amp;', '', $str);
-    
     return($str);
 }
 

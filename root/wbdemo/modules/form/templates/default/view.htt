@@ -1,0 +1,14 @@
+<!-- BEGIN main_block -->
+
+<!-- available replacements
+    URL
+    HEIGHT
+    NOTICE
+-->
+
+<iframe src="{URL}" width="100%" height="{HEIGHT}" frameborder="0" scrolling="auto">
+    {NOTICE}
+    <a href="{URL}" target="_blank">{URL}</a>
+</iframe>
+
+<!-- END main_block -->

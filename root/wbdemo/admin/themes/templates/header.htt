@@ -1,10 +1,9 @@
 <!-- BEGIN header_block -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE HTML>
+<html lang="{LANGUAGE}">
 <head>
+<meta charset="utf-8" />
 <title>{WEBSITE_TITLE} >> {TEXT_ADMINISTRATION} - {SECTION_NAME}</title>
-<meta http-equiv="content-type" content="text/html; charset={CHARSET}" />
-<meta http-equiv="content-language" content="{LANGUAGE}" />
 <meta name="description" content="{TEXT_ADMINISTRATION}" />
 <meta name="keywords" content="{TEXT_ADMINISTRATION}" />
 <meta name="author" content="WebsiteBaker Org e.V." />
@@ -12,8 +11,6 @@
 <meta http-equiv="Accept-Encoding" content="gzip, deflate" />
 <link href="{THEME_URL}/theme.css" rel="stylesheet" type="text/css" />
 {BACKEND_MODULE_CSS}
-<script src="{WB_URL}/include/jquery/domReady.js" type="text/javascript"></script>
-<script src="{WB_URL}/include/jquery/LoadOnFly.js" type="text/javascript"></script>
 <script type="text/javascript">
 var WB_URL = '{WB_URL}';
 var THEME_URL = '{THEME_URL}';
@@ -21,28 +18,41 @@ var TEMPLATE = '{TEMPLATE}';
 var ADMIN_URL = '{ADMIN_URL}';
 var EDITOR = '{EDITOR}';
 </script>
+<script src="{WB_URL}/include/jquery/domReady.js" type="text/javascript"></script>
+<script src="{WB_URL}/include/jquery/LoadOnFly.js" type="text/javascript"></script>
 <script src="{WB_URL}/include/jquery/jquery-min.js" type="text/javascript"></script>
 <script src="{WB_URL}/include/jquery/jquery-insert.js" type="text/javascript"></script>
 <script src="{WB_URL}/include/jquery/jquery-include.js" type="text/javascript"></script>
 <!--[if lt IE 7]><script type="text/javascript" src="{WB_URL}/include/jquery/plugins/jquery-pngFix.js"></script><![endif]-->
 {BACKEND_MODULE_JS}
 </head>
-<body>
 <table summary="" class="header">
 <tr>
     <td>
-        <a href="{ADMIN_URL}" title="{TITLE_START}"><img src="{THEME_URL}/images/logo.png" border="0" alt="Logo" /></a>
+        <a href="{ADMIN_URL}" title="{TITLE_START}"><img src="{THEME_URL}/images/logo.png"  alt="Logo" /></a>
     </td>
     <td>&nbsp;</td>
-    <td class="menue">
-         <a href="{ADMIN_URL}" title="{TITLE_START}"><img src="{THEME_URL}/images/home.png" border="0" alt="{TITLE_START}" /></a>
-         &nbsp;&nbsp;<a href="{URL_VIEW}" target="_blank" title="{TITLE_VIEW}"><img src="{THEME_URL}/images/view.png" border="0" alt="{WB_URL}" /></a>
-    &nbsp; <a href="{URL_HELP}" target="_blank" title="{TITLE_HELP}"><img src="{THEME_URL}/images/help.png" border="0" alt="{TITLE_HELP}" /></a>
-         &nbsp; <a href="{ADMIN_URL}/logout" title="{TITLE_LOGOUT}"><img src="{THEME_URL}/images/dl.png" border="0" alt="{TITLE_LOGOUT}" /></a>
-</td>
-    <td class="version">
-    Version {VERSION} {SP}<br />
-    Revision {REVISION}
+    <td class="menue" style="white-space: nowrap;">
+         <a href="{ADMIN_URL}" title="{TITLE_START}"><img src="{THEME_URL}/images/home.png" alt="{TITLE_START}" /></a>
+         &nbsp;&nbsp;<a href="{URL_VIEW}" target="_blank" title="{TITLE_VIEW}"><img src="{THEME_URL}/images/view.png" alt="{WB_URL}" /></a>
+         &nbsp; <a href="{URL_HELP}" target="_blank" title="{TITLE_HELP}"><img src="{THEME_URL}/images/help.png" alt="{TITLE_HELP}" /></a>
+         &nbsp; <a href="{ADMIN_URL}/logout" title="{TITLE_LOGOUT}"><img src="{THEME_URL}/images/dl.png" alt="{TITLE_LOGOUT}" /></a>
+    </td>
+    <td class="version" style="white-space: normal; float: right; margin-top: 1.5em;">
+      <!-- BEGIN infoBlockBasis -->
+      <ul class="infoBlockBasis" style="width: 23.5em;">
+          <li>WB Version {VERSION}+{SP} </li>
+          <li>{REVISION}</li>
+          <li>{SERVER_ADDR1}</li>
+      </ul>
+      <!-- END infoBlockBasis -->
+      <!-- BEGIN infoBlockExented -->
+      <ul class="infoBlockExented" >
+          <li>WB Version {VERSION}+{SP} {REVISION} </li>
+          <li>PHP Version {PHP_VERSION}</li>
+          <li>SQL Server Version {MYSQLI_VERSION} ( {MYSQLSTRICT} )</li>
+      </ul>
+      <!-- END infoBlockExented -->
     </td>
 </tr>
 </table>

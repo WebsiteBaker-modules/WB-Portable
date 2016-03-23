@@ -11,12 +11,12 @@
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
  * @version         $Id: move_down.php 1457 2011-06-25 17:18:50Z Luisehahne $
- * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/form/move_down.php $
+ * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/form/move_down.php $
  * @lastmodified    $Date: 2011-06-25 19:18:50 +0200 (Sa, 25. Jun 2011) $
  * @description     
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+require('../../config.php');
 
 // Include WB admin wrapper script
 require(WB_PATH.'/modules/admin.php');
@@ -40,4 +40,3 @@ if($order->move_down($field_id)) {
 
 // Print admin footer
 $admin->print_footer();
-exit();

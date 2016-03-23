@@ -18,8 +18,8 @@
 
 
 // Create new admin object and print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages_delete');
 
 // Include the WB functions file
@@ -32,18 +32,9 @@ if( (!($page_id = $admin->checkIDKEY('page_id', 0, $_SERVER['REQUEST_METHOD'])))
     exit();
 }
 
-/* 
-// Get page id
-if(!isset($_GET['page_id']) || !is_numeric($_GET['page_id'])) {
-    header("Location: index.php");
-    exit(0);
-} else {
-    $page_id = $_GET['page_id'];
-}
-*/
 // Get perms
 if (!$admin->get_page_permission($page_id,'admin')) {
-    $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }
 
 // Find out more about the page
@@ -53,7 +44,7 @@ if($database->is_error()) {
     $admin->print_error($database->get_error());
 }
 if($results->numRows() == 0) {
-    $admin->print_error($MESSAGE['PAGES']['NOT_FOUND']);
+    $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
 }
 
 $results_array = $results->fetchRow();
@@ -67,22 +58,42 @@ if(PAGE_TRASH != 'disabled' AND $visibility != 'deleted') {
     function trash_subs($parent = 0) {
         global $database;
         // Query pages
-        $query_menu = $database->query("SELECT page_id FROM ".TABLE_PREFIX."pages WHERE parent = '$parent' ORDER BY position ASC");
-        // Check if there are any pages to show
-        if($query_menu->numRows() > 0) {
-            // Loop through pages
-            while($page = $query_menu->fetchRow()) {
-                // Update the page visibility to 'deleted'
-                $database->query("UPDATE ".TABLE_PREFIX."pages SET visibility = 'deleted' WHERE page_id = '".$page['page_id']."' LIMIT 1");
-                // Run this function again for all sub-pages
-                trash_subs($page['page_id']);
+
+        $sql = 'SELECT `page_id` FROM `'.TABLE_PREFIX.'pages` '
+              .'WHERE `parent` = '.$parent.' '
+              .'ORDER BY `position` ASC';
+        if($oRes = $database->query($sql)) {
+            // Check if there are any pages to show
+            if($oRes->numRows() > 0) {
+                // Loop through pages
+                while($page = $oRes->fetchRow(MYSQLI_ASSOC)) {
+                    // Update the page visibility to 'deleted'
+                    $sql = 'UPDATE `'.TABLE_PREFIX.'pages` SET '
+                          .'`visibility` = \'deleted\' '
+                          .'WHERE `page_id` = '.$page['page_id'].' '
+                          .'';
+                    $database->query($sql);
+
+                    if($database->is_error()) {
+                        $admin->print_error($database->get_error());
+                    }
+                    // Run this function again for all sub-pages
+                    trash_subs($page['page_id']);
+                }
             }
         }
     }
-    
     // Update the page visibility to 'deleted'
-    $database->query("UPDATE ".TABLE_PREFIX."pages SET visibility = 'deleted' WHERE page_id = '$page_id.' LIMIT 1");
-    
+    $sql = 'UPDATE `'.TABLE_PREFIX.'pages` SET '
+                      .'`visibility` = \'deleted\' '
+                      .'WHERE `page_id` = '.$page_id.' '
+                      .'';
+                $database->query($sql);
+
+                if($database->is_error()) {
+                    $admin->print_error($database->get_error());
+                }
+    //
     // Run trash subs for this page
     trash_subs($page_id);
 } else {
@@ -94,13 +105,13 @@ if(PAGE_TRASH != 'disabled' AND $visibility != 'deleted') {
     }
     // Delete page
     delete_page($page_id);
-}    
+}
 
 // Check if there is a db error, otherwise say successful
 if($database->is_error()) {
     $admin->print_error($database->get_error());
 } else {
-    $admin->print_success($MESSAGE['PAGES']['DELETED']);
+    $admin->print_success($MESSAGE['PAGES_DELETED']);
 }
 
 // Print admin footer

@@ -16,23 +16,22 @@
  *
  */
 
-require_once('../config.php');
+if( !defined( 'WB_PATH' ) ){ require(dirname(__DIR__).'/config.php'); }
+ if( !class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
+// Create new frontend object
+if (!isset($wb) || !($wb instanceof frontend)) { $wb = new frontend(); }
 
 if(!FRONTEND_LOGIN) {
-    if(INTRO_PAGE) {
-        header('Location: '.WB_URL.PAGES_DIRECTORY.'/index.php');
-        exit(0);
-    } else {
-        header('Location: '.WB_URL.'/index.php');
-        exit(0);
-    }
+    header('Location: '.WB_URL.'/index.php');
+    exit(0);
 }
-require_once(WB_PATH.'/framework/class.frontend.php');
-$wb_inst = new wb();
-if ($wb_inst->is_authenticated()==false) {
+
+if ($wb->is_authenticated()==false) {
     header('Location: '.WB_URL.'/account/login.php');
     exit(0);
 }
+$redirect_url = ((isset($_SESSION['HTTP_REFERER']) && $_SESSION['HTTP_REFERER'] != '') ? $_SESSION['HTTP_REFERER'] : WB_URL );
+$redirect_url = ( isset($redirect) && ($redirect!='') ? $redirect : $redirect_url);
 
 $page_id = @$_SESSION['PAGE_ID'] ?: 0;
 
@@ -51,4 +50,5 @@ define('VISIBILITY', 'public');
 
 define('PAGE_CONTENT', WB_PATH.'/account/preferences_form.php');
 // Include the index (wrapper) file
+$no_intro = true;
 require(WB_PATH.'/index.php');

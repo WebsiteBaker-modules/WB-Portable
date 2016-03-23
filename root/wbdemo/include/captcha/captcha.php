@@ -25,7 +25,7 @@ if(!function_exists('display_captcha_real')) {
         $output .= "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"";
         $output .= strtolower(LANGUAGE)."\" lang=\"".strtolower(LANGUAGE)."\">\n";
         $output .= "\t<head>\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
-        $output .= "\t\t<title>captcha</title>\n\t</head>\n\t<body>\n";
+        $output .= "\t\t<title>captcha</title>\n\t</head>\n\t<body style=\"margin: 0.925em auto;\">\n";
         $_SESSION['captcha_time'] = $t;
         if($kind=='image') {
             $output .= "\t\t<a title=\"reload\" href=\"".WB_URL."/include/captcha/captcha.php?display_captcha_X986E21=2\">";
@@ -113,19 +113,19 @@ if(!function_exists('call_captcha')) {
         switch(CAPTCHA_TYPE) {
         case 'calc_image':
             $captcha_width = 160;
-            $captcha_height = 60;
+            $captcha_height = 75;
             break;
         case 'calc_ttf_image':
-            $captcha_width = 175;
-            $captcha_height = 60;
+            $captcha_width = 185;
+            $captcha_height = 75;
             break;
         case 'ttf_image':
-            $captcha_width = 175;
-            $captcha_height = 60;
+            $captcha_width = 185;
+            $captcha_height = 75;
             break;
         case 'old_image':
-            $captcha_width = 160;
-            $captcha_height = 55;
+            $captcha_width = 185;
+            $captcha_height = 70;
             break;
         default:
             $captcha_width = 250;
@@ -158,7 +158,8 @@ if(!function_exists('call_captcha')) {
                 case 'calc_ttf_image': // calculation with varying background and ttf-font
                   ?><table class="captcha_table" style="font-size: 100%;"><tr>
                     <td class="image_captcha">
-                        <?php echo "<iframe class=\"captcha_iframe\" width=\"$captcha_width\" height=\"$captcha_height\" style=\"overflow:hidden;border: 1px solid #999;\" name=\"captcha_iframe_$sec_id\" src=\"". WB_URL ."/include/captcha/captcha.php?display_captcha_X986E21=1&amp;s=$sec_id"; ?>">
+                        <?php echo "<iframe class=\"captcha_iframe\" width=\"$captcha_width\" height=\"$captcha_height\" style=\"overflow:hidden; border: 1px solid #999;\" "
+                                 . "name=\"captcha_iframe_$sec_id\" src=\"". WB_URL ."/include/captcha/captcha.php?display_captcha_X986E21=1&amp;s=$sec_id"; ?>">
                         <img src="<?php echo WB_URL.'/include/captcha/captchas/'.CAPTCHA_TYPE.".php?t=$t&amp;s=$sec_id"; ?>" alt="Captcha" style="margin: auto;padding:  0;" />
                         </iframe>
                     </td>

@@ -14,11 +14,11 @@
  * @lastmodified    $Date: 2011-02-07 05:55:31 +0100 (Mo, 07. Feb 2011) $
  *
  */
+
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
+if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
-
 $msg = '';
 $sTable = TABLE_PREFIX.'mod_code';
 if(($sOldType = $database->getTableEngine($sTable))) {

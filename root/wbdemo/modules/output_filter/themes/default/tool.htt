@@ -1,0 +1,112 @@
+<!-- BEGIN main_block -->
+
+<!-- BEGIN headline_block -->
+<h4 style="margin: 0; border-bottom: 1px solid #DDD; padding-bottom: 5px;">
+    <a href="{CANCEL_URL}" title="{ADMINISTRATION_TOOLS}">{ADMINISTRATION_TOOLS}</a>
+    »
+    <a href="{ADMINTOOL_LINK}" title="" alt="">{TOOL_NAME}</a>
+</h4>
+<!-- END headline_block -->
+<h2>
+  {HEADING}
+</h2>
+<!-- BEGIN core_info_block -->
+<div class="{CORE_MSGCLS}">{CORE_MSGTXT}</div>
+<!-- END core_info_block -->
+<div id="filter_and_tables" class="filteroptions">
+<p>
+  {HOWTO}
+</p>
+<!-- BEGIN message_block -->
+<div class="{MSGCLS}">{MSGTXT}</div>
+<!-- END message_block -->
+<form name="store_settings" action="{ADMIN_URL}/admintools/tool.php?tool={MODULE_NAME}" method="post">
+  <input type="hidden" name="url" value="{PAGE_ID}" />
+  <input type="hidden" name="section_id" value="{SECTION_ID}" />
+  <input type="hidden" name="cmd" value="tool" />
+  <input type="hidden" name="action" value="save" />
+  {FTAN}
+  <div id="selectOutputFilters">
+    <table class="filter_table_title">
+          <thead>
+            <tr>
+              <th class="filter_check_all" style="opacity: 1;">
+              {SET_ACTIVE}
+              </th>
+              <th>
+            <!--  <input type="checkbox" id="table_check_all"> -->
+              </th>
+            </tr>
+          </thead>
+    </table>
+      <div class="filter_table_list_container">
+        <input type="hidden" value="0" name="filter_forced">
+        <table class="filter_table_select">
+
+          <tbody>
+<!-- BEGIN filter_block -->
+            <tr>
+              <td class="filter_table_name">{FNAME}</td>
+              <td>
+                <input type="checkbox" {FCHECKED} value="1" name="{FNAME}" id="cb-{FNAME}">
+              </td>
+            </tr>
+<!-- END filter_block -->
+          </tbody>
+        </table>
+      </div>
+  </div>
+
+  <div id="selectFilterContent">
+<!-- BEGIN email-filter_block -->
+  <table id="email-filter" style="{DISPLAY_EMAIL_SETTINGS}">
+    <tbody>
+      <tr>
+        <td>
+          {AT_REPLACEMENT}:
+        </td>
+        <td>
+          <input type="text" style="width: 160px" value="{at_replacement}" name="at_replacement"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {DOT_REPLACEMENT}:
+        </td>
+        <td>
+          <input type="text" style="width: 160px" value="{dot_replacement}" name="dot_replacement"/>
+        </td>
+      </tr>
+    <tr>
+        <td >{EMAIL_FILTER}:</td>
+        <td>
+            <input type="checkbox" name="email_filter" value="1" {EMAIL_FILTER_CHECK}>
+        </td>
+    </tr>
+    <tr>
+        <td>{MAILTO_FILTER}:</td>
+        <td>
+            <input type="checkbox" name="mailto_filter" value="1" {MAILTO_FILTER_CHECK}>
+        </td>
+    </tr>
+    </tbody>
+  </table>
+<!-- END email-filter_block -->
+  </div>
+
+  <div style="padding-top: 1.525em; clear: both; position: relative;">
+    <table>
+      <tr>
+        <td>
+          <input type="submit" value="{SAVE}" />
+        </td>
+        <td>
+          <input type="button" value="{CANCEL}" onclick="window.location = '{CANCEL_URL}';" />
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</form>
+</div>
+<!-- END main_block -->

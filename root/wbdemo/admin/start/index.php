@@ -15,9 +15,8 @@
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
 */
-
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Start','start');
 // ---------------------------------------
 
@@ -55,12 +54,16 @@ if(defined('FINALIZE_SETUP')) {
 // ---------------------------------------
 $msg = '<br />';
 // check if it is neccessary to start the uograde-script
-if(($admin->get_user_id()==1) && file_exists(WB_PATH.'/upgrade-script.php')) {
+if(($admin->ami_group_member('1')) && file_exists(WB_PATH.'/upgrade-script.php')) {
     // check if it is neccessary to start the uograde-script
-    $sql = 'SELECT `value` FROM `'.TABLE_PREFIX.'settings` WHERE `name`=\'wb_revision\'';
-    if($wb_revision=$database->get_one($sql)) {
-    }
-    if (version_compare($wb_revision, REVISION ) < 0) {
+    $oldVersion = '';
+/*
+    $oldVersion  = ''.WB_VERSION.(@WB_SP ? : '');
+    $newVersion  = ''.VERSION.( @SP ? : '');
+*/
+    $oldVersion  = trim(''.WB_VERSION.'+'.WB_REVISION.'+'.( defined('WB_SP') ? WB_SP : ''), '+');
+    $newVersion  = trim(''.VERSION.'+'.REVISION.'+'.( defined('SP') ? SP : ''), '+');
+    if ( version_compare($oldVersion, $newVersion, '<') === true ) {
         if(!headers_sent()) {
             header('Location: '.WB_URL.'/upgrade-script.php');
             exit;

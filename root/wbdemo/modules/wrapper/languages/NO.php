@@ -29,4 +29,5 @@ NORSK LANGUAGE FILE FOR THE ADDON: WRAPPER
 // Headings and text outputs
 $MOD_WRAPPER['NOTICE'] =    'Nettleseren din st&oslash;tter ikke &quot;inline frames&quot;.<br />Klikk p&amp;aring; lenken under for &amp;aring; g&amp;aring; til nettsiden som var men &amp;aring; skulle vises i dette vinduet...<br />';
 
-?>
+// end of file
+

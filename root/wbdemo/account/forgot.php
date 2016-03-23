@@ -16,9 +16,12 @@
  *
  */
 
-require_once('../config.php');
+if ( !defined( 'WB_PATH' ) ){ require(dirname(__DIR__).'/config.php'); }
+if ( !class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
+// Create new frontend object
+if (!isset($wb) || !($wb instanceof frontend)) { $wb = new frontend(); }
 
-$page_id = (!empty($_SESSION['PAGE_ID']) ? $_SESSION['PAGE_ID'] : 0);
+$page_id = @$_SESSION['PAGE_ID'] ?: 0;
 
 // Required page details
 // $page_id = 0;
@@ -33,13 +36,8 @@ define('MENU_TITLE', $MENU['FORGOT']);
 define('VISIBILITY', 'public');
 
 if(!FRONTEND_LOGIN) {
-    if(INTRO_PAGE) {
-        header('Location: '.WB_URL.PAGES_DIRECTORY.'/index.php');
-        exit(0);
-    } else {
-        header('Location: '.WB_URL.'/index.php');
-        exit(0);
-    }
+    header('Location: '.WB_URL.'/index.php');
+    exit(0);
 }
 
 // Set the page content include file

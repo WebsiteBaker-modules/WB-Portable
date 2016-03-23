@@ -2,7 +2,7 @@
 <table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
     <tr >
         <td valign="middle" align="left"><h2>{ADDONS_OVERVIEW}</h2></td>
-        <td align="right"><a  href="{URL_ADVANCED}">{TEXT_ADVANCED}</a></td>
+        <td align="right"><a class="button" href="{URL_ADVANCED}">{TEXT_ADVANCED}</a></td>
     </tr>
 </table>
 

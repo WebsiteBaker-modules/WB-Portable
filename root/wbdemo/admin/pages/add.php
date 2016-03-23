@@ -17,8 +17,8 @@
  */
 
 // Create new admin object and print admin header
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Pages', 'pages_add', false);
 if (!$admin->checkFTAN())
@@ -31,7 +31,7 @@ if (!$admin->checkFTAN())
 require_once(WB_PATH.'/framework/functions.php');
 
 // Get values
-$title = $admin->get_post_escaped('title');
+$title = $admin->get_post('title');
 $title = htmlspecialchars($title);
 $module = preg_replace('/[^a-z0-9_-]/i', "", $admin->get_post('type')); // fix secunia 2010-93-4
 $parent = intval($admin->get_post('parent')); // fix secunia 2010-91-2
@@ -53,24 +53,24 @@ $admin->print_header();
 if ($parent!=0) {
     if (!$admin->get_page_permission($parent,'admin'))
     {
-        $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+        $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
     }
 
 } elseif (!$admin->get_permission('pages_add_l0','system'))
 {
-    $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }    
 
 // check module permissions:
 if (!$admin->get_permission($module, 'module'))
 {
-    $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }    
 
 // Validate data
 if($title == '' || substr($title,0,1)=='.')
 {
-    $admin->print_error($MESSAGE['PAGES']['BLANK_PAGE_TITLE']);
+    $admin->print_error($MESSAGE['PAGES_BLANK_PAGE_TITLE']);
 }
 
 // Check to see if page created has needed permissions
@@ -86,7 +86,7 @@ if(!in_array(1, $admin->get_groups_id()))
     }
     if ($admin_perm_ok == false)
     {
-        $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+        $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
     }
     $admin_perm_ok = false;
     foreach ($viewing_groups as $view_group)
@@ -98,7 +98,7 @@ if(!in_array(1, $admin->get_groups_id()))
     }
     if ($admin_perm_ok == false)
     {
-        $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+        $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
     }
 }
 
@@ -151,9 +151,11 @@ $order->clean($parent);
 $position = $order->get_new($parent);
 
 // Work-out if the page parent (if selected) has a seperate template or language to the default
-$query_parent = $database->query("SELECT template, language FROM ".TABLE_PREFIX."pages WHERE page_id = '$parent'");
+$sql='SELECT `template`, `language` FROM `'.TABLE_PREFIX.'pages` '
+    . 'WHERE `page_id` = '.(int)$parent;
+$query_parent = $database->query($sql);
 if ($query_parent->numRows() > 0) {
-    $fetch_parent = $query_parent->fetchRow();
+    $fetch_parent = $query_parent->fetchRow( MYSQLI_ASSOC );
     $template = $fetch_parent['template'];
     $language = $fetch_parent['language'];
 } else {
@@ -163,7 +165,7 @@ if ($query_parent->numRows() > 0) {
 
 // Insert page into pages table
 $sql = 'INSERT INTO `'.TABLE_PREFIX.'pages` '
-     . 'SET `parent`='.$parent.', '
+     . 'SET `parent`='.(int)$parent.', '
      .     '`link` = \'\', '
      .     '`description`=\'\', '
      .     '`keywords`=\'\', '
@@ -171,18 +173,18 @@ $sql = 'INSERT INTO `'.TABLE_PREFIX.'pages` '
      .     '`admin_users`=\'\', '
      .     '`viewing_users`=\'\', '
      .     '`target`=\'_top\', '
-     .     '`page_title`=\''.$title.'\', '
-     .     '`menu_title`=\''.$title.'\', '
-     .     '`template`=\''.$template.'\', '
-     .     '`visibility`=\''.$visibility.'\', '
-     .     '`position`='.$position.', '
+     .     '`page_title`=\''.$database->escapeString($title).'\', '
+     .     '`menu_title`=\''.$database->escapeString($title).'\', '
+     .     '`template`=\''.$database->escapeString($template).'\', '
+     .     '`visibility`=\''.$database->escapeString($visibility).'\', '
+     .     '`position`='.(int)$position.', '
      .     '`menu`=1, '
-     .     '`language`=\''.$language.'\', '
+     .     '`language`=\''.$database->escapeString($language).'\', '
      .     '`searching`=1, '
      .     '`modified_when`='.time().', '
-     .     '`modified_by`='.$admin->get_user_id().', '
-     .     '`admin_groups`=\''.$admin_groups.'\', '
-     .     '`viewing_groups`=\''.$viewing_groups.'\'';
+     .     '`modified_by`='.(int)$admin->get_user_id().', '
+     .     '`admin_groups`=\''.$database->escapeString($admin_groups).'\', '
+     .     '`viewing_groups`=\''.$database->escapeString($viewing_groups).'\'';
 if (!$database->query($sql)) {
     $admin->print_error($database->get_error());
 }
@@ -195,19 +197,19 @@ $root_parent = root_parent($page_id);
 // Work out page trail
 $page_trail = get_page_trail($page_id);
 // Update page with new level and link
-$sql  = 'UPDATE `'.TABLE_PREFIX.'pages` SET ';
-$sql .= '`root_parent` = '.$root_parent.', ';
-$sql .= '`level` = '.$level.', ';
-$sql .= '`link` = "'.$link.'", ';
-$sql .= '`page_trail` = "'.$page_trail.'"';
-$sql .= (defined('PAGE_LANGUAGES') && PAGE_LANGUAGES)
-         && $field_set
-         && ($language == DEFAULT_LANGUAGE)
-         && (file_exists(WB_PATH.'/modules/mod_multilingual/update_keys.php')
+$sql  = 'UPDATE `'.TABLE_PREFIX.'pages` SET '
+      . '`root_parent` = '.(int)$root_parent.', '
+      . '`level` = '.(int)$level.', '
+      . '`link` = \''.$database->escapeString($link).'\', '
+      . ((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES)
+                 && $field_set
+                 && ($language == DEFAULT_LANGUAGE)
+                 && (file_exists(WB_PATH.'/modules/mod_multilingual/update_keys.php')
          )
-         ? ', `page_code` = '.(int)$page_id.' ' : ' ';
-$sql .= 'WHERE `page_id` = '.$page_id;
-if (!$database->query($sql)) {
+         ? '`page_code` = '.(int)$page_id.', ' : '')
+.     '`page_trail`=\''.$database->escapeString($page_trail).'\' '
+      . 'WHERE `page_id` = '.$page_id;
+    if (!$database->query($sql)) {
     $admin->print_error($database->get_error());
 }
 // Create a new file in the /pages dir
@@ -218,9 +220,9 @@ $position = 1;
 
 // Add new record into the sections table
 $sql = 'INSERT INTO `'.TABLE_PREFIX.'sections` '
-     . 'SET `page_id`='.$page_id.', '
-     .     '`position`='.$position.', '
-     .     '`module`=\''.$module.'\', '
+     . 'SET `page_id`='.(int)$page_id.', '
+     .     '`position`='.(int)$position.', '
+     .     '`module`=\''.$database->escapeString($module).'\', '
      .     '`block`=1';
 if (!$database->query($sql)) {
     $admin->print_error($database->get_error());
@@ -230,9 +232,25 @@ if (!($section_id = $database->getLastInsertId())) {
     $admin->print_error($database->get_error());
 }
 // Include the selected modules add file if it exists
+if (
+    file_exists(WB_PATH.'/modules/'.$module.'/addon.php') &&
+    file_exists(WB_PATH.'/modules/'.$module.'/cmd/cmdModify.inc')
+) {
+    $sCommand = 'modify';
+//    require WB_PATH.'/modules/'.$module.'/addon.php';
+    $admin->print_success($MESSAGE['PAGES_ADDED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
+} else {
+    if (file_exists(WB_PATH.'/modules/'.$module.'/add.php')) {
+        require WB_PATH.'/modules/'.$module.'/add.php';
+    }
+    $admin->print_success($MESSAGE['PAGES_ADDED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
+}
+/*
+// Include the selected modules add file if it exists
 if(file_exists(WB_PATH.'/modules/'.$module.'/add.php')) {
     require(WB_PATH.'/modules/'.$module.'/add.php');
 }
 $admin->print_success($MESSAGE['PAGES']['ADDED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
+*/
 // Print admin footer
 $admin->print_footer();

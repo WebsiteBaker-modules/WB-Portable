@@ -16,7 +16,7 @@
  *
  */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages');
 
@@ -136,6 +136,7 @@ print_r( $page ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
             ?>
             <li class="p<?php echo $page['parent']; ?>">
             <table title="<?php echo $TEXT['EXPAND'].'/'.$TEXT['COLLAPSE']; ?>" class="pages_view" >
+            <tbody>
             <tr>
                 <td class="level_<?php echo $page['level']; ?>" style="width: 0.99525em; padding-left: <?php if($page['level'] > 0){ echo $page['level']*20; } else { echo '0'; } ?>px;">
                     <?php
@@ -289,11 +290,15 @@ print_r( $page ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
                     </a>
                     <?php } ?>
                 </td>
+                <td class="list_actions">
+                    <?php echo $page['language']; ?>
+                </td>
                 <?php
                 // end [IC] jeggers 2009/10/14: Add action to add a page as a child
                 ?>
 
             </tr>
+            </tbody>
             </table>
             <?php
             if ( $page['parent'] == 0)
@@ -331,6 +336,9 @@ if($admin->get_permission('pages_view') == true) {
         </th>
         <th class="header_list_actions">
             <?php echo $TEXT['ACTIONS']; ?>:
+        </th>
+        <th >
+            
         </th>
     </tr>
     </thead>

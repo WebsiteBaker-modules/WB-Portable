@@ -22,6 +22,7 @@ $MOD_MAIL_FILTER['HOWTO'] = '&#1042;&#1099; &#1084;&#1086;&#1078;&#1077;&#1090;&
 $MOD_MAIL_FILTER['WARNING']    = '';
 
 // Text and captions of form elements
+$MOD_MAIL_FILTER['SET_ACTIVE']            = 'Activate Filter';
 $MOD_MAIL_FILTER['BASIC_CONF']    = '&#1054;&#1089;&#1085;&#1086;&#1074;&#1085;&#1099;&#1077; &#1085;&#1072;&#1089;&#1090;&#1088;&#1086;&#1081;&#1082;&#1080; Email';
 $MOD_MAIL_FILTER['SYS_REL'] = 'Frontendoutput with relative Urls';
 $MOD_MAIL_FILTER['opf']        = 'Output filter Dashboard';

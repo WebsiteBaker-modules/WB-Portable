@@ -17,7 +17,7 @@
  */
 
 // Print admin header
-require('../../config.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 include_once('resize_img.php');
 include_once('parameters.php');
 
@@ -48,7 +48,7 @@ $rootlink = 'index.php?dir=';
 // Check to see if target contains ../
 if (!check_media_path($target, false))
 {
-    $admin->print_error($MESSAGE['MEDIA']['TARGET_DOT_DOT_SLASH'] );
+    $admin->print_error($MESSAGE['MEDIA_TARGET_DOT_DOT_SLASH'] );
 }
 
 // Create relative path of the target location for the file
@@ -59,7 +59,7 @@ $resizepath = str_replace(array('/',' '),'_',$target);
 $overwrite = ($admin->get_post('overwrite') != '') ? true : false;
 
 // Get list of file types to which we're supposed to append 'txt'
-$get_result=$database->query("SELECT value FROM ".TABLE_PREFIX."settings WHERE name='rename_files_on_upload' LIMIT 1");
+$get_result=$database->query("SELECT value FROM ".TABLE_PREFIX."settings WHERE name='rename_files_on_upload'");
 $file_extension_string='';
 if ($get_result->numRows()>0) {
     $fetch_result=$get_result->fetchRow();
@@ -73,7 +73,6 @@ $forbidden_file_types  = preg_replace( '/\s*[,;\|#]\s*/','|',RENAME_FILES_ON_UPL
 $good_uploads = 0;
 $sum_dirs = 0;
 $sum_files = 0;
-
 for($count = 1; $count <= 10; $count++)
 {
     // If file was upload to tmp

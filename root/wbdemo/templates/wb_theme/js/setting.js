@@ -28,20 +28,30 @@ function change_wbmailer(type) {
     }
 }
 /*  */
-function toggle_wbmailer_auth() {
-        document.getElementById('row_wbmailer_smtp_username').style.display = '';
-        document.getElementById('row_wbmailer_smtp_password').style.display = '';
-        document.settings.wbmailer_smtp_auth.checked == true;
-/*
-    if( document.settings.wbmailer_smtp_auth.checked == true ) {
-        document.getElementById('row_wbmailer_smtp_username').style.display = '';
-        document.getElementById('row_wbmailer_smtp_password').style.display = '';
-    } else {
-        document.getElementById('row_wbmailer_smtp_username').style.display = 'none';
-        document.getElementById('row_wbmailer_smtp_password').style.display = 'none';
-    }
-*/
+function toggle_wbmailer_auth( elm ) {
+        if ( elm.checked == true ) {
+            elm.checked = false;
+            document.getElementById('row_wbmailer_smtp_username').style.display = 'none';
+            document.getElementById('row_wbmailer_smtp_password').style.display = 'none';
+        }
+        else  {
+            elm.checked = true;
+            document.getElementById('row_wbmailer_smtp_username').style.display = 'block';
+            document.getElementById('row_wbmailer_smtp_password').style.display = 'block';
+        }
+console.info(elm);
 }
+
+function toggle_wbmailer_secure( elm ) {
+        if ( elm.value === '465' ) {
+            document.getElementById('wbmailer_smtp_secure').value = 'SSL';
+console.info(elm);
+        }
+        else  {
+//            document.getElementById('wbmailer_smtp_secure').value = 'block';
+        }
+}
+
 domReady(function() {
 
     var system_linux = document.getElementById("operating_system_linux");
@@ -69,6 +79,20 @@ domReady(function() {
     if ( smtp ){
         smtp.addEventListener("click", function() {
             change_wbmailer( 'smtp' );
+        }, false);
+    }
+
+    var smtpAuth = document.getElementById("wbmailer_smtp_auth");
+    if ( smtpAuth ){
+        smtpAuth.addEventListener("click", function() {
+            toggle_wbmailer_auth( smtpAuth );
+        }, false);
+    }
+
+    var smtpPort = document.getElementById("wbmailer_smtp_port");
+    if ( smtpPort ){
+        smtpPort.addEventListener("change", function() {
+            toggle_wbmailer_secure( smtpPort );
         }, false);
     }
 

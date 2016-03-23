@@ -18,10 +18,11 @@
 
 // Headings and text outputs
 $MOD_MAIL_FILTER['HEADING'] = 'Indstillinger: Output-filter';
-$MOD_MAIL_FILTER['HOWTO'] = 'Du kan konfigurere output-filteret med indstillingerne nedenfor.<p style="line-height:1.5em;"><strong>Tip: </strong>Mailadresser kan krypteres vedhj&Atilde;&brvbar;lp af en  Javascript-funktion. For at g&Atilde;¸re brug af denne indstilling, skal du tilf&Atilde;¸je PHP-koden <code style="background:#FFA;color:#900;"><?php register_frontend_modfiles(js);?></code> til <head> sektionnen af  index.php i din template (layout-skabelon). Uden denne &Atilde;&brvbar;ndring vil kun @-tegnet i email-adressen blive erstattet.</p>';
+$MOD_MAIL_FILTER['HOWTO'] = 'Du kan konfigurere output-filteret med indstillingerne nedenfor.<strong>Tip: </strong>Mailadresser kan krypteres vedhj&Atilde;&brvbar;lp af en  Javascript-funktion. For at g&Atilde;¸re brug af denne indstilling, skal du tilf&Atilde;¸je PHP-koden <code style="background:#FFA;color:#900;"><?php register_frontend_modfiles(js);?></code> til <head> sektionnen af  index.php i din template (layout-skabelon). Uden denne &Atilde;&brvbar;ndring vil kun @-tegnet i email-adressen blive erstattet.';
 $MOD_MAIL_FILTER['WARNING']                = '';
 
 // Text and captions of form elements
+$MOD_MAIL_FILTER['SET_ACTIVE']            = 'Activate Filter';
 $MOD_MAIL_FILTER['BASIC_CONF'] = 'Email grundindstillinger';
 $MOD_MAIL_FILTER['SYS_REL'] = 'Frontendoutput with  relative Urls';
 $MOD_MAIL_FILTER['opf']        = 'Output filter Dashboard';

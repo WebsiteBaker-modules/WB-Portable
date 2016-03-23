@@ -18,8 +18,8 @@
 /*
 */
 // Create new admin object
-require('../../config.php');
-require_once(WB_PATH.'/framework/class.admin.php');
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Pages', 'pages_modify', false);
@@ -38,9 +38,12 @@ if(!isset($_POST['section_id']) || !is_numeric($_POST['section_id'])) {
 } else {
     $section_id = intval($_POST['section_id']);
 }
-
 // $js_back = "javascript: history.go(-1);";
 $js_back = ADMIN_URL.'/pages/modify.php?page_id='.$page_id;
+$bBackLink = isset($_POST['pagetree']);
+if ( $bBackLink ) {
+  $js_back = ADMIN_URL.'/pages/index.php';
+}
 
 if (!$admin->checkFTAN())
 {
@@ -86,9 +89,9 @@ if(file_exists(WB_PATH.'/modules/'.$module.'/save.php'))
 // Check if there is a db error, otherwise say successful
 if($database->is_error())
 {
-    $admin->print_error($database->get_error(), ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
+    $admin->print_error($database->get_error(), $js_back );
 } else {
-    $admin->print_success($MESSAGE['PAGES_SAVED'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
+    $admin->print_success($MESSAGE['PAGES_SAVED'], $js_back );
 }
 
 // Print admin footer

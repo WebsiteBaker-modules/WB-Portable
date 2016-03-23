@@ -18,10 +18,11 @@
 
 // Headings and text outputs
 $MOD_MAIL_FILTER['HEADING']                = 'Beheersinstellingen: Output Filter';
-$MOD_MAIL_FILTER['HOWTO']                = 'Hier kan je de uitvoer filteren met onderstaande opties.<p style="line-height:1.5em;"><strong>Tip: </strong>Mailto links kunnen gecodeerd worden door een Javascript functie. Om van deze optie gebruik te kunnen maken moet je de PHP code <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(\'js\');?&gt;</code> in de &lt;head&gt; sectie van het index.php bestand van je template plaatsen. Zonder deze aanpassing zal enkel het @ teken in het mailto deel vervangen worden.</p>';
+$MOD_MAIL_FILTER['HOWTO']                = 'Hier kan je de uitvoer filteren met onderstaande opties.<strong>Tip: </strong>Mailto links kunnen gecodeerd worden door een Javascript functie. Om van deze optie gebruik te kunnen maken moet je de PHP code <code style="background:#FFA;color:#900;">&lt;?php register_frontend_modfiles(\'js\');?&gt;</code> in de &lt;head&gt; sectie van het index.php bestand van je template plaatsen. Zonder deze aanpassing zal enkel het @ teken in het mailto deel vervangen worden.';
 $MOD_MAIL_FILTER['WARNING']                = '';
 
 // Text and captions of form elements
+$MOD_MAIL_FILTER['SET_ACTIVE']            = 'Activate Filter';
 $MOD_MAIL_FILTER['BASIC_CONF']            = 'E-mail Configuratie';
 $MOD_MAIL_FILTER['SYS_REL'] = 'Frontendoutput with  relative Urls';
 $MOD_MAIL_FILTER['opf']        = 'Output filter Dashboard';

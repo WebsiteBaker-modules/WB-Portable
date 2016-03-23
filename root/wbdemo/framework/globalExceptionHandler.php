@@ -4,17 +4,14 @@
  * @package         WebsiteBaker_core
  * @author          Werner v.d.Decken
  * @copyright       WebsiteBaker.org e.V.
- * @link            http://websitebaker2.org
+ * @link            http://websitebaker.org
  * @license         http://www.gnu.org/licenses/gpl.html
- * @version         $Id: class.order.php 1487 2011-08-10 13:20:15Z DarkViper $
- * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/framework/class.order.php $
+ * @version         $Id:  $
+ * @filesource      $HeadURL:  $
  *
  * Global exception-handler
  * This module will activate a global exception handler to catch all thrown exceptions
  *
- */
-/**
- * define several default exceptions directly to prevent from extra loading requests
  */
 
 /**
@@ -44,7 +41,7 @@
             echo $e;
         }else {
         // default exception handling
-            $out  = 'There was an unknown exception:'."\n";
+            $out  = 'There was an uncatched exception:'."\n";
             $out .= $e->getMessage()."\n";
             $out .= 'in line ('.$e->getLine().') of ('.$file.')'."\n";
             echo $out;

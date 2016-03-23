@@ -30,6 +30,7 @@
 $module_description = 'Dieses Modul erlaubt das Einbinden fremder Inhalte auf Ihrer Seite mit Hilfe von Inline Frames (iframe)';
 
 // Ueberschriften und Textausgaben
-$MOD_WRAPPER['NOTICE'] = 'Ihr Browser unterst&uuml;tzt keine Inline Frames.<br />Bitte klicken Sie auf nachfolgenden Link, um den Seiteninhalt der externen Seite zu betrachten ...<br />';
+$MOD_WRAPPER['NOTICE'] = 'Ihr Browser unterstützt keine Inline Frames.<br />Bitte klicken Sie auf nachfolgenden Link, um den Seiteninhalt der externen Seite zu betrachten ...<br />';
 
-?>
+// end of file
+

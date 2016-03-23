@@ -15,7 +15,7 @@
  *
 */
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 // suppress to print the header, so no new FTAN will be set
 $admin_header = false;
@@ -34,7 +34,6 @@ $admin->print_header();
 // Include the WB functions file
 require_once(WB_PATH.'/framework/functions.php');
 
-$sMediaUrl = WB_URL.MEDIA_DIRECTORY;
 $bBackLink = isset($_POST['pagetree']);
 // Update the mod_wysiwygs table with the contents
 if(isset($_POST['content'.$section_id])) {
@@ -43,16 +42,31 @@ if(isset($_POST['content'.$section_id])) {
     {
         $content = $admin->strip_slashes($_POST['content'.$section_id]);
     }
+/*
+    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
     $searchfor = '@(<[^>]*=\s*")('.preg_quote($sMediaUrl).')([^">]*".*>)@siU';
     $content = preg_replace($searchfor, '$1{SYSVAR:MEDIA_REL}$3', $content);
+*/
+    $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
+    $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
+    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
+    $aPatterns = array(
+        '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
+        '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
+    );
+    $aReplacements = array(
+        '\1'.$sDocumentRootUrl.'/\3',
+        '$1{SYSVAR:MEDIA_REL}$3'
+    );
+    $content = preg_replace($aPatterns, $aReplacements, $content);
+
     $text = strip_tags($content);
-    $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wysiwyg` '
-         . 'SET `content`=\''.$database->escapeString($content).'\', '
-         .     '`text`=\''.$database->escapeString($text).'\' '
+    $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wysiwyg` SET '
+         . '`content`=\''.$database->escapeString($content).'\', '
+         . '`text`=\''.$database->escapeString($text).'\' '
          . 'WHERE `section_id`='.(int)$section_id;
     $database->query($sql);
 }
-
 $sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR.$section['section_id'] : '' );
 if(defined('EDIT_ONE_SECTION') && EDIT_ONE_SECTION){
     $edit_page = ADMIN_URL.'/pages/modify.php?page_id='.$page_id.'&wysiwyg='.$section_id;

@@ -31,4 +31,4 @@ $MOD_PREFERENCE = array(
     'SAVE_EMAIL' => 'Email speichern',
     'SAVE_PASSWORD' => 'Passwort speichern',
 );
-?>
+$MESSAGE['USERS_DISPLAYNAME_TAKEN'] = 'Der angegebene Anzeigename wird bereits verwendet';

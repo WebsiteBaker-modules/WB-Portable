@@ -30,7 +30,7 @@
  *
  */
  
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 require(WB_PATH.'/modules/admin.php');
 $backlink = ADMIN_URL.'/pages/modify.php?page_id='.(int)$page_id;
 if(!$admin->checkFTAN('GET')) {

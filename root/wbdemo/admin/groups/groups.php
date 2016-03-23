@@ -17,7 +17,7 @@
  */
 
 // Include config file and admin class file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Set parameter 'action' as alternative to javascript mechanism
 $action = 'cancel';

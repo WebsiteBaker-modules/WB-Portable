@@ -1,6 +1,6 @@
 <!-- BEGIN main_block -->
 
-<table summary="" cellpadding="5" cellspacing="0" border="0" align="center" width="100%" style="margin-bottom:10px;">
+<table style="border-collapse: separate; margin-bottom:10px; width: 100%;">
 <tr >
    <td valign="middle" align="left"><h2>{HEADING_MODIFY_PAGE}</h2></td>
    <td align="left" width="20%">ID: {PAGE_ID}</td>

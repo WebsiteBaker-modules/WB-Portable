@@ -17,8 +17,16 @@
  */
 
 // Include config file and admin class file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+// Include the WB functions file
+if ( !function_exists( 'get_modul_version' ) ) { require(WB_PATH.'/framework/functions.php'); }
+if (!function_exists("replace_all")) {
+    function replace_all ($aStr = "", &$aArray ) {
+        foreach($aArray as $k=>$v) $aStr = str_replace("{{".$k."}}", $v, $aStr);
+        return $aStr;
+    }
+}
 
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Addons', 'templates_uninstall', false);
@@ -40,27 +48,24 @@ if(!isset($_POST['file']) || $_POST['file'] == false) {
 } else {
     $file = $_POST['file'];
 }
-
 // Extra protection
 if(trim($file) == '') {
     $admin->print_error($MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 }
-
-// Include the WB functions file
-require_once(WB_PATH.'/framework/functions.php');
-
+// check whether the template is used as default wb theme
+$aPreventFromUninstall = array ('wb_theme', 'WbTheme', 'default_theme', 'DefaultTheme', 'default' );
+if(
+    $file == DEFAULT_THEME ||
+    preg_match('/'.$file.'/si', implode('|', $aPreventFromUninstall ))
+) {
+    $temp = array ('name' => $file );
+    $msg = replace_all( $MESSAGE['GENERIC_CANNOT_UNINSTALL_IS_DEFAULT_THEME'], $temp );
+    $admin->print_error( $msg );
+}
 // Check if the template exists
 if(!is_dir(WB_PATH.'/templates/'.$file)) {
     $admin->print_error($MESSAGE['GENERIC_NOT_INSTALLED'], $js_back );
 }
-
-if (!function_exists("replace_all")) {
-    function replace_all ($aStr = "", &$aArray ) {
-        foreach($aArray as $k=>$v) $aStr = str_replace("{{".$k."}}", $v, $aStr);
-        return $aStr;
-    }
-}
-
 /**
 *    Check if the template is the standard-template or still in use
 */
@@ -85,7 +90,7 @@ if ($file == DEFAULT_TEMPLATE) {
     *    Check if the template is still in use by a page ...
     */
     $info = $database->query("SELECT `page_id`, `page_title` FROM `".TABLE_PREFIX."pages` WHERE `template`='".$file."' order by `page_title`");
-    
+
     if ($info->numRows() > 0) {
         /**
         *    Template is still in use, so we're collecting the page-titles
@@ -99,8 +104,8 @@ if ($file == DEFAULT_TEMPLATE) {
             $msg_template_str  = "<br /><br />{{type}} <b>{{type_name}}</b> could not be uninstalled because it is still in use by {{pages}}";
             $msg_template_str .= ":<br /><i>click for editing.</i><br /><br />";
         } else {
-            $msg_template_str = $MESSAGE['GENERIC']['CANNOT_UNINSTALL_IN_USE_TMPL'];
-            $temp = explode(";",$MESSAGE['GENERIC']['CANNOT_UNINSTALL_IN_USE_TMPL_PAGES']);
+            $msg_template_str = $MESSAGE['GENERIC_CANNOT_UNINSTALL_IN_USE_TMPL'];
+            $temp = explode(";",$MESSAGE['GENERIC_CANNOT_UNINSTALL_IN_USE_TMPL_PAGES']);
             $add = $info->numRows() == 1 ? $temp[0] : $temp[1];
         }
         /**
@@ -126,18 +131,18 @@ if ($file == DEFAULT_TEMPLATE) {
         /**
         *    Printing out the error-message and die().
         */
-        $admin->print_error($MESSAGE['GENERIC']['CANNOT_UNINSTALL_IN_USE'].$msg.$page_names);
+        $admin->print_error($MESSAGE['GENERIC_CANNOT_UNINSTALL_IN_USE'].$msg.$page_names);
     }
 }
 
 // Check if we have permissions on the directory
 if(!is_writable(WB_PATH.'/templates/'.$file)) {
-    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UNINSTALL'].WB_PATH.'/templates/'.$file);
+    $admin->print_error($MESSAGE['GENERIC_CANNOT_UNINSTALL'].WB_PATH.'/templates/'.$file);
 }
 
 // Try to delete the template dir
 if(!rm_full_dir(WB_PATH.'/templates/'.$file)) {
-    $admin->print_error($MESSAGE['GENERIC']['CANNOT_UNINSTALL']);
+    $admin->print_error($MESSAGE['GENERIC_CANNOT_UNINSTALL']);
 } else {
     // Remove entry from DB
     $database->query("DELETE FROM ".TABLE_PREFIX."addons WHERE directory = '".$file."' AND type = 'template'");
@@ -148,7 +153,7 @@ if(!rm_full_dir(WB_PATH.'/templates/'.$file)) {
 $database->query("UPDATE ".TABLE_PREFIX."pages SET template = '".DEFAULT_TEMPLATE."' WHERE template = '$file'");
 
 // Print success message
-$admin->print_success($MESSAGE['GENERIC']['UNINSTALLED']);
+$admin->print_success($MESSAGE['GENERIC_UNINSTALLED']);
 
 // Print admin footer
 $admin->print_footer();

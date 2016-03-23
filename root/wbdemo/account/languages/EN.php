@@ -30,5 +30,4 @@ $MOD_PREFERENCE = array(
     'SAVE_EMAIL'    => 'save email',
     'SAVE_PASSWORD' => 'save password',
 );
-
-?>
+$MESSAGE['USERS_DISPLAYNAME_TAKEN'] = 'The displayname you entered is already taken';

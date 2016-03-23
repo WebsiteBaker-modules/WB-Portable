@@ -29,9 +29,9 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
     $admin = new admin('Pages', 'pages_modify',(bool)$admin_header);
 // get request method
     $requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
-    $aRequestVars  = (isset(${$requestMethod})) ? ${$requestMethod} : null;
+    $aRequestVars  = (isset(${$requestMethod}) ? ${$requestMethod} : null);
 // Get page id (on error page_id == 0))
-    $page_id = intval(isset(${$requestMethod}['page_id']) 
+    $page_id = intval(isset(${$requestMethod}['page_id'])
                       ? ${$requestMethod}['page_id'] 
                       : (isset($page_id) ? $page_id : 0)
                );
@@ -195,5 +195,9 @@ if(isset($print_info_banner) && $print_info_banner == true) {
 
 // Work-out if the developer wants us to update the timestamp for when the page was last modified
 if(isset($update_when_modified) && $update_when_modified == true) {
-    $database->query("UPDATE `".TABLE_PREFIX."pages` SET `modified_when` = '".time()."', `modified_by` = '".$admin->get_user_id()."' WHERE `page_id` = '$page_id'");
+    $sql  = 'UPDATE '.TABLE_PREFIX.'"pages` SET '
+          . 'modified_when` = '.time().','
+          . '`modified_by` = '.$admin->get_user_id().''
+          . 'WHERE `page_id` = '.$page_id;
+    $database->query($sql);
 }

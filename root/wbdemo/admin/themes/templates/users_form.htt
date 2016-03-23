@@ -1,34 +1,45 @@
 <!-- BEGIN main_block -->
-<script type="text/javascript">
-function toggle_radio(radio_on, radio_off) {
-    document.getElementById(radio_on).checked = true;
-    document.getElementById(radio_off).checked = true;
-}
-</script>
-
-<h2 style="{DISPLAY_EXTRA}">{HEADING_MODIFY_USER}</h2>
-
-<form name="user" action="{ACTION_URL}" method="post" class="{DISPLAY_ADD}" >
+<form name="user" action="{ACTION_URL}" method="post" class="{DISPLAY_ADD} access" style="margin: auto 13%;" >
 <input type="hidden" name="user_id" value="{USER_ID}" />
 <input type="hidden" name="username_fieldname" value="{USERNAME_FIELDNAME}" />
 {FTAN}
-<table summary="" cellpadding="5" cellspacing="0" border="0" width="100%">
+
+<h2 style="{DISPLAY_EXTRA}">{HEADING_MODIFY_USER}</h2>
+
+<table style=" border-collapse: collapse; border-spacing: 0; " >
 <tr>
-    <td width="150">{TEXT_USERNAME}:</td>
+    <td style="width: 150px; ">{TEXT_USERNAME}:</td>
+
     <td class="value_input">
-        <input type="text" name="{USERNAME_FIELDNAME}" maxlength="30" value="{USERNAME}"{READONLY} />
+<!-- BEGIN user_add_block -->
+        <input type="text" name="{USERNAME_FIELDNAME}" maxlength="30" value="{USERNAME}" style="width: 52%;" />
+<!-- END user_add_block -->
+<!-- BEGIN user_display_block -->
+        <div id="username" style="width: 52%;" >{USERNAME}</div>
+<!-- END user_display_block -->
+    </td>
+
+</tr>
+<tr class="ui-helper-clearfix">
+    <td class="setting_name">
+        <label for="pwLen" >Passwordlen</label>
+    </td>
+    <td class="setting_value">
+      <input type="text" onchange="onChange(this);" id="pwLen" value="8" name="length" style="width: 12%;" />
     </td>
 </tr>
+
 <tr>
     <td>{TEXT_PASSWORD}:</td>
     <td class="value_input">
-        <input type="password" name="password" maxlength="30" value="" />
+        <input type="text" id="password" name="password" maxlength="30" value="" style="width: 52%;" />
+        <input type="button" value="generate" onclick="onClick(this);" style="width: 12%;" />
     </td>
 </tr>
 <tr>
     <td>{TEXT_RETYPE_PASSWORD}:</td>
     <td class="value_input">
-        <input type="password" name="password2" maxlength="30" value="" />
+        <input type="password" id="password2" name="password2" maxlength="30" value="" style="width: 52%;" />
     </td>
 </tr>
 <tr style="{DISPLAY_EXTRA}">
@@ -40,19 +51,19 @@ function toggle_radio(radio_on, radio_off) {
 <tr>
     <td>{TEXT_DISPLAY_NAME}:</td>
     <td class="value_input">
-        <input type="text" name="display_name" maxlength="255" value="{DISPLAY_NAME}" />
+        <input type="text" name="display_name" maxlength="255" value="{DISPLAY_NAME}" style="width: 52%;" />
     </td>
 </tr>
 <tr>
     <td>{TEXT_EMAIL}:</td>
     <td class="value_input">
-        <input type="text" name="email" maxlength="255" value="{EMAIL}" />
+        <input type="text" name="email" maxlength="255" value="{EMAIL}" style="width: 52%;" />
     </td>
 </tr>
 <tr style="{DISPLAY_HOME_FOLDERS}">
     <td>{TEXT_HOME_FOLDER}:</td>
     <td class="value_input">
-        <select name="home_folder">
+        <select name="home_folder" style="width: 52%;" >
             <option value="">{TEXT_NONE}</option>
             <!-- BEGIN folder_list_block -->
             <option value="{FOLDER}"{SELECTED}>{NAME}</option>
@@ -63,7 +74,7 @@ function toggle_radio(radio_on, radio_off) {
 <tr>
     <td>{TEXT_GROUP}:</td>
     <td class="value_input">
-        <select name="groups[]" multiple="multiple" size="5">
+        <select name="groups[]" multiple="multiple" size="5" style="width: 52%;" >
         <!-- BEGIN group_list_block -->
             <option value="{ID}" {SELECTED}>{NAME}</option>
         <!-- END group_list_block -->
@@ -90,5 +101,61 @@ function toggle_radio(radio_on, radio_off) {
 </table>
 
 </form>
+
+<script type="text/javascript">
+    function toggle_radio(radio_on, radio_off) {
+       document.getElementById(radio_on).checked = true;
+       document.getElementById(radio_off).checked = true;
+    }
+</script>
+<script src="{ADMIN_URL}/users/PasswordGenerator.js"></script>
+<script>
+    var _options = _options || window._options || { };
+            _options.length = 8;
+            _options.lowercase = true;
+            _options.uppercase = true;
+            _options.numbers = true;
+            _options.special_character = true;
+            _options.brackets = true;
+            _options.minus = true;
+            _options.underscore = true;
+            _options.space = true;
+/*
+    passwort.set({
+        length: 50,
+        lowercase: false,
+        uppercase: false,
+        numbers: false,
+        special_character: true,
+        brackets: false,
+        minus: false,
+        underscore: false,
+        space: false
+    });
+ */
+    
+    _options.el   = document.querySelector('#password');
+    _options.el2  = document.querySelector('#password2');
+    var passwort  = new PasswordGenerator(_options);
+console.info( _options.el );
+console.info( _options.el2 );
+console.info( passwort.get() );
+//    passwort.render();
+    //set option with onChange event
+    function onChange(e) {
+        var obj = {};
+        if(e.name == 'length') {
+            obj[e.name] = parseInt(e.value);
+        } else {
+            obj[e.name] = e.checked ? true : false;
+        }
+        passwort.set(obj);
+        passwort.render();
+    }
+    function onClick(e){
+        passwort.render();
+        return false;
+    }
+</script>
 
 <!-- END main_block -->

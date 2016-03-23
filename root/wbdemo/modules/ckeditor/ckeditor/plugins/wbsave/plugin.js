@@ -65,7 +65,7 @@
                 command: pluginName,
                 toolbar: 'document,10'
             });
-            CKEDITOR.scriptLoader.load(CKEDITOR.plugins.getPath('wbsave')+'ibox.js');
+            CKEDITOR.scriptLoader.load(CKEDITOR.plugins.getPath('wbsave')+'ibox.src.js');
         }
     });
 })();

@@ -19,12 +19,12 @@
 
 // Print admin header
 
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Preferences','start', false);
 
-function save_preferences( &$admin, &$database)
+function save_preferences( $admin, $database)
 {
     global $MESSAGE;
     $err_msg = array();
@@ -35,7 +35,8 @@ function save_preferences( &$admin, &$database)
     if(!$admin->checkFTAN()){ $err_msg[] = $MESSAGE['GENERIC_SECURITY_ACCESS']; }
 // Get entered values and validate all
     // remove any dangerouse chars from display_name
-    $display_name     = $admin->add_slashes(strip_tags(trim($admin->get_post('display_name'))));
+//    $display_name     = $admin->add_slashes(strip_tags(trim($admin->get_post('display_name'))));
+    $display_name = strip_tags( $admin->StripCodeFromText($admin->get_post('display_name')));
     $display_name     = ( $display_name == '' ? $admin->get_display_name() : $display_name );
     // check that display_name is unique in whoole system (prevents from User-faking)
     $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
@@ -66,7 +67,7 @@ function save_preferences( &$admin, &$database)
     unset($TIME_FORMATS);
 // email should be validatet by core
     $email = trim( $admin->get_post('email') == null ? '' : $admin->get_post('email') );
-    if( !$admin->validate_email($email) )
+    if( (!$admin->validate_email($email)) )
     {
         $email = '';
         $err_msg[] = $MESSAGE['USERS_INVALID_EMAIL'];
@@ -130,18 +131,18 @@ function save_preferences( &$admin, &$database)
         if(sizeof($err_msg) == 0)
         {
             $sql  = 'UPDATE `'.TABLE_PREFIX.'users` ';
-            $sql .= 'SET `display_name`=\''.$display_name.'\', ';
+            $sql .= 'SET `display_name`=\''.$database->escapeString($display_name).'\', ';
             if($sPwHashNew) {
-                $sql .=     '`password`=\''.$sPwHashNew.'\', ';
+                $sql .=     '`password`=\''.$database->escapeString($sPwHashNew).'\', ';
             }
             if($email != '') {
-                $sql .=     '`email`=\''.$email.'\', ';
+                $sql .=     '`email`=\''.$database->escapeString($email).'\', ';
             }
-            $sql .=     '`language`=\''.$language.'\', ';
-            $sql .=     '`timezone`=\''.$timezone.'\', ';
-            $sql .=     '`date_format`=\''.$date_format.'\', ';
-            $sql .=     '`time_format`=\''.$time_format.'\' ';
-            $sql .= 'WHERE `user_id`='.(int)$admin->get_user_id();
+            $sql .= '`language`=\''.$database->escapeString($language).'\', '
+                  . '`timezone`=\''.$database->escapeString($timezone).'\', '
+                  . '`date_format`=\''.$database->escapeString($date_format).'\', '
+                  . '`time_format`=\''.$database->escapeString($time_format).'\' '
+                  . 'WHERE `user_id`='.(int)$admin->get_user_id();
             if( $database->query($sql) )
             {
                 // update successfull, takeover values into the session

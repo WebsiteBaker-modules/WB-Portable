@@ -16,10 +16,8 @@
  *
  */
 
-/*
-*/
 // Create new admin object
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages_settings');
 // Include the WB functions file
@@ -30,7 +28,7 @@ if(!isset($_GET['page_id']) || !is_numeric($_GET['page_id']))
     $admin->print_header();
     $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
 } else {
-    $page_id = $_GET['page_id'];
+    $page_id = intval($_GET['page_id']);
 }
 
 //if ( !function_exists( 'create_access_file' ) ) { require(WB_PATH.'/framework/functions.php'); }
@@ -75,7 +73,7 @@ if($database->is_error()) {
 }
 if($results->numRows() == 0) {
     $admin->print_header();
-    $admin->print_error($MESSAGE['PAGES']['NOT_FOUND']);
+    $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
 }
 $results_array = $results->fetchRow(MYSQLI_ASSOC);
 
@@ -611,6 +609,7 @@ $template->set_var(array(
                 'TEXT_ENABLED' => $TEXT['ENABLED'],
                 'TEXT_DISABLED' => $TEXT['DISABLED'],
                 'TEXT_SAVE' => $TEXT['SAVE'],
+                'TEXT_BACK' => $TEXT['BACK'],
                 'TEXT_RESET' => $TEXT['RESET'],
                 'LAST_MODIFIED' => $MESSAGE['PAGES']['LAST_MODIFIED'],
                 'HEADING_MODIFY_PAGE' => $HEADING['MODIFY_PAGE']

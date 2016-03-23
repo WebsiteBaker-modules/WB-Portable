@@ -24,8 +24,16 @@
  * check if user has permissions to access this file
  */
 // Include config file and admin class file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
+// Include the WB functions file
+if ( !function_exists( 'get_modul_version' ) ) { require(WB_PATH.'/framework/functions.php'); }
+if (!function_exists("replace_all")) {
+    function replace_all ($aStr = "", &$aArray ) {
+        foreach($aArray as $k=>$v) $aStr = str_replace("{{".$k."}}", $v, $aStr);
+        return $aStr;
+    }
+}
 
 // check user permissions for admintools (redirect users with wrong permissions)
 $admin = new admin('Admintools', 'admintools', false, false);
@@ -56,8 +64,9 @@ $referer = '';
 $required_url = ADMIN_URL . '/modules/index.php';
 if ($referer != '' && (!(strpos($referer, $required_url) !== false || strpos($referer, $required_url) !== false))) 
 { 
-  die(header('Location: ../../index.php')); 
-  }
+    $admin->print_header();
+    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back);
+}
 
 // include WB functions file
 require_once(WB_PATH . '/framework/functions.php');
@@ -67,35 +76,62 @@ require_once(WB_PATH . '/languages/' . LANGUAGE .'.php');
 
 // create Admin object with admin header
 $admin = new admin('Addons', '', true, false);
+$aValideActions = array( 'uninstall', 'install', 'upgrade' );
 
 /**
  * Manually execute the specified module file (install.php, upgrade.php or uninstall.php)
  */
-// check if specified module folder exists
-$mod_path = WB_PATH . '/modules/' . basename(WB_PATH . '/' . $_POST['file']);
-
-// let the old variablename if module use it
-$module_dir = $mod_path;
-if (!file_exists($mod_path . '/' . $_POST['action'] . '.php'))
-{
-    $admin->print_error($TEXT['NOT_FOUND'].': <tt>"'.htmlentities(basename($mod_path)).'/'.$_POST['action'].'.php"</tt> ', $js_back);
+//$sModName = ($_POST['file']);
+// Check if user selected module
+if(!isset($_POST['file']) || $_POST['file'] == "") {
+    $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
+} else {
+    $sAddonName = $admin->StripCodeFromText($_POST['file']);
 }
 
+$sAction = $admin->StripCodeFromText( $_POST['action'] );
+$sAction = ( in_array($sAction, $aValideActions) ? $sAction : 'upgrade' );
+
+// Extra protection
+if(trim($sAddonName) == '') {
+    $admin->print_error($MESSAGE['GENERIC_ERROR_OPENING_FILE'], $js_back );
+}
+// check whether the module is core
+$aPreventFromUninstall = array ( 'captcha_control', 'jsadmin', 'output_filter', 'wysiwyg', 'menu_link' );
+if(
+    $sAction == 'uninstall' &&
+    preg_match('/'.$sAddonsFile.'/si', implode('|', $aPreventFromUninstall ))
+) {
+    $temp = array ('name' => $file );
+    $msg = replace_all( $MESSAGE['MEDIA_CANNOT_DELETE_DIR'], $temp );
+    $admin->print_error( $msg );
+}
+
+// check if specified module folder exists
+$sAddonRelPath = '/modules/'.$sAddonName;
+// let the old variablename if module use it
+
+if (!file_exists( WB_PATH.$sAddonRelPath.'/'.$sAction. '.php'))
+{
+    $admin->print_header();
+    $admin->print_error($TEXT['NOT_FOUND'].': <tt>"'.$sAddonName.'/'.$sAction.'.php"</tt> ', $js_back);
+}
 // include modules install.php script
-require($mod_path . '/' . $_POST['action'] . '.php');
-
+if( in_array($sAction, $aValideActions) ) {
+    require(WB_PATH.$sAddonRelPath . '/' . $sAction . '.php');
+}
 // load module info into database and output status message
-load_module($mod_path, false);
-$msg = $TEXT['EXECUTE'] . ': <tt>"' . htmlentities(basename($mod_path)) . '/' . $_POST['action'] . '.php"</tt>';
+load_module(WB_PATH.$sAddonRelPath, false);
+$msg = $TEXT['EXECUTE'] . ': <tt>"'.$sAddonName.'/'.$sAction.'.php"</tt>';
 
-switch ($_POST['action'])
+switch ($sAction)
 {
     case 'install':
         $admin->print_success($msg, $js_back);
         break;
 
     case 'upgrade':
-        upgrade_module(basename($mod_path), false);
+        upgrade_module($sAddonName, false);
         $admin->print_success($msg, $js_back);
         break;
     

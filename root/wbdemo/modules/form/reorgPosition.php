@@ -30,10 +30,10 @@
  *
  */
  
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 require(WB_PATH.'/modules/admin.php');
 $backlink = ADMIN_URL.'/pages/modify.php?page_id='.(int)$page_id;
-if(!$admin->checkFTAN('GET')) {
+if(!$admin->checkFTAN()) {
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id);
 }
 if ( !class_exists('order', false) ) { require(WB_PATH.'/framework/class.order.php'); }

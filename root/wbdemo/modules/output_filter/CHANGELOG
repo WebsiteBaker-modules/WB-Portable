@@ -1,0 +1,19 @@
+Change Log
+===============================================================================
+Please note: This change log may not be accurate
+
+$Id: CHANGELOG 0001 2015-12-17 00:00:00Z darkviper $
+
+Legend:
++ = Added
+- = Removed
+# = Bugfix
+! = Update/Change
+===============================================================================
+
+
+17 Dec-2015 Build 0001 Manuela v.d.Decken(DarkViper)
++ Initialize project
+
+end of file
+

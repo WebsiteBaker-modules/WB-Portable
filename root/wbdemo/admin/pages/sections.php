@@ -17,7 +17,7 @@
  */
 
 // Include config file
-require( dirname(dirname((__DIR__))).'/config.php' );
+if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 
 // Make sure people are allowed to access this page
 if(MANAGE_SECTIONS != 'enabled')
@@ -33,8 +33,8 @@ if ( !function_exists( 'create_access_file' ) ) { require(WB_PATH.'/framework/fu
 // Create new admin object
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 $admin = new admin('Pages', 'pages_modify', false);
-
 $action = 'show';
+//$echo = $myPath;  //
 // Get page id
 $requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
 $page_id = intval((isset(${$requestMethod}['page_id'])) ? ${$requestMethod}['page_id'] : 0);
@@ -113,6 +113,10 @@ switch ($action):
             // Get the section id
             $section_id = $database->get_one("SELECT LAST_INSERT_ID()");
             // Include the selected modules add file if it exists
+            if (
+                file_exists(WB_PATH.'/modules/'.$module.'/addon.php') &&
+                file_exists(WB_PATH.'/modules/'.$module.'/cmd/cmdModify.inc')
+            ) { break; }
             if(file_exists(WB_PATH.'/modules/'.$module.'/add.php'))
             {
                 require(WB_PATH.'/modules/'.$module.'/add.php');
@@ -165,7 +169,7 @@ switch ($action):
         if($results->numRows() == 0)
         {
             // $admin->print_header();
-            $admin->print_error($MESSAGE['PAGES']['NOT_FOUND']);
+            $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
         }
         $results_array = $results->fetchRow(MYSQLI_ASSOC);
 
@@ -217,6 +221,10 @@ switch ($action):
         $tpl->set_block('section_block', 'block_block', 'block_list');
         $tpl->set_block('main_block', 'calendar_block', 'calendar_list');
         $tpl->set_var('FTAN', $admin->getFTAN());
+        // setting trash only if more than one section exists
+        $tpl->set_block('section_block', 'can_delete_block', 'delete');
+        $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'sections` '.'WHERE `page_id`='.intval($page_id);
+        $bSectionCanDelete = ($database->get_one($sql) > 1);
 
         // set first defaults and messages
         $tpl->set_var(array(
@@ -421,6 +429,11 @@ switch ($action):
                                     )
                                 );
                 }
+            if($bSectionCanDelete) {
+                $tpl->parse('delete', 'can_delete_block', false);
+            } else {
+                $tpl->parse('delete', '', false);
+            }
                 $tpl->parse('section_list', 'section_block', true);
             }
         }
