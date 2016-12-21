@@ -1,0 +1,104 @@
+/**
+ *
+ */
+@import url( "chmod.css");
+.settings_table { width: 100%;}
+div.settings_table {
+  margin: 0 auto;
+  width: 90%;
+}
+.settings_table td { text-align :left; vertical-align :top; }
+.settings_table td.setting_value { width :80%; }
+.settings_table td.setting_value textarea { height : 8.225em; }
+.settings_table td.setting_name {
+  width :20%;
+  min-width :200px;
+  color: #0d4b6e;
+  text-align: right;
+  font-weight: bold;
+  padding-right: 0.525em;
+  }
+
+#file_mode input, #dir_mode input { color: #205979; }
+
+.header_title, .setting_value input, .setting_value select, .setting_value textarea, .value_input input, .value_input text, .value_input select, .form_submit, .input_full {
+  width: 100%;
+}
+.settings_table tr {
+  white-space: normal;
+  line-height: 2.225em;
+}
+
+h4, .warning { margin :0 auto; }
+div.mbox { margin :0 auto; }
+
+div.mbox select,
+div.mbox textarea,
+div.mbox input { display :block; float :left; }
+
+div.mbox label {
+color: #0d4b6e;
+font-weight: bold;
+min-width: 200px;
+padding-right: 0.525em;
+text-align: right;
+width: 20%;
+padding-right :5px;
+ display :block;
+}
+
+.settings_table p.note {
+  line-height: 1.4em; margin: auto; font-size: 1.025em;
+}
+
+.setting_value_permissions dl {
+  min-width: 60.225em!important ;
+}
+form.settings_table label.setting_name {
+  clear: left;
+  color: #333333;
+  display: block;
+  float: left;
+  font-size: 1.025em;
+  font-weight: bold;
+  margin: 3px auto;
+  min-height: 1.9em;
+  padding-right: 5px;
+  vertical-align: top;
+  width: 30%;
+}
+
+form#Settings {
+}
+
+form#Settings fieldset legend h2 {
+font-size:1.255em;
+}
+
+form#Settings dd {
+margin-left:0.525em;
+}
+
+form#Settings dd select {
+font-size:inherit;
+min-width:19.125em;
+}
+
+form#Settings dd textarea {
+overflow:auto;
+width:100%;
+}
+.reformed-form dl {
+  margin: auto;
+}
+.chmod h4 {
+  font-size: 1.225em;
+  background: #215a7a;
+  line-height: 1.925em;
+  padding-left: 0.525em;
+  color: #fff;
+}
+.inline-columns > div {
+  float: left;
+  width: 50%;
+}

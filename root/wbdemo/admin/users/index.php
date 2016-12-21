@@ -25,6 +25,13 @@ $iUserStatus = 1;
 $iUserStatus = ( ( $admin->get_get('status')==1 ) ? 0 : $iUserStatus );
 unset($_GET);
 
+$oTrans = Translate::getInstance();
+$oTrans->enableAddon('admin\\users');
+/**
+
+ * print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+ * print_r( $oTrans ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+ */
 // Setup template object, parse vars to it, then parse it
 // Create new template object
 $template = new Template(dirname($admin->correct_theme_source('users.htt')));
@@ -40,9 +47,9 @@ $template->set_var('USER_STATUS', $iUserStatus );
 $UserStatusActive = 'url('.THEME_URL.'/images/user.png)';
 $UserStatusInactive = 'url('.THEME_URL.'/images/user_red.png)';
 
-$sUserTitle = ($iUserStatus == 0) ? $MENU['USERS'].' '.strtolower($TEXT['ACTIVE']) : $MENU['USERS'].' '.strtolower($TEXT['DELETED']) ;
+$sUserTitle = ($iUserStatus == 0) ? $oTrans->MENU_USERS.' '.strtolower($oTrans->TEXT_ACTIVE) : $oTrans->MENU_USERS.' '.strtolower($oTrans->TEXT_DEACTIVED) ;
 
-$template->set_var('TEXT_USERS', $sUserTitle.' '.$TEXT['SHOW'] );
+$template->set_var('TEXT_USERS', $sUserTitle.' '.$oTrans->TEXT_SHOW );
 $template->set_var('STATUS_ICON', ( ($iUserStatus==0) ? $UserStatusActive : $UserStatusInactive) );
 
 // Get existing value from database
@@ -56,8 +63,8 @@ if($database->is_error()) {
     $admin->print_error($database->get_error(), 'index.php');
 }
 
-$sUserList  = $TEXT['LIST_OPTIONS'].' ';
-$sUserList .= ($iUserStatus == 1) ? $MENU['USERS'].' '.strtolower($TEXT['ACTIVE']) : $MENU['USERS'].' '.strtolower($TEXT['DELETED']) ;
+$sUserList  = $oTrans->TEXT_LIST_OPTIONS.' ';
+$sUserList .= ($iUserStatus == 1) ? $oTrans->MENU_USERS.' '.strtolower($oTrans->TEXT_ACTIVE) : $oTrans->MENU_USERS.' '.strtolower($oTrans->TEXT_DEACTIVED) ;
 // Insert values into the modify/remove menu
 $template->set_block('main_block', 'list_block', 'list');
 if($results->numRows() > 0) {
@@ -75,7 +82,7 @@ if($results->numRows() > 0) {
     }
 } else {
     // Insert single value to say no users were found
-    $template->set_var('NAME', $TEXT['NONE_FOUND']);
+    $template->set_var('NAME', $oTrans->TEXT_NONE_FOUND);
     $template->parse('list', 'list_block', true);
 }
 
@@ -89,12 +96,12 @@ if($admin->get_permission('users_modify') != true) {
 if($admin->get_permission('users_delete') != true) {
     $template->set_var('DISPLAY_DELETE', 'hide');
 }
-$HeaderTitle = $HEADING['MODIFY_DELETE_USER'].' ';
-$HeaderTitle .= (($iUserStatus == 1) ? strtolower($TEXT['ACTIVE']) : strtolower($TEXT['DELETED']));
+$HeaderTitle  = (($iUserStatus == 1) ? $oTrans->HEADING_MODIFY_ACTIVE_USER.' ' : $oTrans->HEADING_MODIFY_DELETE_USER.' ');
+$HeaderTitle .= (($iUserStatus == 1) ? strtolower($oTrans->TEXT_ACTIVE) : strtolower($oTrans->TEXT_DEACTIVED));
 // Insert language headings
 $template->set_var(array(
         'HEADING_MODIFY_DELETE_USER' => $HeaderTitle,
-        'HEADING_ADD_USER' => $HEADING['ADD_USER']
+        'HEADING_ADD_USER' => $oTrans->HEADING_ADD_USER
         )
 );
 // insert urls
@@ -106,10 +113,10 @@ $template->set_var(array(
 );
 // Insert language text and messages
 $template->set_var(array(
-        'TEXT_MODIFY' => $TEXT['MODIFY'],
-        'TEXT_DELETE' => $TEXT['DELETE'],
-        'TEXT_MANAGE_GROUPS' => ( $admin->get_permission('groups') == true ) ? $TEXT['MANAGE_GROUPS'] : "**",
-        'CONFIRM_DELETE' => (($iUserStatus == 1) ? $TEXT['ARE_YOU_SURE'] : $MESSAGE['USERS']['CONFIRM_DELETE'])
+        'TEXT_MODIFY' => $oTrans->TEXT_MODIFY,
+        'TEXT_DELETE' => (($iUserStatus == 1) ? $oTrans->TEXT_DEACTIVE:$oTrans->TEXT_DELETE),
+        'TEXT_MANAGE_GROUPS' => ( $admin->get_permission('groups') == true ) ? $oTrans->TEXT_MANAGE_GROUPS : "**",
+        'CONFIRM_DELETE' => (($iUserStatus == 1) ? $oTrans->TEXT_ARE_YOU_SURE : $oTrans->MESSAGE_USERS_CONFIRM_DELETE)
         )
 );
 if ( $admin->get_permission('groups') == true ) $template->parse("groups", "manage_groups_block", true);
@@ -128,7 +135,7 @@ $template->set_block('main_block', 'user_display_block', 'user_display');
 $template->set_var('DISPLAY_EXTRA', 'display:none;');
 $template->set_var('ACTIVE_CHECKED', ' checked="checked"');
 $template->set_var('ACTION_URL', ADMIN_URL.'/users/add.php');
-$template->set_var('SUBMIT_TITLE', $TEXT['ADD']);
+$template->set_var('SUBMIT_TITLE', $oTrans->TEXT_ADD);
 $template->set_var('FTAN', $admin->getFTAN());
 // {READONLY}
 $template->set_var('READONLY', '' );
@@ -147,7 +154,7 @@ $template->set_block('main_block', 'group_list_block', 'group_list');
 $results = $database->query("SELECT group_id, name FROM ".TABLE_PREFIX."groups WHERE group_id != '1'");
 if($results->numRows() > 0) {
     $template->set_var('ID', '');
-    $template->set_var('NAME', $TEXT['PLEASE_SELECT'].'...');
+    $template->set_var('NAME', $oTrans->TEXT_PLEASE_SELECT.'...');
     $template->set_var('SELECTED', ' selected="selected"');
     $template->parse('group_list', 'group_list_block', true);
     while($group = $results->fetchRow()) {
@@ -167,12 +174,12 @@ if(in_array(1, $admin->get_groups_id())) {
 } else {
     if($results->numRows() == 0) {
         $template->set_var('ID', '');
-        $template->set_var('NAME', $TEXT['NONE_FOUND']);
+        $template->set_var('NAME', $oTrans->TEXT_NONE_FOUND);
         $template->parse('group_list', 'group_list_block', true);
     }
 }
 
-// Insert permissions values                
+// Insert permissions values
 
 if($admin->get_permission('users_add') != true) {
     $template->set_var('DISPLAY_ADD', 'hide');
@@ -209,22 +216,22 @@ foreach(directory_list(WB_PATH.MEDIA_DIRECTORY) AS $name) {
 
 // Insert language text and messages
 $template->set_var(array(
-            'TEXT_CANCEL' => $TEXT['CANCEL'],
-            'TEXT_RESET' => $TEXT['RESET'],
-            'TEXT_ACTIVE' => $TEXT['ACTIVE'],
-            'TEXT_DISABLED' => $TEXT['DISABLED'],
-            'TEXT_PLEASE_SELECT' => $TEXT['PLEASE_SELECT'],
-            'TEXT_USERNAME' => $TEXT['USERNAME'],
-            'TEXT_PASSWORD' => $TEXT['PASSWORD'],
-            'TEXT_RETYPE_PASSWORD' => $TEXT['RETYPE_PASSWORD'],
-            'TEXT_DISPLAY_NAME' => $TEXT['DISPLAY_NAME'],
-            'TEXT_EMAIL' => $TEXT['EMAIL'],
-            'TEXT_GROUP' => $TEXT['GROUP'],
-            'TEXT_NONE' => $TEXT['NONE'],
-            'TEXT_HOME_FOLDER' => $TEXT['HOME_FOLDER'],
+            'TEXT_CANCEL' => $oTrans->TEXT_CANCEL,
+            'TEXT_RESET' => $oTrans->TEXT_RESET,
+            'TEXT_ACTIVE' => $oTrans->TEXT_ACTIVE,
+            'TEXT_DISABLED' => $oTrans->TEXT_DISABLED,
+            'TEXT_PLEASE_SELECT' => $oTrans->TEXT_PLEASE_SELECT,
+            'TEXT_USERNAME' => $oTrans->TEXT_USERNAME,
+            'TEXT_PASSWORD' => $oTrans->TEXT_PASSWORD,
+            'TEXT_RETYPE_PASSWORD' => $oTrans->TEXT_RETYPE_PASSWORD,
+            'TEXT_DISPLAY_NAME' => $oTrans->TEXT_DISPLAY_NAME,
+            'TEXT_EMAIL' => $oTrans->TEXT_EMAIL,
+            'TEXT_GROUP' => $oTrans->TEXT_GROUP,
+            'TEXT_NONE' => $oTrans->TEXT_NONE,
+            'TEXT_HOME_FOLDER' => $oTrans->TEXT_HOME_FOLDER,
             'USERNAME_FIELDNAME' => $username_fieldname,
-            'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
-             'CANCEL_LINK' => ADMIN_URL.'/access/index.php',
+            'CHANGING_PASSWORD' => $oTrans->MESSAGE_USERS_CHANGING_PASSWORD,
+            'CANCEL_LINK' => ADMIN_URL.'/access/index.php',
             )
     );
 $template->set_block( 'user_display_block', '');

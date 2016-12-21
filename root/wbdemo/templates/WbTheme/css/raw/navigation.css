@@ -1,0 +1,12 @@
+
+.menu { margin :0; padding : 0.525em ; background : none #215A7A; background-repeat :repeat-x; overflow: hidden; white-space: nowrap; }
+.menu li { padding-right : 0.1225em; list-style-type :none; display :inline; }
+.menu a, .menu a:link, .menu a:active, .menu a:visited { border-bottom :0; padding : 0.425em 1.225em; color :#ffffff; }
+.current a, .current a:link, .current a:active, .current a:visited { background : none #217DA1; background-repeat :repeat-x; color :#ffffff; }
+.current a:hover, 
+.menu a:hover { color :#fff; background : none #217DA1; background-repeat :repeat-x; text-decoration :none; }
+
+.menu li,.current a,.menu a, .menu a:link, .menu a:active, .menu a:visited, .menu a:hover  {
+ border-radius: 0.325em;
+}
+

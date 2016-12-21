@@ -2,7 +2,7 @@
 //:Use [[ShowRandomWysiwyg?section=10,12,15,20]]
 //:possible Delimiters: [ ,;:|-+#/ ]
 global $database;
-$content = '';
+$content = ' ';
 if (isset($section)) {
 if( preg_match('/^[0-9]+(?:\s*[\,\|\-\;\:\+\#\/]\s*[0-9]+\s*)*$/', $section)) {
 if (is_readable(WB_PATH.'/modules/wysiwyg/view.php')) {

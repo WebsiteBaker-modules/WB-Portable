@@ -1,7 +1,8 @@
 <!-- BEGIN main_block -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
+<meta charset="utf-8" />
 <title>Set Upload Parameters</title>
 
 
@@ -34,29 +35,60 @@ a:hover {
 </head>
 <body>
 
-<table summary="" cellpadding="4" cellspacing="0" border="0" width="100%" style="border-bottom: 1px solid #666; width: 100%;">
+<table style="border-bottom: 1px solid #666; width: 100%;">
 <tr style="background-color: #DDD;">
-    <td align="center">{TEXT_HEADER}</td>
+    <td style="text-align: center;">{TEXT_HEADER}</td>
 </tr>
 </table>
-<form method="post" action="{ADMIN_URL}/media/setparameter.php">
+<form method="post" action="{ADMIN_URL}/media/setparameter.php" id="myForm">
     {FTAN}
-<table summary="" cellpadding="4" cellspacing="0" border="0" width="100%" class="{DISPLAY_LIST_TABLE}">
+<table  class="{DISPLAY_LIST_TABLE}" style="width: 100%;">
     <tr><td>{SETTINGS}</td><td><input type="checkbox" name="show_thumbs" {NO_SHOW_THUMBS_SELECTED}> {NO_SHOW_THUMBS}</td></tr>
     <tr class="{DISPLAY_ADMIN}"><td></td>&nbsp;<td><input type="checkbox" name="admin_only" {ADMIN_ONLY_SELECTED}> {ADMIN_ONLY}</td></tr>
     <tr><td colspan="2" style="border-bottom: 1px solid #666; line-height: 1px;">&nbsp;</td></tr>
+</table>
+<table  class="{DISPLAY_LIST_TABLE}" style="width: 100%;">
 <!-- BEGIN list_block -->
     <tr style="background-color: #{ROW_BG_COLOR};">
         <td>{PATH_NAME}</td>
-        <td>{WIDTH} <input size="5" type="text" name="{FIELD_NAME_W}" value="{CUR_WIDTH}"> {HEIGHT} <input size="5" type="text" name="{FIELD_NAME_H}" value="{CUR_HEIGHT}"></td>
+        <td>
+        {WIDTH}<input size="5" type="text" name="{FIELD_NAME_W}" value="{CUR_WIDTH}" id="W{FILE_ID}" onblur="BlurFunction(this.id)" onfocus="FocusFunction(this.id)" />
+        {HEIGHT}<input size="5" type="text" name="{FIELD_NAME_H}" value="{CUR_HEIGHT}" id="H{FILE_ID}" onblur="BlurFunction(this.id)" onfocus="FocusFunction(this.id)" />
+        </td>
     </tr>
 <!-- END list_block -->
     <tr>
-        <td><input type="button" onclick="javascript: window.location = 'browse.php'" value="{BACK}"></td>
-        <td><input type="submit" name="save" value="{SAVE_TEXT}"></td>
+        <td><input type="button" onclick="window.location = 'browse.php'" value="{BACK}"/></td>
+        <td><input type="submit" name="save" value="{SAVE_TEXT}"/></td>
     </tr>
 </table>
 </form>
+<script>
+/*
+var x = document.getElementById("myForm");
+x.addEventListener("focus", FocusFunction, true);
+x.addEventListener("blur", BlurFunction, true);
+*/
+function FocusFunction(id) {
+//    document.getElementById("myInput").style.backgroundColor = "yellow";
+    var el2 = document.getElementById(id),
+        tmp = el2.value;
+    el2.style.backgroundColor  = '';
+    if (tmp === '-'){
+        el2.value  = ''
+    }
+}
+
+function BlurFunction(id) {
+    var el1 = document.getElementById(id);
+        tmp = el1.value;
+    el1.style.backgroundColor  = '';
+    if (tmp === ''){
+        el1.value  = '-'
+    }
+}
+</script>
+
 </body>
 </html>
 

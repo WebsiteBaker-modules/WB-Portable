@@ -36,8 +36,10 @@
 //    $oApp = (isset($GLOBALS['admin']) ? $GLOBALS['admin'] : $GLOBALS['wb']);
     $bIsBackend = ($oApp instanceof admin);
     // set addon depending path / url
-    $sAddonPath = $oReg->AppPath.'/modules/'.$sAddonName;
-    $sAddonUrl  = $oReg->AppUrl.'/modules/'.$sAddonName;
+    $sAddonPath = $oReg->AppPath.'modules/'.$sAddonName;
+    $sAddonUrl  = $oReg->AppUrl.'modules/'.$sAddonName;
+    $sAddonRel = '/modules/'.basename(__DIR__);
+    $sAddonThemeRel ='/themes/default';
     // define the theme to use -----------------------------------------------------------
     if (is_readable($sAddonPath.'/themes/default')) {
     // first set fallback to system default theme
@@ -78,11 +80,32 @@
         // try loading language of user (backend) or page (frontend) defined settings
         include $sAddonPath.'/languages/'.$oReg->Language.'.php';
     }
-     // Include the ordering class
-    if (!class_exists('order')) {
-    include WB_PATH.'/framework/class.order.php';
+    // load addon Theme/Template depending language file ---------------------------------
+    $sTmp = ($bIsBackend ? $sAddonThemePath : $sAddonTemplatePath).'/languages/';
+    if (is_readable($sTmp.'EN.php')) {
+        // first load fallback to system default language (EN)
+        include $sTmp.'EN.php';
+    }
+    if (is_readable($sTmp.$oReg->DefaultLanguage.'.php')) {
+        // try loading language of global settings
+        include $sTmp.$oReg->DefaultLanguage.'.php';
+    }
+    if (is_readable($sTmp.$oReg->Language.'.php')) {
+        // try loading language of user (backend) or page (frontend) defined settings
+        include $sTmp.$oReg->Language.'.php';
     }
     // Simple Command Dispatcher ---------------------------------------------------------
+     // Include the ordering class
+    if (!class_exists('order')) {
+    include $oReg->AppPath.'framework/class.order.php';
+    }
+    if (!class_exists('admin')) {
+        include $oReg->AppPath.'framework/class.admin.php';
+    }
+    if (!class_exists('Translate')) {
+        include $oReg->AppPath.'framework/Translate.php';
+    }
+    Translate::getInstance ()->enableAddon ('modules\\'.$sAddonName);
     // sanitize command from compatibility file
     $sCommand = (isset($sCommand) ? strtolower($sCommand) : '');
     // sanitize/validate request var 'cmd'

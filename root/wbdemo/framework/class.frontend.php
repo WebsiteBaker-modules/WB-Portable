@@ -1,11 +1,11 @@
 <?php
 /**
  *
- * @category        framework
- * @package         frontend
- * @author          Ryan Djurovich, WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
+ * @category        frontend
+ * @package         framework
+ * @author          Ryan Djurovich (2004-2009), WebsiteBaker Project
+ * @copyright       2009-2012, WebsiteBaker Org. e.V.
+ * @link            http://www.websitebaker2.org/
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
@@ -34,34 +34,58 @@ class frontend extends wb {
     // page details
     // page database row
     public $page;
-    public $page_id,$page_title,$menu_title,$parent,$root_parent,$level,$position,$visibility;
-    public $page_description,$page_keywords,$page_link;
+    public $page_id,$page_code,$page_title,$menu_title,$parent,$root_parent,$level,$position,$visibility;
+    public $page_description,$page_keywords,$page_link, $page_icon, $menu_icon_0, $menu_icon_1, $tooltip;
     public $page_trail=array();
-    
+
     public $page_access_denied;
     public $page_no_active_sections;
-    
+
     // website settings
     public $website_title,$website_description,$website_keywords,$website_header,$website_footer;
 
     // ugly database stuff
     public $extra_where_sql, $sql_where_language;
-    
+/*
     public function __construct() {
         parent::__construct(1);
+*/
+    public function __construct($value=true) {
+        parent::__construct(1);
+        $this->FrontendLanguage = isset($value) ? $value : true;
     }
 
+    public function ChangeFrontendLanguage( $value=true ) {
+        $this->FrontendLanguage=$value;
+    }
 
     public function page_select() {
         global $page_id, $no_intro, $database;
+/*
+ * Store installed languages in SESSION
+ */
+
+        if( $this->get_session('session_started') ) {
+            $_SESSION['USED_LANGUAGES'] = $this->getLanguagesInUsed();
+        }
+
+        $maintance = ( defined('SYSTEM_LOCKED') && (SYSTEM_LOCKED==true) ? true : false );
+
+        if( ($maintance==true) || $this->get_session('USER_ID')!= 1 )
+        {
+           //  check for show maintenance screen and terminate if needed
+            $this->ShowMaintainScreen('locked');
+        }
         // We have no page id and are supposed to show the intro page
-        if ((INTRO_PAGE && !isset($no_intro)) && (!isset($page_id) || !is_numeric($page_id))) {
+        if((INTRO_PAGE && ($maintance != true) && !isset($no_intro)) && (!isset($page_id) || !is_numeric($page_id)))
+        {
             // Since we have no page id check if we should go to intro page or default page
             // Get intro page content
-            $filename = WB_PATH.PAGES_DIRECTORY.'/intro'.PAGE_EXTENSION;
-            if(is_readable($filename)) {
-                header('Location: '.WB_URL.PAGES_DIRECTORY.'/intro'.PAGE_EXTENSION);   // send intro.php as header to allow parsing of php statements
-                exit;
+            $sIntroFilename = PAGES_DIRECTORY.'/intro'.PAGE_EXTENSION;
+            if(file_exists(WB_PATH.$sIntroFilename)) {
+                // send intro.php as header to allow parsing of php statements
+                header("Location: ".WB_URL.$sIntroFilename."");
+                exit();
             }
         }
         // Check if we should add page language sql code
@@ -70,7 +94,69 @@ class frontend extends wb {
         }
         // Get default page
         // Check for a page id
+        $table_p = TABLE_PREFIX.'pages';
+        $table_s = TABLE_PREFIX.'sections';
         $now = time();
+        $sql  = 'SELECT `p`.`page_id`, `link` ';
+        $sql .= 'FROM `'.$table_p.'` AS `p` INNER JOIN `'.$table_s.'` USING(`page_id`) ';
+        $sql .= 'WHERE `parent`=0 AND `visibility`=\'public\' ';
+        $sql .=     'AND (('.$now.'>=`publ_start` OR `publ_start`=0) ';
+        $sql .=     'AND ('.$now.'<=`publ_end` OR `publ_end`=0)) ';
+        if(trim($this->sql_where_language) != '') {
+            $sql .= trim($this->sql_where_language).' ';
+        }
+        $sql .= 'ORDER BY `p`.`position` ASC';
+        if($get_default = $database->query($sql)) {
+
+            $default_num_rows = $get_default->numRows();
+            if(!isset($page_id) OR !is_numeric($page_id)){
+                // Go to or show default page
+                if($default_num_rows > 0) {
+                    $fetch_default = $get_default->fetchArray(MYSQLI_ASSOC);
+                    $this->default_link = $fetch_default['link'];
+                    $this->default_page_id = $fetch_default['page_id'];
+                    // Check if we should redirect or include page inline
+                    if(HOMEPAGE_REDIRECTION) {
+                        // Redirect to page
+    //                    header("Location: ".$this->page_link($this->default_link));
+    //                    exit();
+                        $this->send_header($this->page_link($this->default_link));
+                    } else {
+                        // Include page inline
+                        $this->page_id = $this->default_page_id;
+                    }
+                } else {
+                       // No pages have been added, so print under construction page
+    //                if(trim($this->sql_where_language) == '') {
+    //                    $this->ShowMaintainScreen('new');
+    //                    exit();
+    //                }
+                    $this->ShowMaintainScreen('new');
+    //                $this->print_under_construction();
+                    exit();
+                }
+            } else {
+                $this->page_id=$page_id;
+            }
+            // Get default page link
+            if(!isset($fetch_default)) {
+                  $fetch_default = $get_default->fetchArray(MYSQLI_ASSOC);
+                 $this->default_link = $fetch_default['link'];
+                $this->default_page_id = $fetch_default['page_id'];
+            }
+            return true;
+
+        } else {
+            $this->ShowMaintainScreen('new');
+            exit();
+        }
+
+    }
+
+
+
+
+/*
         $sql = 'SELECT `p`.`page_id`, `link` '
              . 'FROM `'.TABLE_PREFIX.'pages` `p` '
              .       'INNER JOIN `'.TABLE_PREFIX.'sections` '
@@ -101,7 +187,9 @@ class frontend extends wb {
         // time to set default values
         $this->default_link    = $aDefaultPage['link'];
         $this->default_page_id = $aDefaultPage['page_id'];
-        if (!isset($page_id) || !intval($page_id)) {
+//        if (!isset($page_id) || !intval($page_id)) {
+//        if (!isset($page_id) || !is_numeric($page_id)) {
+          if (!(isset($page_id) && is_numeric($page_id) && is_int($page_id))) {
         // use default page if validation fails
             if(HOMEPAGE_REDIRECTION) {
             // for mandatory redirect request the starting page via accessfile now
@@ -116,10 +204,12 @@ class frontend extends wb {
         }
         return true;
     }
+*/
 
     public function get_page_details() {
         global $database;
-        if($this->page_id != 0) {
+        if($this->page_id != 0)
+        {
             // Query page details
             $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `page_id`='.(int)$this->page_id;
             $get_page = $database->query($sql);
@@ -144,6 +234,9 @@ class frontend extends wb {
             // Begin code to set details as either variables of constants
             // Page ID
             if(!defined('PAGE_ID')) {define('PAGE_ID', $this->page['page_id']);}
+            // Page Code
+            if(!defined('PAGE_CODE')) {define('PAGE_CODE', $this->page['page_code']);}
+            $this->page_code = PAGE_CODE;
             // Page Title
             if(!defined('PAGE_TITLE')) {define('PAGE_TITLE', $this->page['page_title']);}
             $this->page_title=PAGE_TITLE;
@@ -155,6 +248,10 @@ class frontend extends wb {
                 if(!defined('MENU_TITLE')) {define('MENU_TITLE', PAGE_TITLE);}
             }
             $this->menu_title = MENU_TITLE;
+            $this->page_icon = $this->page['page_icon'];
+            $this->menu_icon_0 = $this->page['menu_icon_0'];
+            $this->menu_icon_1 = $this->page['menu_icon_1'];
+            $this->tooltip = $this->page['tooltip'];
             // Page parent
             if(!defined('PARENT')) {define('PARENT', $this->page['parent']);}
             $this->parent=$this->page['parent'];
@@ -183,9 +280,10 @@ class frontend extends wb {
             // Page keywords
             $this->page_keywords=$this->page['keywords'];
             // Page link
-            $this->link=$this->page_link($this->page['link']);
+            $this->link = $this->page_link($this->page['link']);
             $_SESSION['PAGE_ID'] = $this->page_id;
             $_SESSION['HTTP_REFERER'] = $this->link;
+
         // End code to set details as either variables of constants
         }
 
@@ -219,7 +317,7 @@ class frontend extends wb {
                     // User isnt allowed on this page so tell them
                     $this->page_access_denied=true;
                 }
-                
+
             }
         }
         // check if there is at least one active section
@@ -254,7 +352,7 @@ class frontend extends wb {
         } elseif(SEARCH == 'private' AND $this->is_authenticated() == true) {
             define('SHOW_SEARCH', true);
         } elseif(SEARCH == 'registered' AND $this->is_authenticated() == true) {
-            define('SHOW_SEARCH', true);    
+            define('SHOW_SEARCH', true);
         } else {
             define('SHOW_SEARCH', false);
         }
@@ -281,8 +379,10 @@ class frontend extends wb {
  */
     public function preprocess(&$content)
     {
+    //   do nothing
+    }
 /**
- * 
+ *
         global $database;
         $replace_list = array();
         $pattern = '/\[wblink([0-9]+)\]/isU';
@@ -303,8 +403,8 @@ class frontend extends wb {
                 }
             }
         }
- */
     }
+ */
 
 /*
     function preprocess(&$content) {
@@ -322,6 +422,7 @@ class frontend extends wb {
         }
     }
 */
+
     public function menu() {
         global $wb;
        if (!isset($wb->menu_number)) {
@@ -359,7 +460,7 @@ class frontend extends wb {
        }
        $wb->show_menu();
     }
-    
+
     public function show_menu() {
         global $database;
         if ($this->menu_start_level>0) {
@@ -435,6 +536,9 @@ class frontend extends wb {
 
     // Function to show the "Under Construction" page
     public function print_under_construction() {
+        $this->ShowMaintainScreen('new');
+        exit();
+/*
         global $MESSAGE;
         require_once(WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
         echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -444,6 +548,7 @@ class frontend extends wb {
 }--></style></head><body>
         <br /><h1>'.$MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'].'</h1><br />
         '.$MESSAGE['GENERIC_PLEASE_CHECK_BACK_SOON'].'</body></html>';
+*/
     }
 
     // Function to show the "Under Construction" page

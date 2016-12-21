@@ -22,19 +22,41 @@ if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.p
 
 // suppress to print the header, so no new FTAN will be set
 $admin = new admin('Access', 'groups_add', false);
+$requestMethod = '_'.($GLOBALS['_SERVER']['REQUEST_METHOD']);
+$aRequestVars  = (@(${$requestMethod}) ? : null);
+
+$bAdvanced       = intval(@$aRequestVars['advanced'] ?: 0);
+$bAdvancedSave   = intval(@$aRequestVars['advanced_extended'] ?: 0);
+$bResetSystem    = intval(@$aRequestVars['reset_system'] ?: 0);
+$bResetModules   = intval(@$aRequestVars['reset_modules'] ?: 0);
+$bResetTemplates = intval(@$aRequestVars['reset_templates'] ?: 0);
 // Create a javascript back link
 $js_back = ADMIN_URL.'/groups/index.php';
+$action = 'save';
+$action = (isset($_POST['cancel']) ? 'cancel' : $action );
+    switch ($action):
+        case 'cancel':
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: '.$js_back);
+            exit;
+        default:
+
+        break;
+    endswitch;
 
 if (!$admin->checkFTAN())
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL);
+    $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION).'::');
+    $sDEBUG=(@DEBUG?$sInfo:'');
+    $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL);
 }
 // After check print the header
 $admin->print_header();
 
 // Gather details entered
-$group_name = $database->escapeString(trim(strip_tags($admin->get_post('group_name'))));
+$group_name = preg_replace('/[^a-z0-9_-]/i', "", $admin->get_post('group_name'));
+$group_name = $admin->StripCodeFromText($group_name);
 
 // Check values
 if($group_name == "") {
@@ -43,7 +65,7 @@ if($group_name == "") {
 $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'groups` '
      . 'WHERE `name`=\''.$group_name.'\'';
 if ($database->get_one($sql)) {
-    $admin->print_error($MESSAGE['GROUPS_GROUP_NAME_EXISTS'], $js_back);  
+    $admin->print_error($MESSAGE['GROUPS_GROUP_NAME_EXISTS'], $js_back);
 }
 $system_permissions = array();
 // Get system and module permissions
@@ -51,15 +73,17 @@ require(ADMIN_PATH.'/groups/get_permissions.php');
 
 // Update the database
 $sql = 'INSERT INTO `'.TABLE_PREFIX.'groups` SET '
-     .     '`name`=\''.$group_name.'\', '
+     .     '`name`=\''.$database->escapeString($group_name).'\', '
      .     '`system_permissions`=\''.$database->escapeString($system_permissions).'\', '
      .     '`module_permissions`=\''.$database->escapeString($module_permissions).'\', '
      .     '`template_permissions`=\''.$database->escapeString($template_permissions).'\'';
+
 if (($database->query($sql))) {
-    $admin->print_success($MESSAGE['GROUPS_ADDED'], ADMIN_URL.'/groups/index.php');
+    $group_id = $admin->getIDKEY($database->getLastInsertId());
+    $modifyUrl = ADMIN_URL.'/groups/groups.php?modify=&group_id='.$group_id.'';
+    $admin->print_success($MESSAGE['GROUPS_ADDED'], $modifyUrl);
 } else {
-    $admin->print_error($database->get_error());
+    $admin->print_error($database->get_error(), $js_back);
 }
 // Print admin footer
 $admin->print_footer();
-

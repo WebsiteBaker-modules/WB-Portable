@@ -11,9 +11,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: delete_droplet.php 1503 2011-08-18 02:18:59Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/droplets/delete_droplet.php $
- * @lastmodified    $Date: 2011-08-18 04:18:59 +0200 (Do, 18. Aug 2011) $
+ * @version         $Id: delete_droplet.php 16 2016-09-13 20:52:49Z dietmar $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2-modules/addons/droplets/commands/delete_droplet.php $
+ * @lastmodified    $Date: 2016-09-13 22:52:49 +0200 (Di, 13. Sep 2016) $
  *
  */
 /* -------------------------------------------------------- */
@@ -21,19 +21,18 @@
 if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 // Get id
- $droplet_id = intval($admin->checkIDKEY($droplet_id, false, ''));
-if (!$droplet_id) {
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl);
+if ($droplet_id===false) {
+    $oApp->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl);
     exit();
 }
 
-if( !$admin->checkFTAN() ){
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl );
+if( !$oApp->checkFTAN() ){
+    $oApp->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl );
     exit();
 }
 
-if( !isset( $aRequestVars['DropletsToDelete'])  ) {
-    
+if (!isset( $aRequestVars['DropletsToDelete']))
+{
     $sDropletsToDelete = ( isset($droplet_id) && !isset( $aRequestVars['cb']) ? $droplet_id : '' );
     $iDELETED = (isset($droplet_id) ? 1 : 0 );
     if( isset( $aRequestVars['cb'])  ) {
@@ -45,60 +44,46 @@ if( !isset( $aRequestVars['DropletsToDelete'])  ) {
     $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_droplets` '
           . 'WHERE `id` IN ('.$sDropletsToDelete.') ';
     $inDroplets = '';
-    if ( $oRes = $database->query($sql)) {
+    if ( $oRes = $oDb->query($sql)) {
         while( $aRow = $oRes->fetchRow( MYSQLI_ASSOC ) ) {
           $inDroplets .= $aRow['name'].', '; 
         }
     }
+    $iDropletIdKey = $oApp->getIDKEY($droplet_id);
+    $aFtan = $admin->getFTAN('');
+    // prepare default data for phplib and twig
+    $aTplData = array (
+        'FTAN_NAME' => $aFtan['name'],
+        'FTAN_VALUE' => $aFtan['value'],
+        'iDropletIdKey' => $iDropletIdKey,
+        'sDropletsToDelete' => $sDropletsToDelete,
+        'inDroplets' =>  rtrim($inDroplets, ', '),
+        );
+// Create new template object with phplib
+    $oTpl = new Template($sAddonThemePath, 'keep' );
+    $oTpl->set_file('page', 'delete_droplets.htt');
+    $oTpl->set_block('page', 'main_block', 'main');
+//    $oTpl->set_var('FTAN_NAME', $aFtan['name']);
+//    $oTpl->set_var('FTAN_VALUE', $aFtan['value']);
+    $oTpl->set_var($aLang);
+    $oTpl->set_var($aTplDefaults);
+    $oTpl->set_var($aTplData);
+/*-- finalize the page -----------------------------------------------------------------*/
+    $oTpl->parse('main', 'main_block', false);
+    $oTpl->pparse('output', 'page');
 
-?>
-<div class="droplets-delete" style="height: 20.525em;" >
-    <h4 style="margin: 0; border-bottom: 1px solid #DDD; padding-bottom: 5px;">
-        <a href="<?php echo $admintool_link;?>" title="<?php echo $HEADING['ADMINISTRATION_TOOLS']; ?>"><?php echo $HEADING['ADMINISTRATION_TOOLS']; ?></a>
-        »
-        <a href="<?php echo $ToolUrl;?>" title="<?php echo $sOverviewDroplets ?>" alt="<?php echo $sOverviewDroplets ?>">Droplets</a>
-    </h4>
-
-  <div id="droplets-delete" class="modal-Dialog" draggable="true">
-    <form action="<?php echo $ModuleUrl.'index.php'; ?>" method="post">
-          <input type="hidden" name="DropletsToDelete" value="<?php echo $sDropletsToDelete; ?>" />
-          <?php echo $admin->getFTAN(); ?>
-          <div id="customConfirm" style="display: block;">
-               <a href="#close" title="Close" class="close" onclick="window.location='<?php echo $ToolUrl; ?>';">X</a>
-              <header class=" modal-label"><?php echo $Droplet_Message['DELETE_DROPLETS']; ?></header>
-              <div class="body">
-                  <h3><?php echo $Droplet_Message['CONFIRM_DROPLET_DELETING']; ?></h3>
-                  <p><?php echo rtrim($inDroplets, ', '); ?></p>
-              </div>
-              <div class="footer">
-                  <button name="command" type="submit" value="delete_droplet?droplet_id=<?php echo $admin->getIDKEY($droplet_id); ?>" class="confirm"><?php echo $TEXT['DELETE']; ?></button>
-                  <button name="cancel" class="cancel" type="button" onclick="window.location='<?php echo $ToolUrl; ?>';"><?php echo $TEXT['CANCEL']; ?></button>
-              </div>
-          </div>
-    </form>
-</div>
-<?php
-} elseif ( !isset($aRequestVars['cancel']) ) {
+} elseif (!isset($aRequestVars['cancel'])) {
     $sDropletsToDelete = $aRequestVars['DropletsToDelete'];
     $iDELETED = sizeof( explode(',', $sDropletsToDelete) );
     $sql  = 'DELETE FROM `'.TABLE_PREFIX.'mod_droplets` '
           . 'WHERE `id` IN ('.$sDropletsToDelete.') ';
-
     // Delete droplet
-    $database->query($sql);
+    $oDb->query($sql);
     
     // Check if there is a db error, otherwise say successful
-    if($database->is_error()) {
-        msgQueue::add( $database->get_error().'<br />'.$sql );
+    if($oDb->is_error()) {
+        msgQueue::add( $oDb->get_error().'<br />'.$sql );
     } else {
         msgQueue::add( sprintf("%'.02d", $iDELETED ).'  '.$DR_TEXT['DROPLETS_DELETED'], true );
     }
 } else { /* do nothing */}
-?></div><script >
-<!--
-domReady(function() {
-    LoadOnFly('head', WB_URL+"<?php echo $ModuleRel.$sStyleFolder; ?>css/customAlert.css");
-});
--->
-</script>
-<?php

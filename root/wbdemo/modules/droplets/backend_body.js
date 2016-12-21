@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 domReady(function() {
 
@@ -13,22 +13,20 @@ domReady(function() {
        else
           e.style.display = 'block';
     }
-
+// CHANGELOG 20160323
     function addEvent(elem, event, fn) {
+        if(!elem) { return false; }
+console.info (elem);
         if (elem.addEventListener) {
             elem.addEventListener(event, fn, false);
         } else {
             elem.attachEvent("on" + event, function() {
                 // set the this pointer same as addEventListener when fn is called
-                return(fn.call(elem, window.event));   
+                return(fn.call(elem, window.event));
             });
         }
     }
-/**
- * 
- */
- 
- 
+
     function mouseX (e) {
       if (e.pageX) {
         return e.pageX;
@@ -60,7 +58,6 @@ domReady(function() {
       offsetX = 0;
       offsetY = 0;
       var mousemoveTemp = null;
-    
       if (t) {
         var move = function (x,y) {
           t.style.left = (parseInt(t.style.left)+x) + "px";
@@ -68,9 +65,7 @@ domReady(function() {
         }
         var mouseMoveHandler = function (e) {
           e = e || window.event;
-    
           if(!drag){return true};
-    
           var x = mouseX(e);
           var y = mouseY(e);
           if (x != offsetX || y != offsetY) {
@@ -82,11 +77,9 @@ domReady(function() {
         }
         var start_drag = function (e) {
           e = e || window.event;
-    
           offsetX=mouseX(e);
           offsetY=mouseY(e);
           drag=true; // basically we're using this to detect dragging
-    
           // save any previous mousemove event handler:
           if (document.body.onmousemove) {
             mousemoveTemp = document.body.onmousemove;
@@ -95,8 +88,7 @@ domReady(function() {
           return false;
         }
         var stop_drag = function () {
-          drag=false;      
-    
+          drag=false;
           // restore previous mousemove event handler if necessary:
           if (mousemoveTemp) {
             document.body.onmousemove = mousemoveTemp;
@@ -109,13 +101,13 @@ domReady(function() {
       }
     }
 
-
     function move(ev) {
       ev.dataTransfer.setData('text', ev.target.id);
     }
 
     window.addEventListener("load",function () {
       initCheckboxes();
+//      addEvent(document.getElementById('selectOrder'), 'change', changeOrder);
       var dragItems = document.querySelectorAll("[draggable=true]")
 console.info( dragItems );
       for (var i = 0; i < dragItems.length; i++) {
@@ -123,9 +115,7 @@ console.info( dragItems );
         draggable.addEventListener("dragstart",move);
       };
     });
-
 //    addEvent( window, 'load', initCheckboxes );
-
     function initCheckboxes() {
         addEvent(document.getElementById('select_all'), 'click', setCheckboxes);
     }
@@ -139,7 +129,7 @@ console.info(cb);
     }
 
     function selectSingleElement(IdSuffix, el ) {
-        document.getElementById(el.id + IdSuffix).checked ='checked'; 
+        document.getElementById(el.id + IdSuffix).checked ='checked';
         document.getElementById('select_all').checked =false;
     }
 
@@ -151,8 +141,29 @@ console.info(cb);
             e.checked = el.checked;
         }
     }
-
-
-
+    function changeOrder(){
+console.info(this);
+    }
 
 });
+/*-------------------------------------------------------------------------------------------------*/
+if (typeof Droplet ==="object"){
+    var DR_MODULE_URL = Droplet.AddonUrl;
+    var DR_ICONS = Droplet.ThemeUrl + 'img';
+    var DR_AJAX_PLUGINS =  Droplet.AddonUrl + 'ajax';  // this var could change in the future
+    var LANGUAGE = LANGUAGE ? LANGUAGE : 'EN'; // set var LANGUAGE to EN if LANGUAGE not set before
+    /*
+    console.info(DR_MODULE_URL);
+    console.info(DR_ICONS);
+    console.info(DR_AJAX_PLUGINS);
+    */
+            $.insert(  Droplet.AddonUrl + 'ajax' +"/ajaxActiveStatus.js");
+    console.info(DR_AJAX_PLUGINS);
+            // AjaxHelper change item active status
+            $("td.active_status").ajaxActiveStatus({
+                    MODULE : Droplet.AddonUrl,
+                    DB_RECORD_TABLE: 'mod_droplets',
+                    DB_COLUMN: 'id',
+                    sFTAN: ''
+            });
+}

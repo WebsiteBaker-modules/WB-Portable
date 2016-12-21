@@ -1,0 +1,66 @@
+/**
+ * 
+ */
+@import url( "chmod.css");
+.settings_table { width: 100%;}
+.settings_table td { text-align :left; vertical-align :top; }
+.settings_table td.setting_value { width :80%; }
+.settings_table td.setting_value textarea { height : 8.225em; }
+.settings_table td.setting_name { 
+  width :20%; 
+  min-width :200px;
+  color: #0d4b6e;
+  text-align: right;
+  font-weight: bold;
+  padding-right: 0.525em;
+  }
+
+#file_mode input, #dir_mode input { color: #205979; }
+
+.header_title, .setting_value input, .setting_value select, .setting_value textarea, .value_input input, .value_input text, .value_input select, .form_submit, .input_full {
+  width: 100%;
+}
+.settings_table tr {
+  white-space: normal;
+  line-height: 1.925em;
+}
+
+.settings_table p.note {
+  line-height: 1.4em; margin: auto; font-size: 1.025em;
+}
+
+.setting_value_permissions table {
+  width: 60%!important ;
+}
+
+
+form#Settings {
+}
+
+form#Settings fieldset legend h2 {
+font-size:1.255em;
+}
+
+form#Settings dd {
+margin-left:0.525em;
+}
+
+form#Settings dd select {
+font-size:inherit;
+min-width:19.125em;
+}
+
+form#Settings dd textarea {
+overflow:auto;
+width:100%;
+}
+.reformed-form dl {
+  margin: auto;
+}
+.chmod h4 {
+  font-size: 1.225em;
+  background: #215a7a;
+  line-height: 1.925em;
+  padding-left: 0.525em;
+  color: #fff;
+}

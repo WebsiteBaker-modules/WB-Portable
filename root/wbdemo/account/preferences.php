@@ -16,10 +16,15 @@
  *
  */
 
-if( !defined( 'WB_PATH' ) ){ require(dirname(__DIR__).'/config.php'); }
- if( !class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
+if (!defined( 'WB_PATH')){ require(dirname(__DIR__).'/config.php'); }
+if (!class_exists('frontend')) {require(WB_PATH.'/framework/class.frontend.php');}
+
+require_once(WB_PATH.'/framework/functions.php');
+
 // Create new frontend object
-if (!isset($wb) || !($wb instanceof frontend)) { $wb = new frontend(); }
+if (!isset($wb) || !($wb instanceof frontend)) {
+  $wb = new frontend();
+}
 
 if(!FRONTEND_LOGIN) {
     header('Location: '.WB_URL.'/index.php');
@@ -32,8 +37,13 @@ if ($wb->is_authenticated()==false) {
 }
 $redirect_url = ((isset($_SESSION['HTTP_REFERER']) && $_SESSION['HTTP_REFERER'] != '') ? $_SESSION['HTTP_REFERER'] : WB_URL );
 $redirect_url = ( isset($redirect) && ($redirect!='') ? $redirect : $redirect_url);
-
-$page_id = @$_SESSION['PAGE_ID'] ?: 0;
+$page_id = @$_SESSION['PAGE_ID'] ?: PAGE_ID;
+/*
+$requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
+$redirect  = strip_tags(isset(${$requestMethod}['redirect']) ? ${$requestMethod}['redirect'] : '');
+$redirect = ((isset($_SERVER['HTTP_REFERER']) && empty($redirect)) ?  $_SERVER['HTTP_REFERER'] : $redirect);
+$_SESSION['HTTP_REFERER'] = str_replace(WB_URL,'',$redirect);
+*/
 
 // Required page details
 $page_description = '';

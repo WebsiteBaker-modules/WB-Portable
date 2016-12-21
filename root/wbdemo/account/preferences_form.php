@@ -15,12 +15,16 @@
  * @lastmodified    $Date: 2012-02-06 16:59:24 +0100 (Mo, 06. Feb 2012) $
  *
  */
-
 // prevent this file from being accesses directly
 if(defined('WB_PATH') == false) { exit("Cannot access this file directly"); }
 $sCallingScript = WB_URL;
-$redirect_url = ((isset($_SESSION['HTTP_REFERER']) && $_SESSION['HTTP_REFERER'] != '') ? $_SESSION['HTTP_REFERER'] : WB_URL );
-$redirect_url = ( isset($redirect) && ($redirect!='') ? $redirect : $redirect_url);
+
+$redirect_url = (isset($_SESSION['HTTP_REFERER']) && ($_SESSION['HTTP_REFERER'] != '') ? $_SESSION['HTTP_REFERER'] : $sCallingScript );
+$redirect_url = (isset($redirect) && ($redirect!='') ? $redirect : $redirect_url);
+/*
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.$page_id.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+print_r( $redirect_url ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+*/
     if($wb->is_authenticated() === false) {
 // User needs to login first
         header("Location: ".WB_URL."/account/login.php?redirect=".$wb->link);
@@ -28,14 +32,20 @@ $redirect_url = ( isset($redirect) && ($redirect!='') ? $redirect : $redirect_ur
     }
 // load module default language file (EN)
 $sAddonName = basename(__DIR__);
-require(WB_PATH .'/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
-}
+$oTrans = Translate::getInstance();
+$oTrans->enableAddon('account');
+
+//require(WB_PATH .'/'.$sAddonName.'/languages/EN.php');
+//if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
+//    require(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+//}
     require_once(WB_PATH.'/framework/functions-utf8.php');
+/*
     echo '<style type="text/css">';
     include(WB_PATH .'/account/frontend.css');
     echo "\n</style>\n";
+*/
+
     $user_time = true;
     require(ADMIN_PATH.'/interface/timezones.php');
     require(ADMIN_PATH.'/interface/date_formats.php');
@@ -62,7 +72,7 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
 // get existing values from database
     $sql = "SELECT `display_name`,`email` FROM `".TABLE_PREFIX."users` WHERE `user_id` = '".$wb->get_user_id()."'";
     $rowset = $database->query($sql);
-    if($database->is_error()) $error[] = $database->get_error();
+    if($database->is_error()) { $error[] = $database->get_error(); }
     $row = $rowset->fetchRow(MYSQLI_ASSOC);
 // insert values into form
     $template->set_var('DISPLAY_NAME', $row['display_name']);
@@ -89,8 +99,8 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
         $actual_time = time()+ $_SESSION['TIMEZONE'];
         foreach($TIME_FORMATS as $key => &$val) {
             if($key == "system_default") {
-                if(isset($TEXT['SYSTEM_DEFAULT'])) {
-                    $TIME_FORMATS['system_default'] = gmdate(DEFAULT_TIME_FORMAT, $actual_time).' ('.$TEXT['SYSTEM_DEFAULT'].')';
+                if(isset($oTrans->TEXT_SYSTEM_DEFAULT)) {
+                    $TIME_FORMATS['system_default'] = gmdate(DEFAULT_TIME_FORMAT, $actual_time).' ('.$oTrans->TEXT_SYSTEM_DEFAULT.')';
                 } else {
                     $TIME_FORMATS['system_default'] = gmdate(DEFAULT_TIME_FORMAT, $actual_time).' (System Default)';
                 }
@@ -102,8 +112,8 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
         // Keep in mind we've also update the Date! (± one day)
         foreach($DATE_FORMATS as $key => &$val) {
             if($key == "system_default") {
-                if(isset($TEXT['SYSTEM_DEFAULT'])) {
-                    $DATE_FORMATS['system_default'] = gmdate(DEFAULT_DATE_FORMAT, $actual_time).' ('.$TEXT['SYSTEM_DEFAULT'].')';
+                if(isset($oTrans->TEXT_SYSTEM_DEFAULT)) {
+                    $DATE_FORMATS['system_default'] = gmdate(DEFAULT_DATE_FORMAT, $actual_time).' ('.$oTrans->TEXT_SYSTEM_DEFAULT.')';
                 } else {
                     $DATE_FORMATS['system_default'] = gmdate(DEFAULT_DATE_FORMAT, $actual_time).' (System Default)';
                 }
@@ -113,8 +123,16 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
             }
         }
     }
-    $iCurrentTimeZone = (@$_SESSION['TIMEZONE'] ? : $wb->get_timezone());
+
+    $iActualTimezone = ((DEFAULT_TIMEZONE <> 0)  ? DEFAULT_TIMEZONE : 0);
+    $iActualTimezone = (($iActualTimezone == $wb->get_timezone())? 'system_default':$wb->get_timezone());
+    $iCurrentTimeZone = intval(@$_SESSION['TIMEZONE'] ? : $iActualTimezone);
     foreach($TIMEZONES AS $hour_offset => $title) {
+        $iTmpOffset = (is_numeric($hour_offset)?$hour_offset*3600:$hour_offset);
+        $template->set_var('VALUE',    $hour_offset);
+        $template->set_var('NAME',     $title);
+        $template->set_var('SELECTED', (($iTmpOffset === $iActualTimezone) ? ' selected="selected"' : ''));
+/*
         $template->set_var('VALUE', $hour_offset);
         $template->set_var('NAME', $title);
         if($iCurrentTimeZone == $hour_offset*3600) {
@@ -122,11 +140,12 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
         } else {
             $template->set_var('SELECTED', '');
         }
+*/
         $template->parse('timezone_list', 'timezone_list_block', true);
     }
 // Insert date format list
     $template->set_block('main_block', 'date_format_list_block', 'date_format_list');
-    $sTempDateFormat = (@$_SESSION['DATE_FORMAT'] ?: DATE_FORMAT); 
+    $sTempDateFormat = (@$_SESSION['DATE_FORMAT'] ?: DATE_FORMAT);
     foreach($DATE_FORMATS AS $format => $title) {
         $format = str_replace('|', ' ', $format); // Add's white-spaces (not able to be stored in array key)
         if($format != 'system_default') {
@@ -164,38 +183,40 @@ if(file_exists(WB_PATH .'/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
         }
         $template->parse('time_format_list', 'time_format_list_block', true);
     }
+// insert all translations
+    $template->set_var($oTrans->getLangArray());
+    $template->set_var('HTTP_REFERER', $redirect_url); //$_SESSION['HTTP_REFERER'],
 // Insert language headings
-    $template->set_var(array(
-                                'HEADING_MY_SETTINGS' => $HEADING['MY_SETTINGS'],
-                                'HEADING_MY_EMAIL'    => $HEADING['MY_EMAIL'],
-                                'HEADING_MY_PASSWORD' => $HEADING['MY_PASSWORD']
-                                )
-                        );
-// Insert language text and messages
-    $template->set_var(array(
-                                'HTTP_REFERER' => $redirect_url,//$_SESSION['HTTP_REFERER'],
-                                'TEXT_SAVE'    => $TEXT['SAVE'],
-                                'TEXT_RESET' => $TEXT['RESET'],
-                                'TEXT_CANCEL' => $TEXT['CANCEL'],
-                                'TEXT_DISPLAY_NAME'    => $TEXT['DISPLAY_NAME'],
-                                'TEXT_EMAIL' => $TEXT['EMAIL'],
-                                'TEXT_LANGUAGE' => $TEXT['LANGUAGE'],
-                                'TEXT_TIMEZONE' => $TEXT['TIMEZONE'],
-                                'TEXT_DATE_FORMAT' => $TEXT['DATE_FORMAT'],
-                                'TEXT_TIME_FORMAT' => $TEXT['TIME_FORMAT'],
-                                'TEXT_CURRENT_PASSWORD' => $TEXT['CURRENT_PASSWORD'],
-                                'TEXT_NEW_PASSWORD' => $TEXT['NEW_PASSWORD'],
-                                'TEXT_RETYPE_NEW_PASSWORD' => $TEXT['RETYPE_NEW_PASSWORD']
-                                )
-                        );
-// Insert module releated language text and messages
-    $template->set_var(array(
-                                'MOD_PREFERENCE_PLEASE_SELECT'    => $MOD_PREFERENCE['PLEASE_SELECT'],
-                                'MOD_PREFERENCE_SAVE_SETTINGS'    => $MOD_PREFERENCE['SAVE_SETTINGS'],
-                                'MOD_PREFERENCE_SAVE_EMAIL'            => $MOD_PREFERENCE['SAVE_EMAIL'],
-                                'MOD_PREFERENCE_SAVE_PASSWORD'    => $MOD_PREFERENCE['SAVE_PASSWORD'],
-                                )
-                        );
+//    $template->set_var(array(
+//                                'HEADING_MY_SETTINGS' => $oTrans->HEADING_MY_SETTINGS,
+//                                'HEADING_MY_EMAIL'    => $oTrans->HEADING_MY_EMAIL,
+//                                'HEADING_MY_PASSWORD' => $oTrans->HEADING_MY_PASSWORD
+//                                )
+//                        );
+//// Insert language text and messages
+//    $template->set_var(array(
+//                                'TEXT_SAVE'    => $oTrans->TEXT_SAVE,
+//                                'TEXT_RESET' => $oTrans->TEXT_RESET,
+//                                'TEXT_CANCEL' => $oTrans->TEXT_CANCEL,
+//                                'TEXT_DISPLAY_NAME'    => $oTrans->TEXT_DISPLAY_NAME,
+//                                'TEXT_EMAIL' => $oTrans->TEXT_EMAIL,
+//                                'TEXT_LANGUAGE' => $oTrans->TEXT_LANGUAGE,
+//                                'TEXT_TIMEZONE' => $oTrans->TEXT_TIMEZONE,
+//                                'TEXT_DATE_FORMAT' => $oTrans->TEXT_DATE_FORMAT,
+//                                'TEXT_TIME_FORMAT' => $oTrans->TEXT_TIME_FORMAT,
+//                                'TEXT_CURRENT_PASSWORD' => $oTrans->TEXT_CURRENT_PASSWORD,
+//                                'TEXT_NEW_PASSWORD' => $oTrans->TEXT_NEW_PASSWORD,
+//                                'TEXT_RETYPE_NEW_PASSWORD' => $oTrans->TEXT_RETYPE_NEW_PASSWORD
+//                                )
+//                        );
+//// Insert module releated language text and messages
+//    $template->set_var(array(
+//                                'MOD_PREFERENCE_PLEASE_SELECT'    => $oTrans->MOD_PREFERENCE_PLEASE_SELECT,
+//                                'MOD_PREFERENCE_SAVE_SETTINGS'    => $oTrans->MOD_PREFERENCE_SAVE_SETTINGS,
+//                                'MOD_PREFERENCE_SAVE_EMAIL'            => $oTrans->MOD_PREFERENCE_SAVE_EMAIL,
+//                                'MOD_PREFERENCE_SAVE_PASSWORD'    => $oTrans->MOD_PREFERENCE_SAVE_PASSWORD,
+//                                )
+//                        );
 // Insert error and/or success messages
     $template->set_block('main_block', 'error_block', 'error_list');
     if(sizeof($error)>0){

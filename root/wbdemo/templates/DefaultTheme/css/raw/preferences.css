@@ -1,0 +1,18 @@
+#language, #timezone, #date_format, #time_format {
+  width: 100%;
+}
+
+#display_name, #username, #email, #new_password_1, #new_password_2, #current_password {
+  width: 99%;
+}
+
+#display_name, #username, #email, #new_password_1, #new_password_2, #current_password {
+  min-width: 250px;
+}
+form#preferences_save div div label {
+  float: right;
+  padding-right: 0.525em;
+  font-weight: bold;
+  color: #0D4B6E;
+}
+form#preferences_save div#username { width :100%; background-color :#e9e9e9; min-width : 250px; border :0px groove #6799c4; text-align :left; font-weight :bold; margin :0; }

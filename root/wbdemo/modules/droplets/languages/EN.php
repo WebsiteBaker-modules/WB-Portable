@@ -1,6 +1,5 @@
 <?php
-
-// $Id: EN.php 1098 2009-07-27 07:37:22Z Ruebenwurzel $
+// $Id: EN.php 16 2016-09-13 20:52:49Z dietmar $
 
 /*
 
@@ -26,37 +25,43 @@
 // english module description
 $module_description     = 'Droplets are small chunks of php code (just like the code module) that can be included in your template or any other content section. Including a droplet is done by encapsulating the droplet name in double brackets.';
 // headers and text
-$DR_TEXT['ADD']  = 'Add a Droplet';
+$DR_TEXT['ADD_DROPLET']   = 'Add a Droplet';
 $DR_TEXT['ADMIN_EDIT']    = 'Edit a Droplet';
 $DR_TEXT['ADMIN_VIEW']    = 'View';
+$DR_TEXT['ARCHIV_LOAD']   = 'Load an Archive file';
 $DR_TEXT['BACKUP']        = 'Backup Droplets (Zip)';
-$DR_TEXT['COPY']    = 'Copy a Droplet';
-$DR_TEXT['DELETE']    = 'Delete a Droplet';
-$DR_TEXT['DROPLET']  = 'Droplet';
-$DR_TEXT['DROPLETS']  = 'Droplets';
+$DR_TEXT['COPY']          = 'Copy a Droplet';
+$DR_TEXT['DELETE']        = 'Delete a Droplet';
+$DR_TEXT['DROPLET']       = 'Droplet';
+$DR_TEXT['DROPLETS']      = 'Droplets';
 $DR_TEXT['DROPLETS_DELETED'] = 'Droplets deleted successfully.';
-$DR_TEXT['HELP']        = 'Help';
+$DR_TEXT['HELP']          = 'Help';
 $DR_TEXT['IMPORT']        = 'Import selected Droplet';
-$DR_TEXT['INVALIDCODE']    = 'This Droplet has invalid PHP code';
+$DR_TEXT['INVALIDCODE']   = 'This Droplet has invalid PHP code';
 $DR_TEXT['INVALID_BACK']  = 'Invalid choice. Back to the overview';
-$DR_TEXT['MODIFY']    = 'Edit';
-$DR_TEXT['RESTORE']        = 'Droplets restored';
+$DR_TEXT['MODIFIED_WHEN'] = 'Modified';
+$DR_TEXT['MODIFY']        = 'Edit';
+$DR_TEXT['RESTORE']       = 'Droplets restored';
 $DR_TEXT['README']        = 'readme.html';
-$DR_TEXT['SHOW']  = 'Overview';
-$DR_TEXT['SAVE']  = 'Save';
-$DR_TEXT['NOTUNIQUE']    = 'This droplet name is used!';
-$DR_TEXT['WYSIWYG']        = 'Wysiwyg';
-$DR_TEXT['UPLOAD']  = 'Upload';
-$DR_TEXT['USED']        = 'This droplet is used on the following page(-s):<br />';
-
+$DR_TEXT['SHOW']          = 'Overview';
+$DR_TEXT['SAVE']          = 'Save';
+$DR_TEXT['NOTUNIQUE']     = 'This droplet name is used!';
+$DR_TEXT['WYSIWYG']       = 'Wysiwyg';
+$DR_TEXT['UPLOAD']        = 'Upload';
+$DR_TEXT['USED']          = 'This droplet is used on the following page(-s):<br />';
+$DR_TEXT['PLEASE_SELECT'] = 'Please select an Archive file';
+$DR_TEXT['INACTIVE']      = 'Inactive';
+$DR_TEXT['VALID_CODE']    = 'Code valide';
+$DR_TEXT['INVALID_CODE']  = 'Code not valide';
+$DR_TEXT['COPY_DROPLET']  = 'Duplicate';
 
 $Droplet_Message = array (
-    'ARCHIVE_DELETED' => 'Zip(s)s deleted successfully.',
+    'ARCHIVE_DELETED' => 'Zip(s) deleted successfully.',
     'ARCHIVE_NOT_DELETED' => 'Cannot delete the selected Zip(s).',
     'CONFIRM_DROPLET_DELETING' => 'Are you sure you want to delete the selected droplets?',
     'DELETED' => 'Droplets deleted successfully.',
     'DELETE_DROPLETS' => 'Delete a Droplet',
-    'MISSING_UNMARKED_ARCHIVE_FILES' => 'No Droplet-File selected to restore.',
+    'MISSING_UNMARKED_ARCHIVE_FILES' => 'No Droplet-File selected to import.',
     'GENERIC_MISSING_ARCHIVE_FILE' => 'No Zip-File selected to delete!',
     'GENERIC_MISSING_TITLE' => 'Insert a Droplet name.',
     'GENERIC_LOCAL_DOWNLOAD' => 'Download Zip',
@@ -70,14 +75,31 @@ $Droplet_Header = array (
     'DESCRIPTION' => 'Description',
     'SIZE' => 'Size',
     'DATE' => 'Date',
+    'RENAME_DROPLET' => 'Rename Droplet',
     'SELECT_DROPLET' => 'Select a Zip',
     );
 
+$Droplet_Select_Order = array (
+    'CHOOSE_ORDER'=>'Select Droplet Sorting Order',
+    'ASC' => 'Ascending',
+    'DESC'=> 'Descending',
+    );
 
+$Droplet_Select_Option = array (
+        'ASC' => 'Ascending', array(
+        '1' => 'Dropletname',
+        '2' => 'Modified Whem',
+        ),
+        'DESC' => 'Ascending', array(
+        '4' => 'Dropletname',
+        '8' => 'Modified Whem',
+        )
+    );
 
 $Droplet_Help = array (
-    'DELETE' => 'Delete a Droplet. Click to delete the selected droplet in this row. Durch Auswahl lassen sich auch mehrere Droplets auf einmal löschen. ',
-
+    'DROPLET_DELETE' => 'Delete a Droplet. Click to delete the selected droplet in this row. Durch Auswahl lassen sich auch mehrere Droplets auf einmal löschen. ',
+    'DROPLET_RENAME' => 'Now you can rename the Droplet',
+    'DROPLET_RENAME_ADD' => 'Input your new Dropletname',
 );
 
 $Droplet_Import = array (
@@ -85,4 +107,3 @@ $Droplet_Import = array (
       'ARCHIV_IMPORTED' => 'Selected droplets import into the database ! ',
       'UPATE_EXISTING_DROPLETS' => 'Overwrite existing droplets?',
       );
-

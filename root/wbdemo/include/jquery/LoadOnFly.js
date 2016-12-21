@@ -113,7 +113,7 @@ function doSomething(elm) {
 function strip_tags(s) {
   return s.replace(/<[^>]*>/g, '');
 }
-/**                                                                 
+/**
  *         discuss at: http:phpjs.org/functions/dirname/
  *               http: kevin.vanzonneveld.net
  *        original by: Ozh
@@ -161,6 +161,7 @@ var showMessage = (function (txt, sel) {
   elm.appendChild(document.createTextNode(txt));
   result.appendChild(elm);
 });
+
 /**
  *  http://www.javascriptkit.com/dhtmltutors/treewalker.shtml
  *
@@ -275,7 +276,7 @@ if ((typeof url !== 'undefined') && (urlExt === 'css')) {
 
 });
 /**
- * 
+ *
     document.onreadystatechange = function () {
         if (document.readyState == "interactive") {
 console.info( 'Start readyState.interactive' );

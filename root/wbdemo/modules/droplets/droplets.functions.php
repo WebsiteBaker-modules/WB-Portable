@@ -10,9 +10,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: droplets.functions.php 2070 2014-01-03 01:21:42Z darkviper $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/droplets/droplets.functions.php $
- * @lastmodified    $Date: 2014-01-03 02:21:42 +0100 (Fr, 03. Jan 2014) $
+ * @version         $Id: droplets.functions.php 44 2016-09-22 08:43:36Z dietmar $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2-modules/addons/droplets/droplets.functions.php $
+ * @lastmodified    $Date: 2016-09-22 10:43:36 +0200 (Do, 22. Sep 2016) $
  *
  */
 /* -------------------------------------------------------- */
@@ -49,51 +49,66 @@ function prepareDropletToFile($aDroplet) {
           }
         }
     }
- 
     $retVal = $sDescription."\n".$sComments.rtrim($sCode,"\n");
     return $retVal;
 }
 
-function backupDropletFromDatabase( $sTmpDir, $FilesInDB='*' ) {
-    global $database;
-    $retVal = '';
+function backupDropletFromDatabase( $sTmpDir, $FilesInDB='*', $oDb) {
+    if (!class_exists('PclZip',false) ) { require( WB_PATH.'/include/pclzip/Constants.php'); }
+    $retVal = array();
+    $sDescription = '';
     $FilesInDB = rtrim($FilesInDB, ',');
     $sqlWhere = ( ($FilesInDB=='*') ? '': 'WHERE `name` IN ('.$FilesInDB.') ');
     $sql = 'SELECT `name`,`description`,`comments`,`code`  FROM `'.TABLE_PREFIX.'mod_droplets` '
          . $sqlWhere
          . 'ORDER BY `modified_when` DESC';
-    if( $oRes = $database->query($sql) ) {
+    if( $oRes = $oDb->query($sql) ) {
         while($aDroplet = $oRes->fetchRow(MYSQLI_ASSOC)) {
             $sData = prepareDropletToFile($aDroplet);
             $sFileName = $sTmpDir.$aDroplet['name'].'.php';
             if(file_put_contents($sFileName,$sData)) {
-                $retVal .= $sFileName.',';
+                $sDescription = ($aDroplet['description']);
+                $retVal[] = array(
+                                PCLZIP_ATT_FILE_NAME => $sFileName,
+                                PCLZIP_ATT_FILE_COMMENT => $sDescription
+                               );
             }
         }
     }
     return $retVal;
 }
 
+    function getUniqueName($oDb, $sName)
+    {
+        $sBaseName = preg_replace('/^(.*?)(\_[0-9]+)?$/', '$1', $sName);
+        $sql = 'SELECT `name` FROM `'.TABLE_PREFIX.'mod_droplets` '
+             . 'WHERE `name` RLIKE \'^'.$sBaseName.'(\_[0-9]+)?$\' '
+             . 'ORDER BY `name` DESC';
+        if (($sMaxName = $oDb->get_one($sql))) {
+            $iCount = intval(preg_replace('/^'.$sBaseName.'\_([0-9]+)$/', '$1', $sMaxName));
+            $sName = $sBaseName.sprintf('_%03d', ++$iCount);
+        }
+        return $sName;
+    }
 /**
  * importDropletToDB()
- * 
+ *
  * @param mixed $aDroplet
  * @param mixed $msg
  * @param mixed $bOverwriteDroplets
  * @return
  */
-function insertDroplet( array $aDroplet, $bUpdateDroplets = false ) {
-        global $admin, $database;
+function insertDroplet( array $aDroplet, $oDb, $oApp, $bUpdateDroplets = false )
+{
         $sImportDroplets = '';
-        $oDb = $database;
         $extraSql = '';
         $sPattern = "#//:#im";
         $sDropletFile = $aDroplet['name'];
         $sDropletFile = preg_replace('/^\xEF\xBB\xBF/', '', $sDropletFile);
         $sDropletName = pathinfo ($sDropletFile, PATHINFO_FILENAME);
         // get right $aFileData a) from Zip or b) from File
-        if( isset($aDroplet['content']) ) { 
-            $aFileData = $aDroplet['content']; 
+        if( isset($aDroplet['content']) ) {
+            $aFileData = $aDroplet['content'];
             $sFileData = $aFileData[0];
             $bRetval  = (bool)preg_match_all($sPattern, $sFileData, $matches, PREG_SET_ORDER);
             if ( $bRetval == false ) { return $bRetval; }
@@ -141,7 +156,7 @@ function insertDroplet( array $aDroplet, $bUpdateDroplets = false ) {
             }
             if( !isset($sTmpName) || $bUpdateDroplets) {
               $iModifiedWhen = time();
-              $iModifiedBy = (method_exists($admin, 'get_user_id') && ($admin->get_user_id()!=null) ? $admin->get_user_id() : 1);
+              $iModifiedBy = (method_exists($oApp, 'get_user_id') && ($oApp->get_user_id()!=null) ? $oApp->get_user_id() : 1);
               $sql .= 'SET  `name` =\''.$oDb->escapeString($sDropletName).'\','
                    .       '`description` =\''.$oDb->escapeString($sDescription).'\','
                    .       '`comments` =\''.$oDb->escapeString($sComments).'\','
@@ -158,11 +173,9 @@ function insertDroplet( array $aDroplet, $bUpdateDroplets = false ) {
     return ($sImportDroplets != '') ? $sImportDroplets : false;
 }
 
-function insertDropletFile($aDropletFiles,&$msg,$bOverwriteDroplets)
+function insertDropletFile($aDropletFiles, $oDb, $oApp, &$msg,$bOverwriteDroplets)
 {
-    global $database;
-    $oDb = $database;
-    $admin = new admin ('##skip##');
+//    $oApp = new admin ('##skip##');
     $OK  = ' <span style="color:#006400; font-weight:bold;">OK</span> ';
     $FAIL = ' <span style="color:#ff0000; font-weight:bold;">FAILED</span> ';
     foreach ($aDropletFiles as $sDropletFile) {
@@ -175,7 +188,7 @@ function insertDropletFile($aDropletFiles,&$msg,$bOverwriteDroplets)
         {
             $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_droplets`';
             $msgSql = 'INSERT Droplet `'.$oDb->escapeString($sDropletName).'` INTO`'.TABLE_PREFIX.'mod_droplets`'." $OK";
-        } elseif ($bOverwriteDroplets) 
+        } elseif ($bOverwriteDroplets)
         {
             $sDropletName = $sTmpName;
             $sql = 'UPDATE `'.TABLE_PREFIX.'mod_droplets` ';
@@ -210,7 +223,7 @@ function insertDropletFile($aDropletFiles,&$msg,$bOverwriteDroplets)
                     }
                 }
             $iModifiedWhen = time();
-            $iModifiedBy = (method_exists($admin, 'get_user_id') && ($admin->get_user_id()!=null) ? $admin->get_user_id() : 1);
+            $iModifiedBy = (method_exists($oApp, 'get_user_id') && ($oApp->get_user_id()!=null) ? $oApp->get_user_id() : 1);
             $sql .= 'SET  `name` =\''.$oDb->escapeString($sDropletName).'\','
                  .       '`description` =\''.$oDb->escapeString($sDescription).'\','
                  .       '`comments` =\''.$oDb->escapeString($sComments).'\','

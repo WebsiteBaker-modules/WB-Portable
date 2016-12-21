@@ -17,6 +17,7 @@
 <input type="hidden" name="dir" value="{DIR}" />
 <input type="hidden" name="old_name" value="{FILENAME}" />
 <input type="hidden" name="id" value="{FILE_ID}" />
+<input type="hidden" name="extension" value="{EXTENSION}" />
 {FTAN}
 <table summary="" cellpadding="5" cellspacing="0" border="0" width="400" align="center">
 <tr>
@@ -24,27 +25,19 @@
 </tr>
 <tr>
     <td>
-        <input type="text" name="name" style="width: 100%;" />
+        <input type="text" name="name" style="width: 100%;" value="{BASENAME}" />
         <script type="text/javascript">
         document.rename.name.focus();
         </script>
     </td>
-    <td width="50" class="{DISPlAY_EXTENSION}">
-        <input type="text" name="extension" style="width: 50px;" value="{EXTENSION}" />
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <input type="checkbox" name="overwrite" id="overwrite" value="yes" />
-        <label for="overwrite">
-        {TEXT_OVERWRITE_EXISTING} {TYPE}
-        </label>
+    <td class="{DISPlAY_EXTENSION}" style="width: 10%;">
+        <span>{EXTENSION}</span>
     </td>
 </tr>
 <tr>
     <td colspan="2">
         <input type="submit" name="submit" value="{TEXT_RENAME}" style="width: 49%;" />
-        <input type="button" name="cancel" value="{TEXT_CANCEL}" style="width: 49%;" onclick="javascript: window.location = 'browse.php';" />
+        <input type="button" name="cancel" value="{TEXT_CANCEL}" style="width: 49%;" onclick="javascript: window.location = 'browse.php?dir={DIR}';" />
     </td>
 </tr>
 </table>

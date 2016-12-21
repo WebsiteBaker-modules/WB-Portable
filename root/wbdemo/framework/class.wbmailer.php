@@ -23,16 +23,20 @@ if(!defined('WB_PATH')) {
     throw new IllegalFileException();
 }
 /* -------------------------------------------------------- */
-// Include PHPMailer class
-if( !class_exists( 'PHPMailer' ) ){ require(WB_PATH.'/include/phpmailer/class.phpmailer.php'); }
+//SMTP needs accurate times, and the PHP time zone MUST be set
+//This should be done in your php.ini, but this is how to do it if you don't have access to that
+date_default_timezone_set('Etc/UTC');
 
-class wbmailer extends PHPMailer 
+// Include PHPMailer autoloader in initialize
+
+class wbmailer extends PHPMailer
 {
     // new websitebaker mailer class (subset of PHPMailer class)
-    // setting default values 
+    // setting default values
 
-    function __construct() {
+    function __construct($exceptions = false) {//
 
+        parent::__construct($exceptions);//
         $database = $GLOBALS['database'];
         // set mailer defaults (PHP mail function)
         $db_wbmailer_routine = "phpmail";
@@ -41,7 +45,6 @@ class wbmailer extends PHPMailer
         $db_wbmailer_smtp_secure = '';
         $db_wbmailer_default_sendername = 'WB Mailer';
         $db_server_email = '';
-        $ini_sendmail_path = ini_get('sendmail_path');
 
         // get mailer settings from database
         $sql = 'SELECT * FROM `' .TABLE_PREFIX. 'settings` '
@@ -78,28 +81,31 @@ class wbmailer extends PHPMailer
      * $this->Debugoutput = function($str, $level) {echo "debug level $level; message: $str";};
      * </code>
  */
-        $this->set('SMTPDebug', 2);                               // Enable verbose debug output
+
+        $this->set('SMTPDebug', ((defined('DEBUG') && DEBUG)?4:0));    // Enable verbose debug output
         $this->set('Debugoutput', 'error_log');
 
-        // set method to send out emails  
-        if($db_wbmailer_routine == "smtp" && strlen($db_wbmailer_smtp_host) > 5 ) {
+        // set method to send out emails
+        if ($db_wbmailer_routine == "smtp" && mb_strlen($db_wbmailer_smtp_host) > 5 ) {
             // use SMTP for all outgoing mails send by Website Baker
-            $this->isSMTP();                                             // telling the class to use SMTP
-            $this->isSendmail();                                         // telling the class to use SendMail transport
-            $this->set('Host', $db_wbmailer_smtp_host);
-            $this->set('Port', intval($db_wbmailer_smtp_port));            // TCP port to connect to
-//            $this->set('SMTPKeepAlive', true);                             // SMTP connection will not close after each email sent
+            $this->isSMTP();                                               // telling the class to use SMTP
+            $this->set('SMTPAuth', false);                                 // enable SMTP authentication
+            $this->set('Host', $db_wbmailer_smtp_host);                    // Set the hostname of the mail server
+            $this->set('Port', intval($db_wbmailer_smtp_port));            // Set the SMTP port number - likely to be 25, 465 or 587
+            $this->set('SMTPSecure', strtolower($db_wbmailer_smtp_secure));// Set the encryption system to use - ssl (deprecated) or tls
+            $this->set('SMTPKeepAlive', false);                            // SMTP connection will be close after each email sent
             // check if SMTP authentification is required
             if ($db_wbmailer_smtp_auth  && (mb_strlen($db_wbmailer_smtp_username) > 1) && (mb_strlen($db_wbmailer_smtp_password) > 1) ) {
                 // use SMTP authentification
                 $this->set('SMTPAuth', true);                                                 // enable SMTP authentication
-                $this->set('SMTPSecure', $db_wbmailer_smtp_secure );                          // enable TLS encryption, `ssl` also accepted
-                $this->set('Username', $db_wbmailer_smtp_username);                           // set SMTP username
-                $this->set('Password', $db_wbmailer_smtp_password);                           // set SMTP password
+                $this->set('Username',   $db_wbmailer_smtp_username);                         // set SMTP username
+                $this->set('Password',   $db_wbmailer_smtp_password);                         // set SMTP password
             }
-        } else {
+        } else if ($db_wbmailer_routine == "phpmail" && strlen($db_wbmailer_smtp_host) > 5 ) {
             // use PHP mail() function for outgoing mails send by Website Baker
             $this->IsMail();
+        } else {
+            $this->isSendmail();   // telling the class to use SendMail transport
         }
 
         // set language file for PHPMailer error messages
@@ -108,8 +114,8 @@ class wbmailer extends PHPMailer
         }
 
         // set default charset
-        if(defined('DEFAULT_CHARSET')) { 
-            $this->set('CharSet', DEFAULT_CHARSET); 
+        if(defined('DEFAULT_CHARSET')) {
+            $this->set('CharSet', DEFAULT_CHARSET);
         } else {
             $this->set('CharSet', 'utf-8');
         }
@@ -123,16 +129,34 @@ class wbmailer extends PHPMailer
             }
         }
 
-        /* 
-            some mail provider (lets say mail.com) reject mails send out by foreign mail 
+        /*
+            some mail provider (lets say mail.com) reject mails send out by foreign mail
             relays but using the providers domain in the from mail address (e.g. myname@mail.com)
         $this->setFrom($db_server_email);                       // FROM MAIL: (server mail)
         */
 
         // set default mail formats
         $this->IsHTML();                                        // Sets message type to HTML or plain.
-        $this->set('WordWrap', 80);                                       
+        $this->set('WordWrap', 80);
         $this->set('Timeout', 30);
     }
-}
 
+    /**
+     * Send messages using $Sendmail.
+     * @return void
+     * @description  overrides isSendmail() in parent
+     */
+    public function isSendmail()
+    {
+        $ini_sendmail_path = ini_get('sendmail_path');
+        if (!preg_match('/sendmail$/i', $ini_sendmail_path)) {
+            if ($this->exceptions) {
+                throw new phpmailerException('no sendmail available');
+            }
+        } else {
+            $this->Sendmail = $ini_sendmail_path;
+            $this->Mailer = 'sendmail';
+        }
+    }
+
+}

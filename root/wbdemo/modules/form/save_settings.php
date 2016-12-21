@@ -46,9 +46,9 @@ if (!function_exists('emailAdmin')) {
 
 // load module language file
 $sAddonName = basename(__DIR__);
-require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+require(__DIR__.'/languages/EN.php');
+if(file_exists(__DIR__.'/languages/'.LANGUAGE .'.php')) {
+    require(__DIR__.'/languages/'.LANGUAGE .'.php');
 }
 
 // This code removes any <?php tags and adds slashes
@@ -110,7 +110,7 @@ $sSectionIdPrefix = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? SEC_ANCH
 $sBacklink = ADMIN_URL.'/pages/modify.php?page_id='.$page_id.'#'.$sSectionIdPrefix.$section_id;
 
 // Update settings
-$sql  = 'UPDATE `'.TABLE_PREFIX.'mod_form_settings` SET ' 
+$sql  = 'UPDATE `'.TABLE_PREFIX.'mod_form_settings` SET '
       . '`header` = \''.$database->escapeString($header).'\', '
       . '`field_loop` = \''.$database->escapeString($field_loop).'\', '
       . '`footer` = \''.$database->escapeString($footer).'\', '

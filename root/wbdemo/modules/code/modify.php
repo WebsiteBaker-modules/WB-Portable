@@ -13,7 +13,7 @@
  * @filesource      $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/modules/code/info.php $
  * @lastmodified    $Date: 2011-01-16 13:39:50 +0100 (So, 16. Jan 2011) $
  *
-*/
+ */
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
@@ -46,12 +46,14 @@ $content = htmlspecialchars($content['content']);
 // Insert vars
 $template->set_var(
     array(
+        'ADDON_NAME'            => $sAddonName,
         'PAGE_ID'               => $page_id,
         'SECTION_ID'            => $section_id,
-        'REGISTER_EDIT_AREA'    => function_exists('registerEditArea') ? registerEditArea('content'.$section_id, 'php', false) : '',
+        'REGISTER_EDIT_AREA'    => (function_exists('registerEditArea') ? registerEditArea('content'.$section_id, 'php', false) : ''),
         'WB_URL'                => WB_URL,
         'CONTENT'               => $content,
         'TEXT_SAVE'             => $TEXT['SAVE'],
+        'TEXT_BACK'             => $TEXT['BACK'],
         'TEXT_CANCEL'           => $TEXT['CANCEL'],
         'SECTION'               => $section_id,
         'FTAN'                  => $admin->getFTAN()

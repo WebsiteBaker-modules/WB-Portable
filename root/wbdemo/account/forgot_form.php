@@ -18,8 +18,9 @@
 // Must include code to stop this file being access directly
 if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
 // Check if the user has already submitted the form, otherwise show it
-$sCallingScript = $_SERVER['SCRIPT_NAME'];
-$_SESSION['HTTP_REFERER'] =  isset($_SESSION['HTTP_REFERER']) ? $_SESSION['HTTP_REFERER'] : $sCallingScript;
+$sCallingScript = WB_URL;
+$redirect_url = ((isset($_SESSION['HTTP_REFERER']) && $_SESSION['HTTP_REFERER'] != '') ? $_SESSION['HTTP_REFERER'] : $sCallingScript );
+$redirect_url = ( isset($redirect) && ($redirect!='') ? $redirect : $redirect_url);
 $message = $MESSAGE['FORGOT_PASS_NO_DATA'];
 $errMsg ='';
 if(isset($_POST['email']) && $_POST['email'] != "" )
@@ -33,7 +34,7 @@ if(isset($_POST['email']) && $_POST['email'] != "" )
 // Check if the email exists in the database
     $sql  = 'SELECT `user_id`,`username`,`display_name`,`email`,`last_reset`,`password` '.
             'FROM `'.TABLE_PREFIX.'users` '.
-            'WHERE `email`=\''.$wb->add_slashes($_POST['email']).'\'';
+            'WHERE `email`=\''.$database->escapeString($email).'\'';
     if(($results = $database->query($sql)))
     {
         if(($results_array = $results->fetchRow()))
@@ -104,7 +105,7 @@ if( ($errMsg=='') && ($message != '')) {
 }
 ?>
 <div style="margin: 1em auto;">
-    <button type="button" value="cancel" onClick="javascript: window.location = '<?php print $_SESSION['HTTP_REFERER'] ?>';"><?php print $TEXT['CANCEL'] ?></button>
+    <button type="button" value="cancel" onclick="window.location = '<?php echo $redirect_url; ?>';"><?php print $TEXT['CANCEL'] ?></button>
 </div>
 <h1 style="text-align: center;"><?php echo $MENU['FORGOT']; ?></h1>
 <form name="forgot_pass" action="<?php echo WB_URL.'/account/forgot.php'; ?>" method="post" class="account">

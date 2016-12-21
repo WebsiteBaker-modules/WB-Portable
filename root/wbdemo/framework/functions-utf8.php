@@ -49,6 +49,7 @@ if(!defined('WB_PATH')) {
     throw new IllegalFileException();
 }
 /* -------------------------------------------------------- */
+if (function_exists('functions-utf8')){return;}
 /*
  * check for mb_string support
  */

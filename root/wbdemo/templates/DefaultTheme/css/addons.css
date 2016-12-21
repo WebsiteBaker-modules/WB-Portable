@@ -1,0 +1,11 @@
+span.title { display :block; }
+.section { margin-top :10px; padding :0px; border :1px solid #999999; font-size :1em; width :100%; background-color :#fdfdfd; height :95px; }
+.addons {}
+.addons td.setting_name {
+  color: #0d4b6e;
+  font-weight: bold;
+  min-width: 200px;
+  padding-right: 0.525em;
+  text-align: right;
+  width: 20%;
+}

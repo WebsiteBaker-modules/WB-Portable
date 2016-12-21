@@ -1,0 +1,67 @@
+.header {  margin :0 auto; }
+.container { margin :0 auto; background :url(images/bgtitle.png) #ffffff; background-repeat :repeat-x; }
+.content { padding :1.6em; margin :0 auto; min-height :300px; vertical-align :top; }
+#content_container { text-align :center;  clear :both; margin :0 auto; }
+.header,
+.container,
+.content,
+#content_container { min-width :60em; width :70%; min-width: 103.225em; }
+
+.default-theme {
+    padding: 0.025em;
+    overflow: hidden;
+    margin-bottom: 1.525em; 
+}
+.default-content {
+    padding: 0.525em 1.925em 0.925em;
+}
+/*
+td,th,input,textarea { color :#000000; font-size :1.0em; font-family :Verdana, Arial, Helvetica, sans-serif; }
+textarea { font-size :1em; }
+*/
+img { border :0px; }
+form { margin :0; }
+hr { margin :1em auto; color :#144F71; height :1px; }
+h1 { color :#000000; font-size :1.8em; text-align :center; text-transform :uppercase; }
+h2 { margin :0.5em 0px 0.5em 0px; color :#336699; font-size :1.5em; }
+h2 { font-family :arial,sans-serif; letter-spacing :-1px; margin :0.5em 0; text-align :left; }
+h4 { margin :0; border-bottom :1px solid #dddddd; padding-bottom :5px; }
+a h3 { margin :0; font-size :1.1em; padding-bottom :2px; }
+ul, li { margin :0; padding :0; list-style :none; }
+li p { margin :0.5em 0; }
+tr.nowrap { white-space: nowrap; line-height: 2.9525em; vertical-align: bottom; }
+a:link, a:visited, a:active { color :#003366; text-decoration :none; }
+a:hover { color :#336699; text-decoration :none; }
+
+.block-outer {padding: 3px 3px 0; border: 1px solid #DEE5F8; border-radius: 5px; margin-bottom: 25px; box-shadow: 1px 1px 5px #666; overflow: hidden; }
+.section-active { padding:1px 5px; background:#DEE5F8; border-radius: 5px 5px 0 0; margin-bottom:5px; }
+.section-inactive { padding:1px 5px; background:#eee; border-radius: 5px 5px 0 0; margin-bottom:5px; }
+
+.row {
+    display: table-row;
+}
+
+.col {
+     display: table-cell;
+    width: 50%;
+}
+
+.content {background: rgba(0, 0, 0, 0) linear-gradient(#e0e0e0, #ffffff) no-repeat scroll 0 0 / 100% 60px}
+.info { padding :10px; margin-bottom :0.5em; background :#f8f8f8; color :#666666; font-size :91.7%; }
+.note { border :2px #448844 solid; padding :10px; margin :10px auto; background :#eeffee; color :#004400; }
+.note { color :#666666; font-size :10px; }
+.important { border :2px #888844 solid; padding :10px; margin-bottom :1em; background :#ffffee; color :#444400; }
+.warning { border :2px #884444 solid; padding :10px; margin-bottom :1em; background :#ffeeee; color :#440000; }
+
+.row_0 { background-color :transparent; }
+.row_1 { background-color :#ccddee; }
+
+div.box { width :100%; margin :-10px 0 0 0; font-size :small; text-align :right; }
+div.content_box { margin :0em auto; }
+div.content_box form { width :98%; }
+
+#submit,
+#reset { max-width :100px; }
+.description { padding :4px 4px 0 4px; text-align :left; vertical-align :top; }
+.graphic { border :4px solid #fdfdfd; height :50px; padding-left :3px; width :50px; }
+.graphic img { background-color :#ffffff; border :1px solid #d0d0d0; padding :4px; vertical-align :middle; }

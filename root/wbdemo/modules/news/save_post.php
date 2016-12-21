@@ -32,12 +32,20 @@
       if(!is_writable($sPostsPath.'/')) {
          $admin->print_error($MESSAGE['PAGES_CANNOT_CREATE_ACCESS_FILE']);
       }
+/*
    // delete old accessfile if link has changed
-      if(($newLink != $oldLink) && (is_writable($sPostsPath.$oldLink.PAGE_EXTENSION))) {
-         if(!unlink($sPostsPath.$oldLink.PAGE_EXTENSION)) {
-            $admin->print_error($MESSAGE['PAGES_CANNOT_DELETE_ACCESS_FILE'].' - '.$oldLink);
-         }
-      }
+    if (($newLink != $oldLink) && (is_writable($sPostsPath.$oldLink.PAGE_EXTENSION))) {
+       if (!unlink($sPostsPath.$oldLink.PAGE_EXTENSION)) {
+          $admin->print_error($MESSAGE['PAGES_CANNOT_DELETE_ACCESS_FILE'].' - '.$oldLink);
+       }
+    }
+*/
+    // delete old accessfile if link has changed
+    if (($newLink != $oldLink) && (is_writable($sPagesPath.$oldLink.PAGE_EXTENSION))) {
+        if (!unlink($sPagesPath.$oldLink.PAGE_EXTENSION)) {
+          $admin->print_error($MESSAGE['PAGES_CANNOT_DELETE_ACCESS_FILE'].' - '.$oldLink);
+        }
+    }
    // all ok, now create new accessfile
       $newFile = $sPagesPath.$newLink.PAGE_EXTENSION;
       // $backSteps = preg_replace('/^'.preg_quote(WB_PATH).'/', '', $sPostsPath);
@@ -124,15 +132,21 @@ if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php'
     );
     $short = preg_replace($aPatterns, $aReplacements, $short);
     $long = preg_replace($aPatterns, $aReplacements, $long);
+/*
 // Get page link URL
     $sql = 'SELECT `link` FROM `'.TABLE_PREFIX.'pages` WHERE `page_id`='.(int)$page_id;
-    $oldLink = $database->get_one($sql);
+*/
+// Get post link URL 
+$sql = 'SELECT `link` FROM `'.TABLE_PREFIX.'mod_news_posts` WHERE `post_id`='.$post_id;
+$oldLink = $database->get_one($sql);
+
 // Include WB functions file
     require(WB_PATH.'/framework/functions.php');
 // Work-out what the link should be
     $newLink = '/posts/'.page_filename($title).PAGE_SPACER.$post_id;
 // create new accessfile
     createNewsAccessFile($newLink, $oldLink, $page_id, $section_id, $post_id);
+$now = time();
 // get publisedwhen and publisheduntil
     $publishedwhen = jscalendar_to_timestamp($admin->get_post('publishdate'));
     if($publishedwhen == '' || $publishedwhen < 1) { $publishedwhen=0; }
@@ -149,7 +163,7 @@ if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php'
         . '`active`='.$database->escapeString($active).', '
         . '`published_when`='.(int)$publishedwhen.', '
         . '`published_until`='.(int)$publisheduntil.', '
-        . '`posted_when`='.time().', '
+        . '`posted_when`='.$now.', '
         . '`posted_by`='.(int)$admin->get_user_id().' '
         . 'WHERE `post_id`='.$database->escapeString($post_id);
    $database->query($sql);

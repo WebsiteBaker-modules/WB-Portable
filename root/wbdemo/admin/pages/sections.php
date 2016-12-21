@@ -27,7 +27,7 @@ if(MANAGE_SECTIONS != 'enabled')
 }
 /* */
 $bDebug = false; // to show position and section_id
-If(!defined('PAGE_DEBUG')) { define('PAGE_DEBUG',$bDebug);}
+if(!defined('PAGE_DEBUG')) { define('PAGE_DEBUG',$bDebug);}
 // Include the WB functions file
 if ( !function_exists( 'create_access_file' ) ) { require(WB_PATH.'/framework/functions.php'); }
 // Create new admin object
@@ -49,19 +49,18 @@ $module = ((isset(${$requestMethod}['module'])) ? ${$requestMethod}['module']  :
 $action = ($module != '' ? 'add' : $action);
 $admin_header = true;
 $backlink = ADMIN_URL.'/pages/sections.php?page_id='.(int)$page_id;
-
 switch ($action):
     case 'delete' :
-
-        if( ( !($section_id = intval($admin->checkIDKEY('section_id', 0, $_SERVER['REQUEST_METHOD'])) )) )
+        if( (!($section_id = intval($admin->checkIDKEY('section_id', 0, $_SERVER['REQUEST_METHOD'])))) )
         {
             if($admin_header) { $admin->print_header(); }
-            $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $backlink);
+            $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION)).'_idkey::';
+            $sDEBUG=(@DEBUG?$sInfo:'');
+            $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], $backlink);
         }
-
         $action = 'show';
         $sql  = 'SELECT `module` FROM `'.TABLE_PREFIX.'sections` ';
-        $sql .= 'WHERE `section_id` ='.$section_id;
+        $sql .= ' WHERE `section_id` ='.$section_id;
         if( ( ($modulname = $database->get_one($sql)) == $module) && ($section_id > 0 ) ) {
             // Include the modules delete file if it exists
             if(file_exists(WB_PATH.'/modules/'.$modulname.'/delete.php'))
@@ -91,11 +90,12 @@ switch ($action):
 
         break;
     case 'add' :
-
         if (!$admin->checkFTAN())
         {
             $admin->print_header();
-            $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $backlink);
+            $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION)).'::';
+            $sDEBUG=(@DEBUG?$sInfo:'');
+            $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], $backlink);
         }
         $action = 'show';
         $module = preg_replace('/\W/', '', $module );  // fix secunia 2010-91-4
@@ -132,35 +132,36 @@ endswitch;
 
 switch ($action):
     default:
-
         if($admin_header) { $admin->print_header(); }
         // Get perms
         $sql  = 'SELECT `admin_groups`,`admin_users` FROM `'.TABLE_PREFIX.'pages` '
               . 'WHERE `page_id` = '.$page_id;
-        $results = $database->query($sql);
-
-        $results_array = $results->fetchRow();
-        $old_admin_groups = explode(',', $results_array['admin_groups']);
-        $old_admin_users = explode(',', $results_array['admin_users']);
-        $in_old_group = FALSE;
+        $oPages = $database->query($sql);
+        $aPages = $oPages->fetchRow(MYSQLI_ASSOC);
+        $in_old_group = $admin->is_group_match($aPages['admin_groups'],$admin->get_groups_id());
+/*
+        $old_admin_groups = explode(',', $aPages['admin_groups']);
+        $old_admin_users  = explode(',', $aPages['admin_users']);
+        $in_old_group = false;
         foreach($admin->get_groups_id() as $cur_gid)
         {
             if (in_array($cur_gid, $old_admin_groups))
             {
-                $in_old_group = TRUE;
+                $in_old_group = true;
             }
         }
-        if((!$in_old_group) && !is_numeric(array_search($admin->get_user_id(), $old_admin_users)))
+*/
+        if ((!$in_old_group) && !is_numeric(array_search($admin->get_user_id(), $old_admin_users)))
         {
             $admin->print_header();
-            $admin->print_error($MESSAGE['PAGES']['INSUFFICIENT_PERMISSIONS']);
+            $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION)).'::';
+            $sDEBUG=(@DEBUG?$sInfo:'');
+            $admin->print_error($sDEBUG.$MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
         }
-
         // Get page details
         $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'pages` '
               . 'WHERE `page_id` = '.$page_id;
         $results = $database->query($sql);
-
         if($database->is_error())
         {
             // $admin->print_header();
@@ -172,10 +173,31 @@ switch ($action):
             $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
         }
         $results_array = $results->fetchRow(MYSQLI_ASSOC);
-
         // Set module permissions
+        $aAllowedModules = array();
+        $sAllowedModules = '';
         $module_permissions = $_SESSION['MODULE_PERMISSIONS'];
+        $sAllowedModules = implode(', ',
+                           array_map(function(&$item) use ($database){
+                                         return '\''.$database->escapeString($item) .'\'';
+                                     }, $module_permissions));
+        $sqlAddons  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+                    . 'WHERE `type` = \'module\' '
+                    .   ($sAllowedModules?'AND `directory` NOT IN ('.$sAllowedModules.')' :'')
+                    . 'ORDER BY `name`';
+        if($oAddons = $database->query($sqlAddons))
+        {
+            while($aAddons = $oAddons->fetchRow(MYSQLI_ASSOC))
+            {
+               $aAllowedModules[] = $aAddons['directory'];
+            }
+        }
 
+        $sAllowedModules = '';
+        $sAllowedModules = implode(', ',
+                           array_map(function(&$item) use ($database){
+                                         return '\''.$database->escapeString($item) .'\'';
+                                     }, $aAllowedModules));
         // Unset block var
         unset($block);
         // Include template info file (if it exists)
@@ -204,12 +226,10 @@ switch ($action):
         } else {
             $modified_ts = 'Unknown';
         }
-
         /*-- load css files with jquery --*/
         // include jscalendar-setup
         $jscal_use_time = true; // whether to use a clock, too
         require_once(WB_PATH."/include/jscalendar/wb-setup.php");
-
         // Setup template object, parse vars to it, then parse it
         // Create new template object
         $tpl = new Template(dirname($admin->correct_theme_source('pages_sections.htt')));
@@ -217,21 +237,22 @@ switch ($action):
         $tpl->set_file('page', 'pages_sections.htt');
         $tpl->set_block('page', 'main_block', 'main');
         $tpl->set_block('main_block', 'module_block', 'module_list');
-        $tpl->set_block('main_block', 'section_block', 'section_list');
-        $tpl->set_block('section_block', 'block_block', 'block_list');
+        $tpl->set_block('main_block', 'show_section_block', 'show_section');
         $tpl->set_block('main_block', 'calendar_block', 'calendar_list');
         $tpl->set_var('FTAN', $admin->getFTAN());
         // setting trash only if more than one section exists
-        $tpl->set_block('section_block', 'can_delete_block', 'delete');
-        $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'sections` '.'WHERE `page_id`='.intval($page_id);
+        $tpl->set_block('show_section_block', 'can_delete_block', 'can_delete');
+        $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'sections` '
+             . 'WHERE `page_id`='.intval($page_id).' '
+             .   'AND `module` IN ('.$sAllowedModules.')';
         $bSectionCanDelete = ($database->get_one($sql) > 1);
-
         // set first defaults and messages
         $tpl->set_var(array(
                         'PAGE_ID' => $results_array['page_id'],
                         // 'PAGE_IDKEY' => $admin->getIDKEY($results_array['page_id']),
                         'PAGE_IDKEY' => $results_array['page_id'],
                         'TEXT_PAGE' => $TEXT['PAGE'],
+                        'TIMEZONE' => 'TIMEZONE',
                         'PAGE_TITLE' => ($results_array['page_title']),
                         'MENU_TITLE' => ($results_array['menu_title']),
                         'TEXT_CURRENT_PAGE' => $TEXT['CURRENT_PAGE'],
@@ -256,7 +277,6 @@ switch ($action):
                         'THEME_URL' => THEME_URL
                         )
                     );
-
         // Insert variables
         $tpl->set_var(array(
                         'PAGE_ID' => $results_array['page_id'],
@@ -267,15 +287,17 @@ switch ($action):
                         'MODIFY_LINK' => ADMIN_URL.'/pages/modify.php?page_id='.$results_array['page_id']
                         )
                     );
-
-        $sql  = 'SELECT `section_id`,`module`,`position`,`block`,`publ_start`,`publ_end` FROM `'.TABLE_PREFIX.'sections` '
-              . 'WHERE `page_id` = '.$page_id.' '
-              . 'ORDER BY `position` ASC';
-        $query_sections = $database->query($sql);
-
-        if($query_sections->numRows() > 0)
+        $tpl->set_block('show_section_block', 'section_list_block', 'section_list');
+        $tpl->set_block('show_section_block', 'section_title_block', 'section_title');
+        $sqlSections  = 'SELECT * FROM `'.TABLE_PREFIX.'sections` '
+                      . 'WHERE `page_id` = '.(int)$page_id.' '
+                      .   'AND `module` IN ('.$sAllowedModules.') '
+                      . 'ORDER BY `position`';
+//        $query_sections = $database->query($sql);
+        if ($query_sections = $database->query($sqlSections))
         {
             $num_sections = $query_sections->numRows();
+            $section = array();
             while($section = $query_sections->fetchRow(MYSQLI_ASSOC))
             {
                 if(!is_numeric(array_search($section['module'], $module_permissions)))
@@ -294,6 +316,16 @@ switch ($action):
                     $edit_page_0 = '<a id="sid'.$section['section_id'].'" href="'.ADMIN_URL.'/pages/modify.php?page_id='.$results_array['page_id'];
                     $edit_page_1  = ($sec_anchor!='') ? '#'.$sec_anchor.$section['section_id'].'">' : '">';
                     $edit_page_1 .= $section['module'].'</a>';
+
+                    if ($section['title']!='') {
+                        $sSectionTitle  =  ((mb_strlen($section['title']) > 35) ? mb_substr($section['title'], 0, 34).'…' : $section['title']);
+                        $tpl->set_var('SECTION_TITLE', $sSectionTitle);
+                        $tpl->set_var('SEC_TAG_TITLE', $section['title']);
+                        $tpl->parse('section_title', 'section_title_block', false);
+                    } else {
+                        $tpl->parse('section_title', '');
+                    }
+
                     if(SECTION_BLOCKS)
                     {
                         if($edit_page == '')
@@ -320,7 +352,8 @@ switch ($action):
                                 )
                             );
                         // Add block options to the section_list
-                        $tpl->clear_var('block_list');
+                        $tpl->clear_var('section_list');
+
                         foreach($block AS $number => $name)
                         {
                             $tpl->set_var('NAME', htmlentities(strip_tags($name)));
@@ -332,13 +365,14 @@ switch ($action):
                             } else {
                                 $tpl->set_var('SELECTED', '');
                             }
-                            $tpl->parse('block_list', 'block_block', true);
+                            $tpl->parse('section_list', 'section_list_block', true);
                         }
                     } else {
                         if($edit_page == '')
                         {
                             $edit_page = $edit_page_0.'#wb_'.$edit_page_1;
                         }
+
                         $input_attribute = 'input_normal';
                         $tpl->set_var(array(
                                 'STYLE_DISPLAY_SECTION_BLOCK' => ' style="visibility:hidden;"',
@@ -367,14 +401,14 @@ switch ($action):
                     {
                         $tpl->set_var('VALUE_PUBL_START', '');
                     } else {
-                        $tpl->set_var('VALUE_PUBL_START', date($jscal_format, $section['publ_start']));
+                        $tpl->set_var('VALUE_PUBL_START', date($jscal_format, $section['publ_start']+TIMEZONE));
                     }
                     // set calendar start values
                     if($section['publ_end']==0)
                     {
                         $tpl->set_var('VALUE_PUBL_END', '');
                     } else {
-                        $tpl->set_var('VALUE_PUBL_END', date($jscal_format, $section['publ_end']));
+                        $tpl->set_var('VALUE_PUBL_END', date($jscal_format, $section['publ_end']+TIMEZONE));
                     }
                     // Insert icons up and down
                     if($section['position'] != 1 )
@@ -382,7 +416,7 @@ switch ($action):
                         $tpl->set_var(
                                     'VAR_MOVE_UP_URL',
                                     '<a href="'.ADMIN_URL.'/pages/move_up.php?page_id='.$page_id.'&amp;section_id='.$section['section_id'].'">
-                                    <img src="'.THEME_URL.'/images/up_16.png" alt="{TEXT_MOVE_UP}" />
+                                    <img src="'.THEME_URL.'/images/up_16.png" alt="up" />
                                     </a>' );
                     } else {
                         $tpl->set_var(array(
@@ -394,7 +428,7 @@ switch ($action):
                         $tpl->set_var(
                                     'VAR_MOVE_DOWN_URL',
                                     '<a href="'.ADMIN_URL.'/pages/move_down.php?page_id='.$page_id.'&amp;section_id='.$section['section_id'].'">
-                                    <img src="'.THEME_URL.'/images/down_16.png" alt="{TEXT_MOVE_DOWN}" />
+                                    <img src="'.THEME_URL.'/images/down_16.png" alt="down" />
                                     </a>' );
                     } else {
                         $tpl->set_var(array(
@@ -405,7 +439,6 @@ switch ($action):
                 } else {
                   continue;
                 }
-
                     $tpl->set_var(array(
                                     'DISPLAY_DEBUG' => ' style="visibility="visible;"',
                                     'TEXT_SID' => 'SID',
@@ -430,11 +463,12 @@ switch ($action):
                                 );
                 }
             if($bSectionCanDelete) {
-                $tpl->parse('delete', 'can_delete_block', false);
+                $tpl->parse('can_delete', 'can_delete_block', false);
             } else {
-                $tpl->parse('delete', '', false);
+//                $tpl->parse('can_delete', '', false);
+                $tpl->set_block('can_delete_block', '');
             }
-                $tpl->parse('section_list', 'section_block', true);
+            $tpl->parse('show_section', 'show_section_block', true);
             }
         }
 
@@ -493,9 +527,9 @@ switch ($action):
         {
             // Modules list
             $sql  = 'SELECT `name`,`directory`,`type` FROM `'.TABLE_PREFIX.'addons` '
-                  . 'WHERE `type` = "module" '
-                  .   'AND `function` = "page" '
-                  .   'AND `directory` != "menu_link" '
+                  . 'WHERE `type` = \'module\' '
+                  .   'AND `function` = \'page\' '
+                  .   'AND `directory` != \'menu_link\' '
                   . 'ORDER BY `name`';
             $result = $database->query($sql);
         // if(DEBUG && $database->is_error()) { $admin->print_error($database->get_error()); }
@@ -536,6 +570,12 @@ switch ($action):
                             'TEXT_MOVE_DOWN' => $TEXT['MOVE_DOWN']
                             )
                         );
+        $tpl->set_block('main_block', 'show_settings_block', 'show_settings');
+        if ($admin->get_permission('pages_settings')) {
+            $tpl->parse('show_settings', 'show_settings_block', true);
+        } else {
+            $tpl->set_block('show_settings', '');
+        }
         $tpl->parse('main', 'main_block', false);
         $tpl->pparse('output', 'page');
         // include the required file for Javascript admin

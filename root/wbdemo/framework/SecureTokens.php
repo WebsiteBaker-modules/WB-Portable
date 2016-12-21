@@ -243,10 +243,10 @@ class SecureTokens
         $sRequest = strtoupper($sRequest);
         switch ($sRequest) {
             case 'POST':
-                $sTokenName = @$_POST[$sFieldname] ?: $sFieldname;
+                $sTokenName = $_POST[$sFieldname] ?: $sFieldname;
                 break;
             case 'GET':
-                $sTokenName = @$_GET[$sFieldname] ?: $sFieldname;
+                $sTokenName = $_GET[$sFieldname] ?: $sFieldname;
                 break;
             default:
                 $sTokenName = $sFieldname;
@@ -511,7 +511,8 @@ class SecureTokens
  */
     private function encodeHash($sMd5Hash)
     {
-        return rtrim(base64_encode(pack('h*',$sMd5Hash)), '+-= ');
+         return preg_replace('/[^a-zA-Z0-9]/', '_', rtrim(base64_encode(pack('h*',$sMd5Hash)), '='));
+//        return rtrim(base64_encode(pack('h*',$sMd5Hash)), '+-= ');
     }
 
 // callback method, needed for PHP-5.3.x only    

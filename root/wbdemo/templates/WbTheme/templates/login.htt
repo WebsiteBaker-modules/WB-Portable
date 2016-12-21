@@ -1,0 +1,127 @@
+<!-- BEGIN mainBlock -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+<title>{SECTION_NAME} - {WEBSITE_TITLE}</title>
+<meta http-equiv="content-type" content="text/html; charset={CHARSET}" />
+<meta name="description" content="{TEXT_LOGIN}, {WEBSITE_TITLE}" />
+<meta name="keywords" content="{TEXT_LOGIN},{WEBSITE_TITLE}" />
+<link href="{THEME_URL}/theme.css" rel="stylesheet" type="text/css" />
+</head>
+<body >
+<div class="login-box" style="margin: 1.125em auto; width: 100%;">
+    <table style="border-collapse: collapse; width: 100%;">
+    <tbody>
+    <tr>
+        <td style="width: 20%;" >&nbsp;</td>
+        <td>&nbsp;</td>
+        <td style="margin: auto;">
+            <img src="{THEME_URL}/images/logo.png" alt="Logo" />
+        </td>
+    </tr>
+    <tbody>
+    </table>
+
+    <form name="login" action="{ACTION_URL}" method="post">
+        <input type="hidden" name="url" value="{URL}" />
+        <input type="hidden" name="username_fieldname" value="{USERNAME_FIELDNAME}" />
+        <input type="hidden" name="password_fieldname" value="{PASSWORD_FIELDNAME}" />
+        <table class="container block-outer" style="width: 30.525em; margin-top: 0.025em;border-collapse: collapse;">
+            <caption style="padding: 0.325em 0;: middle; background: #215A7A; font-size: 1.525em; text-align: center; color: #ECECEC;">{SECTION_LOGIN} - {WEBSITE_TITLE}</caption>
+            <thead>
+                 <tr>
+                 <th style="width: 40%;">
+                 </th>
+                 <th >
+                 </th>
+                 </tr>
+            </thead>
+            <tbody style="padding-top: 1.525em;">
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-size: 1.225em; text-align: center;">{MESSAGE}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr style="line-height: 2.525em; margin: 0.525em;">
+                    <td style="float:right;">{TEXT_USERNAME}:</td>
+                    <td><input type="text" maxlength="{MAX_USERNAME_LEN}" name="{USERNAME_FIELDNAME}" value="{USERNAME}" style="width: 40%;" /></td>
+                </tr>
+                <tr style="line-height: 2.525em; margin: 0.525em;">
+                    <td  style="float:right;">{TEXT_PASSWORD}:</td>
+                    <td><input type="password" maxlength="{MAX_PASSWORD_LEN}" name="{PASSWORD_FIELDNAME}" style="width: 40%;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr style="{DISPLAY_REMEMBER_ME}">
+                    <td>&nbsp;</td>
+                    <td>
+                        <input type="checkbox" name="remember" id="remember" value="true" />
+                        <label for="remember">
+                            {TEXT_REMEMBER_ME}
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                    <input type="submit" name="submit" value="{TEXT_LOGIN}" style="width: 100px; font-size: 10px; text-transform: uppercase; color: #003366; border: 1px solid #336699; background-color: #DDDDDD; padding: 3px;" />
+                    <input type="reset" name="reset" value="{TEXT_RESET}" style="width: 100px; font-size: 10px; text-transform: uppercase; color: #003366; border: 1px solid #336699; background-color: #DDDDDD; padding: 3px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                      <div style="text-align: center;">
+                          <p><a href="{FORGOTTEN_DETAILS_APP}">{TEXT_FORGOTTEN_DETAILS}</a></p>
+                          <p><a target="_blank" href="{WB_URL}/">{TEXT_HOME}</a></p>
+                      </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+
+<table style="border-collapse: collapse; width: 100%; margin-top: 2.225em;">
+<tr>
+    <td style="font-size:12px;text-align:center;">
+      <!-- Please note: the below reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+      <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+      <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+      <!-- Please note: the above reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+    </td>
+</tr>
+</table>
+</div>
+
+<script type="text/javascript">
+<!--
+    elm = document.getElementsByTagName('form');
+    console.info(elm);
+      for (i=0; elm[i]; i++) {
+        if ( (elm[i].className.indexOf('autocomplete') == -1) ) {
+            elm[i].setAttribute('autocomplete', 'off');
+        }
+        if ( (elm[i].className.indexOf('accept-charset') == -1) ) {
+            elm[i].setAttribute('accept-charset', 'utf-8');
+        }
+      }
+-->
+</script>
+</body>
+</html>
+<!-- END mainBlock -->

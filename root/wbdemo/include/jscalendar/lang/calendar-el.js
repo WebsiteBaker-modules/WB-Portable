@@ -1,4 +1,4 @@
-\ufeff// ** I18N
+// ** I18N
 Calendar._DN = new Array
 ("\u039a\u03c5\u03c1\u03b9\u03b1\u03ba\u03ae",
  "\u0394\u03b5\u03c5\u03c4\u03ad\u03c1\u03b1",

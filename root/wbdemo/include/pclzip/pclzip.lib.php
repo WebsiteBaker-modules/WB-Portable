@@ -1159,7 +1159,7 @@ class PclZip
   // --------------------------------------------------------------------------------
     public function errorName($p_with_code=false)
     {
-        $aFullList = array_flip(getClassConstants());
+        $aFullList = array_flip($this->getClassConstants());
         $sRetval = isset($aFullList[$this->error_code])
                    ? __CLASS__.'::'.$aFullList[$this->error_code]
                    : 'Unknown code';
@@ -1818,7 +1818,8 @@ class PclZip
                 $v_descr['type'] = 'virtual_file';
             } else {
                 // Missing file / Error log
-                $this->privErrorLog(self::ERR_MISSING_FILE, 'File \''.$v_descr['filename'].'\' does not exist');
+                $sFilename = '/'.basename(dirname($v_descr['filename'])).'/'.basename($v_descr['filename']);
+                $this->privErrorLog(self::ERR_MISSING_FILE, ' File \''.$sFilename.'\' does not exist');
                 return PclZip::errorCode();
             }
             // Calculate the stored filename
@@ -2155,7 +2156,7 @@ class PclZip
                 ($p_filedescr_list[$j]['type'] != 'virtual_file') &&
                 (!file_exists($p_filedescr_list[$j]['filename'])))
             {
-                $this->privErrorLog(self::ERR_MISSING_FILE, 'File \''.$p_filedescr_list[$j]['filename'].'\' does not exist');
+                $this->privErrorLog(self::ERR_MISSING_FILE, ' File \''.$p_filedescr_list[$j]['filename'].'\' does not exist');
                 return self::errorCode();
             }
             // Look if it is a file or a dir with no all path remove option

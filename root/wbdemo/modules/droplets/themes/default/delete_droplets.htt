@@ -1,0 +1,36 @@
+<!-- BEGIN main_block -->
+  <div id="openModal" class="modal-Dialog" draggable="true">
+    <div>
+        <form action="{ToolUrl}" method="post">
+            <input type="hidden" name="DropletsToDelete" value="{sDropletsToDelete}" />
+            <input type="hidden" name="{FTAN_NAME}" value="{FTAN_VALUE}" />
+            <div id="customConfirm" style="display: block;">
+                <button name="cancel" class="close" type="button" onclick="window.location='{ToolUrl}';">X</button>
+                <header class=" modal-label">{DELETE_DROPLETS}</header>
+                <div class="body">
+                    <h3>{CONFIRM_DROPLET_DELETING}</h3>
+                    <p>{inDroplets}</p>
+                </div>
+                <div class="footer">
+                    <button name="command" type="submit" value="delete_droplet?droplet_id={iDropletIdKey}" class="confirm btn btn-success">{DELETE}</button>
+                    <button name="cancel" class="cancel btn btn-danger" type="button" onclick="window.location='{ToolUrl}';">{CANCEL}</button>
+                </div>
+              <footer class="modal-label">
+<!--
+          <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+          <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+-->
+              </footer>
+            </div>
+        </form>
+    </div>
+</div>
+<script >
+<!--
+domReady(function() {
+    LoadOnFly('head', "{sAddonThemeUrl}/css/dialogBox.css");
+    LoadOnFly('head', "{sAddonThemeUrl}/css/customAlert.css");
+});
+-->
+</script>
+<!-- END main_block -->

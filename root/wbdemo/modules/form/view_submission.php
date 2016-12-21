@@ -52,7 +52,7 @@ if($query_content = $database->query($sql)) {
 //print_r( $page ); print '</pre>';
 
 // Get the user details of whoever did this submission
-$sql  = 'SELECT `username`,`display_name` FROM `'.TABLE_PREFIX.'users` '
+$sql  = 'SELECT `username`,`display_name`, `email` FROM `'.TABLE_PREFIX.'users` '
       . 'WHERE `user_id` = '.$submission['submitted_by'];
 if($get_user = $database->query($sql)) {
     if($get_user->numRows() != 0) {
@@ -60,40 +60,47 @@ if($get_user = $database->query($sql)) {
     } else {
         $user['display_name'] = $TEXT['GUEST'];
         $user['username'] = $TEXT['UNKNOWN'];
+        $user['email'] = $TEXT['UNKNOWN'];
     }
 }
 //$sSectionIdPrefix = ( defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR : 'Sec' );
 $sSectionIdPrefix = 'submissions';
 ?>
-<table class="frm-submission" summary="" cellpadding="0" cellspacing="0" border="0">
-<tr>
-    <td><?php echo $TEXT['SUBMISSION_ID']; ?>:</td>
-    <td><?php echo $submission['submission_id']; ?></td>
-</tr>
-<tr>
-    <td><?php echo $TEXT['SUBMITTED']; ?>:</td>
-    <td><?php echo gmdate(DATE_FORMAT .', '.TIME_FORMAT, $submission['submitted_when']+TIMEZONE); ?></td>
-</tr>
-<tr>
-    <td><?php echo $TEXT['USER'].' '; ?>:</td>
-    <td><?php echo $user['display_name'].' '; ?></td>
-</tr>
-<tr>
-    <td colspan="2">
-        <hr />
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <?php echo nl2br($submission['body']); ?>
-    </td>
-</tr>
+<table class="frm-submission" >
+    <tbody>
+        <tr>
+            <td><?php echo $TEXT['SUBMISSION_ID']; ?>:</td>
+            <td><?php echo $submission['submission_id']; ?></td>
+        </tr>
+        <tr>
+            <td><?php echo $TEXT['SUBMITTED']; ?>:</td>
+            <td><?php echo gmdate(DATE_FORMAT .', '.TIME_FORMAT, $submission['submitted_when']+TIMEZONE); ?></td>
+        </tr>
+        <tr>
+            <td><?php echo $TEXT['USER'].' '; ?>:</td>
+            <td><?php echo $user['display_name'].' '; ?></td>
+        </tr>
+        <tr>
+            <td><?php echo $TEXT['EMAIL'].' '; ?>:</td>
+            <td><?php echo $user['email'].' '; ?></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <?php echo nl2br($submission['body']); ?>
+            </td>
+        </tr>
+    </tbody>
 </table>
 
 <br />
 
-<input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="javascript: window.location = '<?php echo ADMIN_URL; ?>/pages/modify.php?page=<?php echo $page?>&amp;page_id=<?php echo $page_id.'#'.$sSectionIdPrefix; ?>';" style="width: 150px; margin-top: 5px;" />
-<input type="button" value="<?php echo $TEXT['DELETE']; ?>" onclick="javascript: confirm_link('<?php echo $TEXT['ARE_YOU_SURE']; ?>', '<?php echo WB_URL; ?>/modules/form/delete_submission.php?page_id=<?php echo $page_id; ?>&section_id=<?php echo $section_id; ?>&submission_id=<?php echo $admin->getIDKEY($submission_id).'#'.$sSectionIdPrefix; ?>');" style="width: 150px; margin-top: 5px;" />
+<input type="button" value="<?php echo $TEXT['CLOSE']; ?>" onclick="window.location = '<?php echo ADMIN_URL; ?>/pages/modify.php?page=<?php echo $page?>&amp;page_id=<?php echo $page_id.'#'.$sSectionIdPrefix; ?>';" style="width: 150px; margin-top: 5px;" />
+<input type="button" value="<?php echo $TEXT['DELETE']; ?>" onclick="confirm_link('<?php echo $TEXT['ARE_YOU_SURE']; ?>', '<?php echo WB_URL; ?>/modules/form/delete_submission.php?page_id=<?php echo $page_id; ?>&section_id=<?php echo $section_id; ?>&submission_id=<?php echo $admin->getIDKEY($submission_id).'#'.$sSectionIdPrefix; ?>');" style="width: 150px; margin-top: 5px;" />
 <?php
 
 // Print admin footer

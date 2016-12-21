@@ -50,13 +50,19 @@ if($results->numRows() > 0) {
             // read contents of the module language file into string
             $data = @file_get_contents(WB_PATH .'/modules/' .$tool['directory'] .'/languages/' .LANGUAGE .'.php');
             $tool_description = get_variable_content('module_description', $data, true, false);
-        }        
+        }
+        if (is_readable(WB_PATH.'/modules/' .$tool['directory'].'/tool_icon.png'))
+        {
+            $template->set_var('TOOL_ICON', WB_URL.'/modules/' .$tool['directory'].'/tool_icon.png');
+        } else {
+            $template->set_var('TOOL_ICON', THEME_URL.'/icons/admintools.png');
+        }
         $template->set_var('TOOL_DESCRIPTION', ($tool_description === False)? $tool['description'] :$tool_description);
         $template->parse('tool_list', 'tool_list_block', true);
       }
     }
 } else {
-    $template->set_var('TOOL_LIST', $TEXT['NONE_FOUND']);    
+    $template->set_var('TOOL_LIST', $TEXT['NONE_FOUND']);
 }
 
 // Parse template objects output

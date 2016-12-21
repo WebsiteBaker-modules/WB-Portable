@@ -31,3 +31,4 @@ $MOD_PREFERENCE = array(
     'SAVE_PASSWORD' => 'save password',
 );
 $MESSAGE['USERS_DISPLAYNAME_TAKEN'] = 'The displayname you entered is already taken';
+$TEXT['FULL_NAME'] = 'Publicly visible name';

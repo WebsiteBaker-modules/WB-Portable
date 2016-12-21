@@ -33,6 +33,10 @@ function save_preferences( $admin, $database)
     $bMailHasChanged = false;
 // first check form-tan
     if(!$admin->checkFTAN()){ $err_msg[] = $MESSAGE['GENERIC_SECURITY_ACCESS']; }
+    $sLanguagesAddonDefaultFile = WB_PATH.'/account/languages/EN.php';
+    if (is_readable($sLanguagesAddonDefaultFile)){include $sLanguagesAddonDefaultFile;}
+    $sLanguagesAddonFile = WB_PATH.'/account/languages/'.LANGUAGE.'.php';
+    if (is_readable($sLanguagesAddonFile)){include $sLanguagesAddonFile;}
 // Get entered values and validate all
     // remove any dangerouse chars from display_name
 //    $display_name     = $admin->add_slashes(strip_tags(trim($admin->get_post('display_name'))));
@@ -41,23 +45,24 @@ function save_preferences( $admin, $database)
     // check that display_name is unique in whoole system (prevents from User-faking)
     $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
     $sql .= 'WHERE `user_id` <> '.(int)$admin->get_user_id().' AND `display_name` LIKE "'.$display_name.'"';
-    if( $database->get_one($sql) > 0 ){ $err_msg[] = $MESSAGE['USERS_USERNAME_TAKEN']; }
+    if( $database->get_one($sql) > 0 ){ $err_msg[] = ( @$MESSAGE['USERS_DISPLAYNAME_TAKEN']?:$MESSAGE['MEDIA_BLANK_NAME'].' ('.$TEXT['DISPLAY_NAME'].')'); }
 // language must be 2 upercase letters only
     $language         = strtoupper($admin->get_post('language'));
     $language         = (preg_match('/^[A-Z]{2}$/', $language) ? $language : DEFAULT_LANGUAGE);
+    $user_time = true;
 // timezone must be between -12 and +13  or -20 as system_default
     $timezone         = $admin->get_post('timezone');
-    $timezone         = (is_numeric($timezone) ? $timezone : -20);
-    $timezone         = ( ($timezone >= -12 && $timezone <= 13) ? $timezone : -20 ) * 3600;
+    $timezone         = (is_numeric($timezone) ? $timezone : DEFAULT_TIMEZONE/3600);
+    $timezone         = (($timezone >= -12 && $timezone <= 13) ? $timezone : DEFAULT_TIMEZONE/3600) * 3600;
+
 // date_format must be a key from /interface/date_formats
     $date_format      = $admin->get_post('date_format');
     $date_format_key  = str_replace(' ', '|', $date_format);
-    $user_time = true;
     include( ADMIN_PATH.'/interface/date_formats.php' );
     $date_format = (array_key_exists($date_format_key, $DATE_FORMATS) ? $date_format : 'system_default');
     $date_format = ($date_format == 'system_default' ? '' : $date_format);
     unset($DATE_FORMATS);
-// time_format must be a key from /interface/time_formats    
+// time_format must be a key from /interface/time_formats
     $time_format      = $admin->get_post('time_format');
     $time_format_key  = str_replace(' ', '|', $time_format);
     $user_time = true;
@@ -65,6 +70,7 @@ function save_preferences( $admin, $database)
     $time_format = (array_key_exists($time_format_key, $TIME_FORMATS) ? $time_format : 'system_default');
     $time_format = ($time_format == 'system_default' ? '' : $time_format);
     unset($TIME_FORMATS);
+
 // email should be validatet by core
     $email = trim( $admin->get_post('email') == null ? '' : $admin->get_post('email') );
     if( (!$admin->validate_email($email)) )

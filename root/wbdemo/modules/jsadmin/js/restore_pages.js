@@ -1,6 +1,7 @@
 // Copyright 2006 Stepan Riha
 // www.nonplus.net
 // $Id: restore_pages.js 2 2006-04-18 03:04:39Z stepan $
+//console.info(ids);
 
 // Array of ids that can be toggled using toggle_visibility()
 JsAdmin.toggled_ids = function() {
@@ -11,6 +12,7 @@ JsAdmin.toggled_ids = function() {
     for(var i = 0; i < links.length; i++) {
         var href = links[i].href || '';
         var match = href.match(reId);
+
         if(!match) {
             continue;
         }
@@ -19,6 +21,7 @@ JsAdmin.toggled_ids = function() {
     }
 
     if(ids.length > 0) {
+console.info(ids);
         return ids;
     } else {
         return false;

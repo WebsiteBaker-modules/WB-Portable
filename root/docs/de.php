@@ -17,7 +17,7 @@ include ("head.php");
 ?>
 <h2>Was ist WebsiteBaker Portable</h2>
 
-        <p>Das <a target="_blank" href="http://www.websitebaker.org/">WebsiteBaker</a> Portable Projekt verbindet das beliebte, leicht zu bedienende Content Management System mit dem einfach konfigurierbaren und vielseitig einsetzbaren <a target="_blank" href="http://www.usbwebserver.net/en/">USBWebserver8</a>.</p>
+        <p>Das <a target="_blank" href="http://websitebaker.org/">WebsiteBaker</a> Portable Projekt verbindet das beliebte, leicht zu bedienende Content Management System mit dem einfach konfigurierbaren und vielseitig einsetzbaren <a target="_blank" href="http://www.usbwebserver.net/en/">USBWebserver8</a>.</p>
         <p><b>Dadurch haben Sie ein System, dass als Live-Demo von WebsiteBaker oder auch für eine lokale Testumgebung genutzt werden&nbsp; kann.</b></p>
         <br />
         <hr />
@@ -40,12 +40,13 @@ include ("head.php");
         <hr />
         <br />
         <h2>Offizieller Support f&uuml;r WebsiteBaker</h2>
-        <p style="text-align: left;">F&uuml;r Hilfestellungen zu einzelnen Themen und der Bedienung von WebsiteBaker steht <a target="_blank" href="http://www.websitebaker.org/de/hilfe/hilfe-projekt.php?lang=DE">die offizielle Hilfe Seite</a> jederzeit zur Verf&uuml;gung. F&uuml;r Detailfragen zu Besonderheiten oder Problemen können Sie auch<a target="_blank" href="http://www.websitebaker.org/forum/"> das Forum</a> durchsuchen.</p>
+        <p style="text-align: left;">F&uuml;r Hilfestellungen zu einzelnen Themen und der Bedienung von WebsiteBaker steht
+         <a target="_blank" href="http://wiki.websitebaker.org/">die offizielle Hilfe Seite</a> jederzeit zur Verf&uuml;gung. F&uuml;r Detailfragen zu Besonderheiten oder Problemen können Sie auch<a target="_blank" href="http://forum.websitebaker.org/"> das Forum</a> durchsuchen.</p>
         <br />
         <hr />
         <br />
         <h2>Erweiterungen - Module und Templates</h2>
-        <p>F&uuml;r WebsiteBaker gibt es sehr viele Templates, Designs, Module und Add-ons. Besuchen Sie das <a target="_blank" href="http://www.websitebaker.org/de/add-ons/add-ons-projekt.php">offizielle Add-ons Repository</a>. Dort finden Sie alle verf&uuml;gbaren Zusatzmodule und -funktionen f&uuml;r Ihr WebsiteBaker.</p>
+        <p>F&uuml;r WebsiteBaker gibt es sehr viele Templates, Designs, Module und Add-ons. Besuchen Sie das <a target="_blank" href="http://addons.websitebaker.org/">offizielle Add-ons Repository</a>. Dort finden Sie alle verf&uuml;gbaren Zusatzmodule und -funktionen f&uuml;r Ihr WebsiteBaker.</p>
         <br />
         <hr />
         <br />
@@ -56,7 +57,7 @@ include ("head.php");
         <li><a target="_blank" href="http://localhost:4001/wbdemo/admin/"><strong>Direktzugang zum Backend </strong></a>(Administrationsbereich)<br /><br />
              <b>Loginname: </b>admin<br />
              <b>Passwort: </b>admin</li>
-        </ul>        
+        </ul>
         </fieldset>
         <br />
         <hr />
@@ -64,8 +65,7 @@ include ("head.php");
         <h2>&Uuml;ber USBWebserver8</h2>
         <p>Alle Infos zu USBWebserver8 WAMP auf einen Blick (z.B. phpinfo) <a target="_blank" href="http://localhost:4001/docs/usbw-info/">gibt es Hier!</a><br />
         Eine Anleitung in englisch: <a href="http://www.usbwebserver.net/downloads/manual.pdf" target="_blank" title="USBWebserver8 Anleitung">Klick!</a><br />
-        Zugriff auf die Datenbank per <b>MySQLDumper</b>: <a target="_blank" href="http://localhost:4001/mysqldumper/">Klick!</a><br />
-        Zugriff auf die Datenbank per <b>phpMyAdmin</b>: <a target="_blank" href="http://localhost:4001/phpmyadmin/">Klick!</a><br /><br /></p>    
+        Zugriff auf die Datenbank per <b>phpMyAdmin</b>: <a target="_blank" href="http://localhost:4001/phpmyadmin/">Klick!</a><br /><br /></p>
         <hr />
         <br />
         <h2>Dank an:</h2>
@@ -79,4 +79,3 @@ include ("head.php");
         <strong>WebsiteBaker Org e.V.</strong></p>
 <?php
 include ("foot.php");
-        

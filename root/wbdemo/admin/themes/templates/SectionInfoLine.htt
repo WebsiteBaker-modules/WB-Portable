@@ -1,0 +1,19 @@
+<!-- BEGIN main_block -->
+<div style="position: relative;" class="section-{aTarget.SectionInfoLine}">
+<form name="form_properties" action="{aTarget.sectionUrl}sections_save.php" method="post">
+  <input type="hidden" name="section_id" value="{aTarget.SectionId}" />
+  <input type="hidden" name="page_id" value="{aTarget.pageId}" />
+  <input type="hidden" name="inputSection" value="1" />
+  <a id="{aTarget.SectionIdPrefix}" ></a>
+  <div class="section-info ">
+  <b>Block:</b> {aTarget.BlockName} ( {aTarget.sectionBlock} ) <b>Modul:</b> {aTarget.sectionModule} <b>ID:</b> {aTarget.SectionId}
+   <b style="margin-left: 1.225em;">Title:</b>
+   <input type="text" name="title_{aTarget.SectionId}" value="{aTarget.title}" style="width: 30%; margin-left: 1.225em;" class="" />
+<!-- BEGIN section_block -->
+      {aTarget.FTAN}
+      <input type="submit" name="save" value="{lang.TEXT_SUBMIT}" class="section_{aTarget.SectionId} submit btn btn-default" />
+<!-- END section_block -->
+  </div>
+</form>
+</div>
+<!-- END main_block -->

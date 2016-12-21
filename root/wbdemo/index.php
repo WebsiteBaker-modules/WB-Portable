@@ -48,7 +48,7 @@ if(!defined('TABLE_PREFIX'))
     exit;    // make sure that subsequent code will not be executed
 }
 
-if( !class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
+if (!class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
 // Create new frontend object
 if (!isset($wb) || !($wb instanceof frontend)) { $wb = new frontend(); }
 

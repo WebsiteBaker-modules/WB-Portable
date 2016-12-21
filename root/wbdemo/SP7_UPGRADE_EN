@@ -1,0 +1,93 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Instructions for Installing WebsiteBaker 2.8.3 Service Pack 6 (Rev 1645)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This Service Pack includes all fixes for WebsiteBaker version 2.8.3 and can be installed on all previously published WB 2.8.3 versions (with or without Service Pack). Instructions for upgrading WebsiteBaker versions older than 2.8.3 are included at the bottom of this page.
+
+When upgrading, it is not necessary to transfer the 'install' folder. The 'install' folder is only required when building a new, full installation (for instance - locally incorporating this Service Pack into an older WB-2.8.3 Full Installation Package).
+
+A 'Whitelist-Array' can be found on line 41 of the file upgrade-script.php. This Array contains a list of all Core-Modules. For all Modules in this list, WB initiates the necessary Upgrade. For all other modules, WB compares the registered version number in the database with the same number in info.php from the module. Feel free to add more of your installed modules to this 'Whitelist-Array'.
+
+To install, transfer the SP6 files/folders to the server (or copy them to the local folder).
+*** Important *** During installation, make sure to manually choose or set the FTP program to overwrite ALL files, even if the source file is older than the existing target file. Those compiling a custom installation should configure their compression program to ensure, upon extraction, that ALL target files are overwritten, even by source files with an older date (e.g. 7Zip, Winzip, Winrar).
+
+To complete an upgrade installation, call the upgrade-script.php file manually in the browser ( http://your_wb_website_url/upgrade-script.php ). If this file is not called manually, the script will run automatically the first time the WebsiteBaker admin backend is accessed ( http://your_wb_website_url/admin ). *** Read the Upgrade feedback report carefully ***. Should the Upgrade fail with an error message, please copy the message and report the exact text in the WB forum.
+
+When you have verified that the installation was successful, delete the upgrade-script.php file (and 'install' folder, if applicable) from the server.
+
+
+Enjoy your new WebsiteBaker installation!
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Upgrade WebsiteBaker versions older than WB 2.8.3
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Before upgrading to SP6, all WB versions older than WB 2.8.3 must first be upgraded to WB 2.8.3 Revision 1611. Download Revision 1611 here: http://addon.websitebaker.org/pages/en/browse-add-ons.php?id=0EA85F12
+
+Upgrade instructions for WB SP 2.8.3 Revision 1611 can be found in the forum, here:
+German Version:
+http://forum.websitebaker.org/index.php/topic,23658.msg160358.html#msg160358
+
+English Version
+http://forum.websitebaker.org/index.php/topic,23412.0.html
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Important changes made in version WB 2.8.3 SP6
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Add missing parameter in system permission (group management)
+Not possible to delete groups who are in use.
+Security fixes news and form modul (Don't allow backend access to persons you don't trust)!
+Preferences - confirm with current password only by e-mail or password changes
+Preferences - user- and display-name are unique in the system
+Add SecureToken (Multitab), remove Single Secureform and Secureform.mtab, Secureform Switcher no longer needed
+Updating settings.js Switching linux/Windows  and PhpMail/SMTP
+Modify page, add block-outer border with info-header area, showing if block is active or inactive
+Sanitize HttpReferer - Value will be first save in ORG_REFERER to use in statistic scripts
+upgrade-script deleting protected files in some folder, you don't needed them
+Droplet add new features
+Output-Filter - add new filter methods
+rss.php convert wblink and sysvar:media placeholder to absolute urls
+Prevent core modules/templates from uninstall in addons management
+add a new class to prevent unwantend code in strings
+Most of sql statememts now are strict 
+Add missing languages in some CKEditor plugins
+Fix the Security Vulnerability Notification  (Sql Injection)
+
+The present class SecureForm and both files SecureForm.php and SecureForm.mtab.php were removed and substituted with the single class SecureTokens. The Addon 'SecureFormSwitcher' thereby also became superfluous and can or should be uninstalled.
+The settings for this SecureForm can be done only by the SuperAdmin (User-ID 1) in the WB Settings.
+Setting possibilities:
+
+Token_Fingerprint:      Enabled / Disabled
+Token_Netmask4:        (0-32 // 0 = off / default = 24)
+Token_Netmask6:        (0-128 // 0 = off / default = 64)
+Token_Life_Time:       ( 30min | 45min | 60min[default] | 120min )
+
+The module SecureFormSwitcher is uninstalled by upgrade script
+
+___________________ ___________________ _________
+
+Frontend Output Filter
+This module delivers some new filters, used in the frontend. After the Upgrade from an older WB version, all filters are activated. Please check this in Admin Tools -> Frontend Output Filter. If you don't see a list with the installed filters, click on the SAVE button in this Admin Tool.
+
+You can choose between the old method with register_frontend_modfiles('jquery') / register_frontend_modfiles('js') or the new filter.
+If you use the new filter, it's not needed to remove both lines from your template.
+
+IMPORTANT: register_frontend_modfiles('css') and all register_frontend_modfiles_body(..) must stay in the template!!
+
+The Filters:
+ 1. canonical - delivered absolute link for a canonical-Link, if also the RelUrl-Filter is active
+ 2. CSStoHead - push included CSS-file into the HEAD-area of the frontend-output
+ 3. Droplets - droplet ON / Off
+ 4. EMail - encrypted mailadresses in link and content
+ 5. FrontendJS - push frontend.js into the HEAD-area of the frontend-output, formaly as register_frontend_m odfiles("js")
+ 6. JQuery - delivered the jquery-package into the HEAD-area of the frontend-output, formaly as register_frontend_m odfiles("jquery")
+ 7. OpF - Output-Filter Dashboard (additional addon) : ON / OFF
+ 8. RelUrl - switch all absolute URLs to relative URLs
+ 9. ScriptVars - delivered variables for Javascript (WB_URL WB_PATH etc)
+10. SnippetJS - included Snippets
+11. SysVar:MediaRel - replace this Variable (SysVar:MediaRel) from the database with the path to media-folder, needed in some modules. (Wysiwyg, News usw). Some other modules like procalendar or download-gallery using actual absolute links and needs in the future only one line more to replace absolute url's in the content
+12. WbLink - replace a wblink with the absolute path
+13. LoadOnFly to load css dynamically into the head area

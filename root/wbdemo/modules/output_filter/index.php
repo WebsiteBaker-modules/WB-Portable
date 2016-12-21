@@ -25,6 +25,8 @@
         return OutputFilterApi(
             array(
                 'WbLink',
+                'ReplaceSysvar',
+                'CssToHead',
 /* ****************************************************************** */
 /* *** from here insert ordered requests of individual filters    *** */
 /* ***                                                            *** */
@@ -40,9 +42,8 @@
 /* *** end of individual filters                                  *** */
 /* ****************************************************************** */
                 'WbLink',
-                'SysvarMedia',
+                'ReplaceSysvar',
                 'RelUrl',
-                'CssToHead',
             ),
             $sContent
         );

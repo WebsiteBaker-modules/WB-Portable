@@ -16,14 +16,14 @@
         var $form = editor.element.$.form;
                     var $form = editor.element.$.form;
 
-            var ifrm = document.createElement('iframe');
+          var ifrm = document.createElement('iframe');
           ifrm.setAttribute('style','display: none;');
           ifrm.setAttribute('id','dummy_iframe');
           ifrm.setAttribute('name','dummy_iframe');
           $form.parentNode.appendChild(ifrm);
           $("#dummy_iframe").load(function() {
               reply = $("#dummy_iframe").contents().find('.content').html();
-        reply = reply.replace(/<input.*>/ig,'');
+              reply = reply.replace(/<input.*>/ig,'');
               iBox.show(reply);
               $("#dummy_iframe").remove();
               $form.target = '';

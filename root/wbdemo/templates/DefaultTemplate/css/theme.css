@@ -1,0 +1,37 @@
+
+
+body { margin :0 auto; padding :0px; background :#ABBFCE; text-align :left; font-size :0.8525em; }
+body { background-color :#698FAB; background-repeat :repeat-x; }
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
+}
+hr { margin :1em auto; color :#003366; height :1px; }
+h1 { color :#000000; font-size :1.8em; text-align :center; text-transform :uppercase; }
+h2 { margin :0.5em 0px 0.5em 0px; color :#336699; font-size :1.5em; }
+h2 { font-family :arial,sans-serif; letter-spacing :-1px; margin :0.5em 0; text-align :left; }
+h4 { margin :0; border-bottom :1px solid #dddddd; padding-bottom :5px; }
+
+div.box { width :100%; margin :-10px 0 0 0; font-size :small; text-align :right; }
+.header {  margin :0 auto; }
+.container { margin :0 auto; background :url(images/bgtitle.png) #ffffff; background-repeat :repeat-x; }
+.content { padding :1.6em; margin :0 auto; min-height :300px; vertical-align :top; }
+#content_container { text-align :center;  clear :both; margin :0 auto; }
+.header,
+.container,
+.content,
+#content_container { min-width :90em; width :75%; }

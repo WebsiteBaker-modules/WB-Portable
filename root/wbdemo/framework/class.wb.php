@@ -28,13 +28,95 @@ if (!class_exists('Sanitize', false )) { include __DIR__.'/Sanitize.php'; }
 
 class wb extends SecureTokensInterface
 {
+  /**
+   @var object instance of the database object */
+  protected $_oDb = null;
+  /**
+   @var object instance holds several values from the application global scope */
+  protected $_oReg = null;
+  /**
+   @var object instance holds all of the translations */
+  protected $_oTrans = null;
 
 //    public $password_chars = 'a-zA-Z0-9\_\-\!\#\*\+\@\$\&\:';    // General initialization function
     public $password_chars = '[\w!#$%&*+\-.:=?@\|]';    // General initialization function
 
     public function  __construct($mode = 0) {
         parent::__construct();
+        $this->_oDb    = $GLOBALS['database'];
+        $this->_oTrans = $GLOBALS['oTrans'];
     }
+
+  /**
+   *
+   *
+   * @return object instance of the database object of all visible languages with defined fields
+   *
+   */
+  public function getAvailableLanguagesObjectInstance()
+  {
+    $sql = 'SELECT `directory`,`name` '.'FROM `'.TABLE_PREFIX.'addons` '.'WHERE `type` = \'language\' '.'ORDER BY `directory`';
+    return ( $this->_oDb->query( $sql));
+  }
+
+  /**
+   *
+   *
+   * @return array of all visible languages with defined fields
+   *
+   */
+  public function getAvailableLanguages()
+  {
+    $aRetval = array();
+    if( $oRes = $this->getAvailableLanguagesObjectInstance()) {
+      while ( $aRow = $oRes->fetchRow( MYSQLI_ASSOC)) {
+        $aRetval[$aRow['directory']] = $aRow['name'];
+      }
+    }
+    return ( $aRetval);
+  }
+
+  /**
+   *
+   *
+   * @return array of first visible language pages with defined fields
+   *
+   */
+  public function getLanguagesDetailsInUsed()
+  {
+    //        global $database;
+    $aRetval = array();
+    $sql = 'SELECT DISTINCT `language`, `page_id`, `level`, `parent`, `root_parent`, '.
+      '`page_code`, `link`, `language`, `visibility`, '.'`viewing_groups`,`viewing_users`,`position` '.
+      'FROM `'.TABLE_PREFIX.'pages` '.'WHERE `level`= \'0\' '.'AND `root_parent`=`page_id` '.
+      'AND `visibility`!=\'none\' '.'AND `visibility`!=\'hidden\' '.'GROUP BY `language` '.
+      'ORDER BY `position`';
+    if( $oRes = $this->_oDb->query( $sql)) {
+      while ( $aRow = $oRes->fetchRow( MYSQLI_ASSOC)) {
+        if( !$this->page_is_visible( $aRow)) {
+          continue;
+        }
+        $aRetval[$aRow['language']] = $aRow;
+      }
+    }
+    return $aRetval;
+  }
+
+  /**
+   *
+   *
+   * @return comma separate list of first visible languages
+   *
+   */
+  public function getLanguagesInUsed()
+  {
+    $aRetval = array_keys( $this->getLanguagesDetailsInUsed());
+    if( sizeof( $aRetval) == 0) {
+      return null;
+    }
+    return implode( ',', $aRetval);
+  }
+
   /**
    * Created parse_url utf-8 compatible function
    *
@@ -59,22 +141,19 @@ class wb extends SecureTokensInterface
  * @param array &$matches: an array-var whitch will return possible matches
  * @return bool: true there is a match, otherwise false
  */
-    public function is_group_match( $groups_list1 = '', $groups_list2 = '', &$matches = null )
+    public function is_group_match($mGroupsList1 = '', $mGroupsList2 = '', &$matches = null)
     {
-        if( $groups_list1 == '' ) { return false; }
-        if( $groups_list2 == '' ) { return false; }
-        if( !is_array($groups_list1) )
-        {
-            $groups_list1 = explode(',', $groups_list1);
+        if ($mGroupsList1 == '' || $mGroupsList2 == '') { return false; }
+        if (!is_array($mGroupsList1)) {
+            $mGroupsList1 = preg_split('/[\s,=+\-\;\:\.\|]+/', $mGroupsList1, -1, PREG_SPLIT_NO_EMPTY);
         }
-        if( !is_array($groups_list2) )
-        {
-            $groups_list2 = explode(',', $groups_list2);
+        if (!is_array($mGroupsList2)) {
+            $mGroupsList2 = preg_split('/[\s,=+\-\;\:\.\|]+/', $mGroupsList2, -1, PREG_SPLIT_NO_EMPTY);
         }
-        $matches = array_intersect( $groups_list1, $groups_list2);
-        return ( sizeof($matches) != 0 );
+        $matches = array_intersect($mGroupsList1, $mGroupsList2);
+        return (sizeof($matches) != 0);
     }
-/* ****************
+/**
  * check if current user is member of at least one of given groups
  * ADMIN (uid=1) always is treated like a member of any groups
  *
@@ -318,7 +397,7 @@ class wb extends SecureTokensInterface
         header( 'Location: '.$location);
         exit( 0);
       } else {
-  
+
         //            $aDebugBacktrace = debug_backtrace();
         //            array_walk( $aDebugBacktrace, create_function( '$a,$b', 'print "<br /><b>". basename( $a[\'file\'] ). "</b> &nbsp; <font color=\"red\">{$a[\'line\']}</font> &nbsp; <font color=\"green\">{$a[\'function\']} ()</font> &nbsp; -- ". dirname( $a[\'file\'] ). "/";' ) );
         $msg = "<div style=\"text-align:center;\"><h2>An error has occurred</h2><p>The <strong>Redirect</strong> could not be start automatically.\n".
@@ -418,6 +497,139 @@ class wb extends SecureTokensInterface
         exit();
     }
 
+  /*
+  * @param string $message: the message to format
+  * @param string $status:  ('ok' / 'error' / '') status defines the apereance of the box
+  * @return string: the html-formatted message (using template 'message.htt')
+  */
+  public function format_message( $message, $status = 'ok')
+  {
+    $retval = '';
+//    if ( ($message == '') ) { return $retval; }
+    $id = uniqid( 'x');
+    $tpl = new Template( dirname( $this->correct_theme_source( 'message.htt')));
+    $tpl->set_file( 'page', 'message.htt');
+    $tpl->set_block( 'page', 'main_block', 'main');
+    $tpl->set_var( 'MESSAGE', $message);
+    $tpl->set_var( 'THEME_URL', THEME_URL);
+    $tpl->set_var( 'ID', $id);
+    if( $status == 'ok' || $status == 'error' || $status = 'warning') {
+      $tpl->set_var( 'BOX_STATUS', ' box-'.$status);
+    } else {
+      $tpl->set_var( 'BOX_STATUS', '');
+    }
+    $tpl->set_var( 'STATUS', $status);
+    if( !defined( 'REDIRECT_TIMER')) {
+      define( 'REDIRECT_TIMER', -1);
+    }
+    if( $status != 'error') {
+      switch ( REDIRECT_TIMER):
+        case 0: // do not show message
+          unset( $tpl);
+          break;
+        case - 1: // show message permanently
+          $tpl->parse( 'main', 'main_block', false);
+          $retval = $tpl->finish( $tpl->parse( 'output', 'page', false));
+          unset( $tpl);
+          break;
+        default: // hide message after REDIRECTOR_TIMER milliseconds
+          $retval = '<script type="text/javascript">/* <![CDATA[ */ function '.$id.'_hide() {'.
+            'document.getElementById(\''.$id.'\').style.display = \'none\';}'.'window.setTimeout(\''.$id.
+            '_hide()\', '.REDIRECT_TIMER.');/* ]]> */ </script>';
+          $tpl->parse( 'main', 'main_block', false);
+          $retval = $tpl->finish( $tpl->parse( 'output', 'page', false)).$retval;
+          unset( $tpl);
+      endswitch;
+    } else {
+      $tpl->parse( 'main', 'main_block', false);
+      $retval = $tpl->finish( $tpl->parse( 'output', 'page', false)).$retval;
+      unset( $tpl);
+    }
+    return $retval;
+  }
+
+  /*
+  * @param string $type: 'locked'(default)  or 'new'
+  * @return void: terminates application
+  * @description: 'locked' >> Show maintenance screen and terminate, if system is locked
+  *               'new' >> Show 'new site under construction'(former print_under_construction)
+  */
+  public function ShowMaintainScreen( $type = 'locked')
+  {
+    global $database, $MESSAGE;
+    $LANGUAGE = strtolower( ( isset( $_SESSION['LANGUAGE']) ? $_SESSION['LANGUAGE'] : LANGUAGE));
+    $PAGE_TITLE = $MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'];
+    $PAGE_ICON = 'negative';
+    $show_screen = false;
+    if( $type == 'locked') {
+      $curr_user = ( intval( isset( $_SESSION['USER_ID']) ? $_SESSION['USER_ID'] : 0));
+      if( ( defined( 'SYSTEM_LOCKED') && ( int)SYSTEM_LOCKED == 1) && ( $curr_user != 1)) {
+        header( $_SERVER['SERVER_PROTOCOL'].' 503 Service Unavailable');
+        // first kick logged users out of the system
+        // delete all remember keys from table 'user' except user_id=1
+        $sql = 'UPDATE `'.TABLE_PREFIX.'users` SET `remember_key`=\'\' ';
+        $sql .= 'WHERE `user_id`<>1';
+        $database->query( $sql);
+        // delete remember key-cookie if set
+        if( isset( $_COOKIE['REMEMBER_KEY'])) {
+          setcookie( 'REMEMBER_KEY', '', time() - 3600, '/');
+        }
+        // overwrite session array
+        $_SESSION = array();
+        // delete session cookie if set
+        if( ini_get( "session.use_cookies")) {
+          $params = session_get_cookie_params();
+          setcookie( session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"],
+            $params["httponly"]);
+        }
+        // delete the session itself
+        session_destroy();
+        $PAGE_TITLE = $MESSAGE['GENERIC_WEBSITE_LOCKED'];
+        $PAGE_ICON = 'system';
+        $show_screen = true;
+      }
+    } else {
+      header( $_SERVER['SERVER_PROTOCOL'].' 503 Service Unavailable');
+      $show_screen = true;
+    }
+    if( $show_screen) {
+      $sMaintanceFile = $this->correct_theme_source( 'maintenance.htt');
+      if( file_exists( $sMaintanceFile)) {
+        $tpl = new Template( dirname( $sMaintanceFile));
+        $tpl->set_file( 'page', 'maintenance.htt');
+        $tpl->set_block( 'page', 'main_block', 'main');
+        if( defined( 'DEFAULT_CHARSET')) {
+          $charset = DEFAULT_CHARSET;
+        } else {
+          $charset = 'utf-8';
+        }
+        $tpl->set_var( 'PAGE_TITLE', $PAGE_TITLE);
+        $tpl->set_var( 'CHECK_BACK', $MESSAGE['GENERIC_PLEASE_CHECK_BACK_SOON']);
+        $tpl->set_var( 'CHARSET', $charset);
+        $tpl->set_var( 'WB_URL', WB_URL);
+        $tpl->set_var( 'BE_PATIENT', $MESSAGE['GENERIC_BE_PATIENT']);
+        $tpl->set_var( 'THEME_URL', THEME_URL);
+        $tpl->set_var( 'PAGE_ICON', $PAGE_ICON);
+        $tpl->set_var( 'LANGUAGE', $LANGUAGE);
+        $tpl->parse( 'main', 'main_block', false);
+        $tpl->pparse( 'output', 'page');
+        exit();
+      } else {
+        require_once ( WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
+        echo '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 TransitionalEN" "http:www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <head><title>'.$MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'].'</title>
+            <style type="text/css"><!-- body{ font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 12px; background-image: url("'.
+          WB_URL.'/templates/'.DEFAULT_THEME.
+          '/images/background.png");background-repeat: repeat-x; background-color: #A8BCCB; text-align: center; }
+            h1 { margin: 0; padding: 0; font-size: 18px; color: #000; text-transform: uppercase;}--></style></head><body>
+            <br /><h1>'.$MESSAGE['GENERIC_WEBSITE_UNDER_CONSTRUCTION'].'</h1><br />
+            '.$MESSAGE['GENERIC_PLEASE_CHECK_BACK_SOON'].'</body></html>';
+      }
+      flush();
+      exit();
+    }
+  }
+
     /**
      * wb::mail()
      *
@@ -447,63 +659,82 @@ class wb extends SecureTokensInterface
                     $sMessagePath='',
                     $aAttachment=null
                     ) {
+
+        $aParameters      = array();
+        $aFromAddress     = array();
+        $aToAddress       = array();
+        $aReplyToAddress  = array();
+
         // Strip breaks and trim
+        if ($sFromname!='') {
+            $sFromname    = preg_replace( "/[^a-z0-9 !?:;,.\/_\-=+@#$&\*\(\)]/im", "", $sFromname );
+            $sFromname    = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sFromname );
+        }
         $sFromAddress     = trim(preg_replace('/[\r\n]/', '', $sFromAddress));
+
+        if ($toName!='') {
+            $toName       = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $toName );
+        }
         $toAddress        = trim(preg_replace('/[\r\n]/', '', $toAddress));
-        $sSubject         = trim(preg_replace('/[\r\n]/', '', $sSubject));
+
+        if ($sReplyToName!='') {
+            $sReplyToName = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sReplyToName );
+        }
+        //Set who the message is to be sent from
         $sReplyToAddress  = trim(preg_replace('/[\r\n]/', '', $sReplyToAddress));
+        $sReplyToAddress  = ( ($sReplyToAddress=='')?$toAddress:$sReplyToAddress );
+
+        $sSubject         = trim(preg_replace('/[\r\n]/', '', $sSubject));
         // sanitize parameter to prevent injection
-        $sRecipient       = preg_replace( "/[^a-z0-9 !?:;,.\/_\-=+@#$&\*\(\)]/im", "", $sFromname );
-        $sFromname        = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sRecipient );
         $sMessage         = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $sMessage );
 
         // create PHPMailer object and define default settings
-        $myMail = new wbmailer();
+        $myMail = new wbmailer(true);
 
-        $html   = nl2br($sMessage);
-        $plain  = $myMail->html2text($html);
+        try {
+            $html   =  preg_replace('/[\n\r]/', '',nl2br(htmlspecialchars($sMessage)));
+            $plain  = $myMail->html2text($html);
 
-        // convert commaseperated toAdresses List to an array
-        $aToAddress = $myMail->parseAddresses( $toAddress, false );
+            // convert commaseperated toAdresses List to an array
+            $aToAddress = $myMail->parseAddresses( $toAddress, false );
 
-        // set user defined from address
-        if ($sFromAddress!='') {
-//Set who the message is to be sent from
-            $myMail->setFrom($sFromAddress, $sFromname);
-            $sReplyToAddress = ( ($sReplyToAddress=='')?$sFromAddress:$sReplyToAddress );
-        // convert commaseperated toAdresses List to an array
-            $aReplyToAddress = $myMail->parseAddresses( $sReplyToAddress, false );
-            foreach ($aReplyToAddress as $replyToAddr) {                            // TO:
-                $myMail->addReplyTo($replyToAddr['address']);
+            if ($sFromAddress!='') {
+            // set user defined from address
+                $myMail->setFrom($sFromAddress, $sFromname);
+            // set user defined to address
+                $myMail->AddAddress($toAddress, $toName);
+            // set user defined to ReplyTo
+                if ($sReplyToAddress!='') {$myMail->addReplyTo($sReplyToAddress, $sReplyToName);}
             }
-            foreach ($aToAddress as $toAddr) {                            // TO:
-                $myMail->AddAddress($toAddr['address']);
+
+    //Set the subject line
+            $myMail->Subject = $sSubject;
+
+            $myMail->wrapText($html, 80);
+
+    //Read an HTML message body from an external file, convert referenced images to embedded,
+    //convert HTML into a basic plain-text alternative body
+            $myMail->msgHTML( $html, $sMessagePath, true);
+
+            if( is_array( $aAttachment )) {
+                foreach($aAttachment as $sFile) {
+                    $myMail->AddAttachment( $sFile );
+                }
             }
+
+            if( $myMail->getReplyToAddresses() ) { }
+    //send the message, check for errors
+            $myMail->Send();
+            return true;
+        } catch (phpmailerException $e) {
+            echo $e->errorMessage(); //Pretty error messages from PHPMailer
+        } catch (Exception $e) {
+            echo $e->getMessage(); //Boring error messages from anything else!
         }
-
-//Set the subject line
-        $myMail->Subject = $sSubject;
-
-        $myMail->wrapText($html, 80);
-
-//Read an HTML message body from an external file, convert referenced images to embedded,
-//convert HTML into a basic plain-text alternative body
-        $myMail->msgHTML( $html, $sMessagePath, true);
-
-        if( is_array( $aAttachment )) {
-            foreach($aAttachment as $sFile) {
-                $myMail->AddAttachment( $sFile );
-            }
-        }
-
-        if( $myMail->getReplyToAddresses() ) {
-
-        }
-//send the message, check for errors
-        return ($myMail->Send());
 
     }
 
+/*--------------------------------------------------------------------------------------------*/
     // Validate send email
     public function _mail($fromaddress, $toaddress, $subject, $message, $fromname='') {
 /*
@@ -555,7 +786,7 @@ class wb extends SecureTokensInterface
     if (file_exists(THEME_PATH.'/templates/'.$sThemeFile )) {
         $sRetval = THEME_PATH.'/templates/'.$sThemeFile;
     } else {
-        if (file_exists(ADMIN_PATH.'/themes/templates/'.$sThemeFile ) ) {
+        if (is_readable(ADMIN_PATH.'/themes/templates/'.$sThemeFile )) {
         $sRetval = ADMIN_PATH.'/themes/templates/'.$sThemeFile;
         } else {
             throw new InvalidArgumentException('missing template file '.$sThemeFile);
@@ -614,4 +845,76 @@ class wb extends SecureTokensInterface
         return Sanitize::StripFromText($mText, $iFlags);
     }
 
+  /**
+   * ReplaceAbsoluteMediaUrl
+   * @param string $sContent
+   * @return string
+   * @description Replace URLs witch are pointing into MEDIA_DIRECTORY with an URL
+   *              independend placeholder
+   */
+/*
+  public function ReplaceAbsoluteMediaUrl( $sContent)
+  {
+//    $oReg = WbAdaptor::getInstance();
+    if( ini_get( 'magic_quotes_gpc') == true) {
+      $sContent = $this->strip_slashes( $sContent);
+    }
+    if( is_string( $sContent)) {
+      $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
+      $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
+      $sMediaUrl = WB_URL.MEDIA_DIRECTORY.'/';
+      $aSearchfor = array(
+          '@(<[^>]*=\s*")('.preg_quote($sMediaUrl).
+          ')([^">]*".*>)@siU', '@(<[^>]*=\s*")('.preg_quote( WB_URL.'/').')([^">]*".*>)@siU',
+          '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
+          '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
+          );
+      $aReplacements = array( '$1{SYSVAR:AppUrl.MediaDir}$3', '$1{SYSVAR:AppUrl}$3','\1'.$sDocumentRootUrl.'/\3','$1{SYSVAR:MEDIA_REL}$3' );
+      $sContent = preg_replace( $aSearchfor, $aReplacements, $sContent);
+    }
+    return $sContent;
+  }
+  public function OldReplaceAbsoluteMediaUrl( $sContent)
+  {
+    $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
+    $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
+    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
+    $aPatterns = array(
+        '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
+        '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
+    );
+    $aReplacements = array(
+        '\1'.$sDocumentRootUrl.'/\3',
+        '$1{SYSVAR:MEDIA_REL}$3'
+    );
+    $content = preg_replace($aPatterns, $aReplacements, $content);
+    return $sContent;
+  }
+*/
+
+/**
+ * get all defined variables from an info.php file
+ * @param string $sFilePath  full path and filename
+ * @return array containing all settings (empty array on error)
+ */
+    public function getContentFromInfoPhp($sFilePath)
+    {
+        $aInfo = array();
+        if (is_readable($sFilePath)) {
+            $aOldVars = array();
+            $aOldVars = get_defined_vars();
+            include $sFilePath;
+            $aNewVars = get_defined_vars();
+            $aInfo = array_diff_key($aNewVars, $aOldVars);
+            $aCommon = array();
+            foreach ($aInfo as $key => $val) {
+                if (is_array($val)) { continue; }
+                $sShortKey = str_replace(array('template_', 'module_'), '', $key);
+                $aCommon[$sShortKey] = $val;
+                unset($aInfo[$key]);
+            }
+            $aInfo['common'] = $aCommon;
+        }
+        return $aInfo;
+    } // end of getContentFromInfoPhp()
 }

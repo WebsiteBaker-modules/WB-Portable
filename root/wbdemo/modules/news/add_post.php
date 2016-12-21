@@ -44,7 +44,7 @@ $position = $order->get_new($section_id);
 $sql = 'SELECT `commenting` FROM `'.TABLE_PREFIX.'mod_news_settings` '
      . 'WHERE `section_id`='.(int)$section_id;
 $commenting = $database->get_one($sql);
-
+$now = time();
 $sUrl = WB_URL.'/modules/news/modify_post.php?page_id='.$page_id.'&section_id='.$section_id.'&post_id=';
 $sql  = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_posts` SET '
       . '`section_id`='.$database->escapeString($section_id).', '
@@ -56,11 +56,11 @@ $sql  = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_posts` SET '
       . '`content_short`=\'\', '
       . '`content_long`=\'\', '
       . '`commenting`=\''.$database->escapeString($commenting).'\', '
-      . '`created_when`='.time().', '
+      . '`created_when`='.$now.', '
       . '`created_by`='.$admin->get_user_id().', '
-      . '`published_when` ='.time().', '
+      . '`published_when` ='.$now.', '
       . '`published_until` =0, '
-      . '`posted_when` ='.time().', '
+      . '`posted_when` ='.$now.', '
       . '`posted_by` ='.$admin->get_user_id().'';
 
 if (($database->query($sql))) {

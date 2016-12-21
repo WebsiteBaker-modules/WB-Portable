@@ -161,9 +161,11 @@ if($query_sections->numRows() > 0)
 //                print /* '<a name="'.$section_id.'"></a>'. */"\n";
                 $sSectionBlock = '<div class="block-outer">'."\n";
 // set container if SECTION_BLOCKS disabled
-                $sSectionInfoLine  = ($bSectionInactive ? '<div class="section-inactive">': '<div class="section-active">')."\n" ;
+//                $sSectionInfoLine  = ($bSectionInactive ? false: true);
+                $sSectionInfoLine  = ($bSectionInactive ? 'inactive': 'active');
+//                $sSectionInfoLine  = ($bSectionInactive ? '<div class="section-inactive">': '<div class="section-active">')."\n" ;
                 // output block name if blocks are enabled
-                if (SECTION_BLOCKS) {
+//                if (SECTION_BLOCKS) {
                     if (isset($block[$section['block']]) && trim(strip_tags(($block[$section['block']]))) != '')
                     {
                         $block_name = htmlentities(strip_tags($block[$section['block']]));
@@ -175,18 +177,43 @@ if($query_sections->numRows() > 0)
                             $block_name = '#' . (int) $section['block'];
                         }
                     }
-                    $sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? 'id="'.SEC_ANCHOR.$section['section_id'].'"' : '');
-                    $sSectionInfoLine .= '<div class="section-info" '.$sec_anchor.' ><b>'.$TEXT['BLOCK']
-                                      . ': </b>'.$block_name.' ('.$section['block'].') <b> Modul: </b>'
-                                      . $section['module'].'<b>  ID: </b>'.$section_id.'</div>'.PHP_EOL;
-                }
-                ob_start() ;
-                require(WB_PATH.'/modules/'.$module.'/modify.php');
-                $content = ob_get_clean() ;
-                if($content != '') {
+
+                    ob_start() ;
+                    require(WB_PATH.'/modules/'.$module.'/modify.php');
+                    $content = ob_get_clean() ;
+                    if($content != '')
+                    {
+                      echo $sSectionBlock;//block-outer
+                      $sSectionIdPrefix = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? SEC_ANCHOR : '' );
+                      $data = array();
+                      $tpl = new Template(dirname($admin->correct_theme_source('SectionInfoLine.htt')),'keep');
+                      // $template->debug = true;
+                      $tpl->set_file('page', 'SectionInfoLine.htt');
+                      $tpl->set_block('page', 'main_block', 'main');
+                      $tpl->set_block('main_block', 'section_block', 'section_save');
+                      $data['aTarget.SectionIdPrefix'] = $sSectionIdPrefix.$section_id;
+                      $data['aTarget.SectionInfoLine'] = $sSectionInfoLine;
+                      $data['aTarget.sectionBlock'] = $section['block'];
+                      $data['aTarget.SectionId'] = $section_id;
+                      $data['aTarget.pageId'] = $page_id;
+                      $data['aTarget.FTAN'] = $admin->getFTAN();
+                      $data['aTarget.BlockName'] = $block_name;
+                      $data['aTarget.sectionUrl'] = ADMIN_URL.'/pages/';
+                      $data['aTarget.sectionModule'] = $section['module'];
+                      $data['aTarget.title'] = $section['title'];
+                      $data['aTarget.Content'] = '';
+                      if( $admin->get_permission('pages_settings') ) {
+                        $data['lang.TEXT_SUBMIT'] = $TEXT['SAVE'];
+                          $tpl->parse('section_save', 'section_block');
+                      } else {
+                          $tpl->parse('section_save', '');
+                      }
+                      $tpl->set_var($data);
+                      $tpl->parse('main', 'main_block', false);
+                      $tpl->pparse('output', 'page');
+                      unset($tpl);
                      $sAfterContent = '</div>'."\n" ;
-                     $sBeforeContent = $sSectionBlock.$sSectionInfoLine;
-                     $content = $sBeforeContent.$sAfterContent.$content.$sAfterContent ;
+                     $content = $content."\n".$sAfterContent;
                      echo $content;
                 }
             }

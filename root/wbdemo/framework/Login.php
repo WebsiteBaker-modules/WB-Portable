@@ -10,7 +10,7 @@
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
  * @version         $Id: class.Login.php 1625 2012-02-29 00:50:57Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/framework/class.Login.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/framework/Login.php $
  * @lastmodified    $Date: 2012-02-29 01:50:57 +0100 (Mi, 29. Feb 2012) $
  *
  */
@@ -30,13 +30,12 @@ require_once(ADMIN_PATH.'/interface/version.php');
 
 class Login extends admin {
 
-
     const PASS_CHARS = '[\,w!#$%&*+\-.:=?@\|]';
     const USER_CHARS = '[a-z0-9&\-.=@_]';
 
+    protected $aConfig = array();
     protected $oDb     = null;
     protected $oTrans  = null;
-    protected $message = '';
 
     public function __construct($config_array) {
         // Get language vars
@@ -46,29 +45,41 @@ class Login extends admin {
         parent::__construct();
     // Get configuration values
         while(list($key, $value) = each($config_array)) {
-            $this->{(strtolower($key))} = $value;
+//            $this->{(strtolower($key))} = $value;
+            $this->aConfig[strtolower($key)] = $value;
         }
+        if (!isset($this->frontend)) { $this->frontend = false; }
+        if (!isset($this->redirect_url)) { $this->redirect_url = ''; }
     // calculate redirect URL
+    // begin new routine
+        $sServerUrl = 'http://';
+        if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
+            $sServerUrl = 'https://';
+        }
+        $sServerUrl .= $_SERVER['HTTP_HOST'];
+    // end new routine
+/*
         $aRedirecthUrl = null;
-        if(!isset($this->frontend)) { $this->frontend = false; }
-        if(!isset($this->redirect_url)) { $this->redirect_url = ''; }
         $sServerUrl = $_SERVER['SERVER_NAME'];
         $aServerUrl = $this->mb_parse_url(WB_URL);
         $sServerScheme = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : isset($aServerUrl['scheme']) ? $aServerUrl['scheme'] : ' http';
         $sServerPath = $_SERVER['SCRIPT_NAME'];
+*/
+
         // If the url is blank, set it to the default url
-        $this->url = $this->get_post('url');
+        $this->url = @$this->get_post('url')?:@$this->get_post('redirect')?:$this->default_url;
+/*
         if ( !$this->frontend ){ $this->redirect_url = ( @$this->url ? : '' );}
         if ( $this->frontend ){ $this->url = ( @$this->redirect_url ? : null );}
+*/
         if (preg_match('/%0d|%0a|\s/i', $this->url)) {
             throw new Exception('Warning: possible intruder detected on login');
         }
+/*
         $aUrl = $this->mb_parse_url( $this->url );
         if ($this->redirect_url!='') {
             $aRedirecthUrl = $this->mb_parse_url( $this->redirect_url );
             $this->redirect_url = isset($aRedirecthUrl['host']) &&($sServerUrl==$aRedirecthUrl['host']) ? $this->redirect_url:$sServerScheme.'://'.$sServerUrl;
-/*
-*/
             $this->url = $this->redirect_url;
         }
         $this->url = isset($aRedirecthUrl['host']) &&($sServerUrl==$aUrl['host']) ? $this->url:ADMIN_URL.'/start/index.php';
@@ -77,6 +88,7 @@ class Login extends admin {
             $this->default_url = isset($aDefaultUrl['host']) &&($sServerUrl==$aDefaultUrl['host']) ? $this->default_url:$sServerScheme.'://'.$sServerUrl;
             $this->url = $this->default_url;
         }
+*/
     // get username & password and validate it
         $username_fieldname = (string)$this->get_post('username_fieldname');
         $username_fieldname = (preg_match('/^_?[a-z][\w]+$/i', $username_fieldname) ? $username_fieldname : 'username');
@@ -100,7 +112,7 @@ class Login extends admin {
                     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'users` '
                          . 'WHERE `user_id`='.$this->get_safe_remember_key();
                     if (($oUsers = $this->oDb->query($sql))) {
-                        if (($aUser = $oUsers->fetchRow())) {
+                        if (($aUser = $oUsers->fetchRow(MYSQLI_ASSOC))) {
                             $this->username = $aUser['username'];
                             $this->password = $aUser['password'];
                             // Check if the user exists (authenticate them)
@@ -116,13 +128,31 @@ class Login extends admin {
                 // Authentication successful
                 $this->send_header($this->url);
             } else {
-                $this->message = $this->oTrans['LOGIN_AUTHENTICATION_FAILED'];
+                $this->message = $this->_oTrans->MESSAGE_LOGIN_AUTHENTICATION_FAILED;
                 $this->increase_attemps();
             }
         } else {
-            $this->message = $this->oTrans['LOGIN_BOTH_BLANK'];
+            $this->message = $this->_oTrans->MESSAGE_LOGIN_BOTH_BLANK;
             $this->display_login();
         }
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->aConfig[$name]);
+    }
+
+    public function __set($name, $value)
+    {
+         return $this->aConfig[$name] = $value;
+    }
+
+   public function __get ($name){
+        $retval = null;
+        if ($this->__isset($name)) {
+            $retval = $this->aConfig[$name];
+        }
+        return $retval;
     }
 
     // Authenticate the user (check if they exist in the database)
@@ -239,7 +269,7 @@ class Login extends admin {
         $_SESSION['ATTEMPS'] = (isset($_SESSION['ATTEMPS']) ? $_SESSION['ATTEMPS']++ : 0);
         $this->display_login();
     }
-    
+
 
     public function getMessage ( ) {
       return $this->message;
@@ -263,49 +293,70 @@ class Login extends admin {
         global $MESSAGE;
         global $MENU;
         global $TEXT;
+
+        $Trans = $GLOBALS['oTrans'];
+        $ThemeName = (defined('DEFAULT_THEME')?DEFAULT_THEME:'DefaultTheme');
+        $Trans->enableAddon('templates\\'.$ThemeName);
+        $aLang = $Trans->getLangArray();
         // If attemps more than allowed, warn the user
         if($this->get_session('ATTEMPS') > $this->max_attemps) {
             $this->warn();
         }
         // Show the login form
         if($this->frontend != true) {
-            require_once(WB_PATH.'/include/phplib/template.inc');
-            // $template = new Template($this->template_dir);
+//            require_once(WB_PATH.'/include/phplib/template.inc');
+            $aWebsiteTitle['value'] = WEBSITE_TITLE;
+            $sql = 'SELECT `value` FROM `'.TABLE_PREFIX.'settings` '
+                 . 'WHERE `name`=\'website_title\'';
+            if ($get_title = $this->oDb->query($sql)){
+                $aWebsiteTitle= $get_title->fetchRow( MYSQLI_ASSOC );
+            }
             // Setup template object, parse vars to it, then parse it
             $template = new Template(dirname($this->correct_theme_source($this->template_file)));
             $template->set_file('page', $this->template_file);
             $template->set_block('page', 'mainBlock', 'main');
             $template->set_var('DISPLAY_REMEMBER_ME', ($this->remember_me_option ? '' : 'display: none;'));
-            $template->set_var(array(
-                'ACTION_URL' => $this->login_url,
-                'ATTEMPS' => $this->get_session('ATTEMPS'),
-                'USERNAME' => $this->username,
-                'USERNAME_FIELDNAME' => $this->username_fieldname,
-                'PASSWORD_FIELDNAME' => $this->password_fieldname,
-                'MESSAGE' => $this->message,
-                'INTERFACE_DIR_URL' =>  ADMIN_URL.'/interface',
-                'MAX_USERNAME_LEN' => $this->max_username_len,
-                'MAX_PASSWORD_LEN' => $this->max_password_len,
-                'ADMIN_URL' => ADMIN_URL,
-                'WB_URL' => WB_URL,
-                'URL' => $this->redirect_url,
-                'THEME_URL' => THEME_URL,
-                'VERSION' => VERSION,
-                'REVISION' => REVISION,
-                'LANGUAGE' => strtolower(LANGUAGE),
-                'FORGOTTEN_DETAILS_APP' => $this->forgotten_details_app,
-                'TEXT_FORGOTTEN_DETAILS' => $TEXT['FORGOTTEN_DETAILS'],
-                'TEXT_USERNAME' => $TEXT['USERNAME'],
-                'TEXT_PASSWORD' => $TEXT['PASSWORD'],
-                'TEXT_REMEMBER_ME' => $TEXT['REMEMBER_ME'],
-                'TEXT_LOGIN' => $TEXT['LOGIN'],
-                'TEXT_SAVE' => $TEXT['SAVE'],
-                'TEXT_RESET' => $TEXT['RESET'],
-                'TEXT_HOME' => $TEXT['HOME'],
-                'PAGES_DIRECTORY' => PAGES_DIRECTORY,
-                'SECTION_LOGIN' => $MENU['LOGIN']
-                )
+
+            $template->set_var(
+                array(
+                    'ACTION_URL' => $this->login_url,
+                    'ATTEMPS' => $this->get_session('ATTEMPS'),
+                    'USERNAME' => $this->username,
+                    'USERNAME_FIELDNAME' => $this->username_fieldname,
+                    'PASSWORD_FIELDNAME' => $this->password_fieldname,
+                    'MESSAGE' => $this->message,
+                    'INTERFACE_DIR_URL' =>  ADMIN_URL.'/interface',
+                    'MAX_USERNAME_LEN' => $this->max_username_len,
+                    'MAX_PASSWORD_LEN' => $this->max_password_len,
+                    'ADMIN_URL' => ADMIN_URL,
+                    'WB_URL' => WB_URL,
+                    'URL' => $this->redirect_url,
+                    'THEME_URL' => THEME_URL,
+                    'VERSION' => VERSION,
+                    'REVISION' => REVISION,
+                    'LANGUAGE' => strtolower(LANGUAGE),
+                    'FORGOTTEN_DETAILS_APP' => $this->forgotten_details_app,
+                    'WEBSITE_TITLE'       => ($aWebsiteTitle['value']),
+                    'TEXT_ADMINISTRATION' => $TEXT['ADMINISTRATION'],
+//                    'TEXT_FORGOTTEN_DETAILS' => $Trans->TEXT_FORGOTTEN_DETAILS,
+                    'TEXT_USERNAME' => $TEXT['USERNAME'],
+                    'TEXT_PASSWORD' => $TEXT['PASSWORD'],
+                    'TEXT_REMEMBER_ME' => $TEXT['REMEMBER_ME'],
+                    'TEXT_LOGIN' => $TEXT['LOGIN'],
+                    'TEXT_SAVE' => $TEXT['SAVE'],
+                    'TEXT_RESET' => $TEXT['RESET'],
+                    'TEXT_HOME' => $TEXT['HOME'],
+                    'PAGES_DIRECTORY' => PAGES_DIRECTORY,
+                    'SECTION_LOGIN' => $MENU['LOGIN'],
+                    'LOGIN_DISPLAY_HIDDEN'   => !$this->is_authenticated() ? 'hidden' : '',
+                    'LOGIN_DISPLAY_NONE'     => !$this->is_authenticated() ? 'none' : '',
+                    'LOGIN_LINK'             => $_SERVER['SCRIPT_NAME'],
+                    'LOGIN_ICON'             => 'login',
+                    'START_ICON'             => 'blank',
+                    'URL_HELP'               => 'http://wiki.websitebaker.org/',
+                    )
             );
+            $template->set_var($aLang);
             $template->set_var('CHARSET', (defined('DEFAULT_CHARSET') ? DEFAULT_CHARSET : 'utf-8'));
             $template->parse('main', 'mainBlock', false);
             $template->pparse('output', 'page');
@@ -329,5 +380,5 @@ class Login extends admin {
         $this->send_header($this->warning_url);
         exit;
     }
-    
+
 }

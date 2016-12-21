@@ -20,7 +20,7 @@
 <!-- BEGIN message_block -->
 <div class="{MSGCLS}">{MSGTXT}</div>
 <!-- END message_block -->
-<form name="store_settings" action="{ADMIN_URL}/admintools/tool.php?tool={MODULE_NAME}" method="post">
+<form name="store_settings" action="{ADMIN_URL}admintools/tool.php?tool={MODULE_NAME}" method="post">
   <input type="hidden" name="url" value="{PAGE_ID}" />
   <input type="hidden" name="section_id" value="{SECTION_ID}" />
   <input type="hidden" name="cmd" value="tool" />

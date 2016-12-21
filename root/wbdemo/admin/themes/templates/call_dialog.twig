@@ -1,0 +1,30 @@
+<!-- BEGIN main_block -->
+<script >
+<!--
+domReady(function() {
+    LoadOnFly('head', "{sAddonThemeUrl}/css/dialogBox.css");
+    LoadOnFly('head', "{sAddonThemeUrl}/css/customAlert.css");
+});
+-->
+</script>
+<div id="openModal" class="modal-Dialog" draggable="true">
+    <div>
+        <span id="customConfirm" style="display: block;">
+            <button name="cancel" class="close" type="button" onclick="window.location='{{ ADMIN_URL }}';">X</button>
+            <header class="modal-label"><h2>{{ TITLE_INFO }}</h2></header>
+            <div class="modal-inner">
+                <iframe  src="{{ INFO_URL }}" style="width: 100%;"></iframe>
+                <div class="footer">
+                    <button name="cancel" class="cancel" type="button" onclick="window.location='{{ ADMIN_URL }}';">{{ CANCEL }}</button>
+                </div>
+            </div>
+            <footer class="modal-label">
+<!--
+            <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+            <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+-->
+            </footer>
+        </span>
+    </div>
+</div>
+<!-- END main_block -->

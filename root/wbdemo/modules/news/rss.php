@@ -59,14 +59,14 @@ header("Content-type: text/xml; charset=$charset" );
 // Header info
 // Required by CSS 2.0
 echo '<?xml version="1.0" encoding="'.$charset.'"?>';
-?> 
+?>
 <rss version="2.0">
     <channel>
         <title><![CDATA[<?php echo PAGE_TITLE; ?>]]></title>
         <link>http://<?php echo $_SERVER['SERVER_NAME']; ?></link>
         <description><![CDATA[<?php echo PAGE_DESCRIPTION; ?>]]></description>
 <?php
-// Optional header info 
+// Optional header info
 ?>
         <language><?php echo strtolower(DEFAULT_LANGUAGE); ?></language>
         <copyright><?php $thedate = date('Y'); $websitetitle = WEBSITE_TITLE; echo "Copyright {$thedate}, {$websitetitle}"; ?></copyright>

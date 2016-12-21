@@ -1,0 +1,115 @@
+<!-- BEGIN main_block -->
+<h2>{HEADING_MY_SETTINGS}</h2>
+<div class="block-outer" style="padding: 0.825em;">
+<div class="content_box">
+    <form name="{FORM_NAME}" id="{FORM_NAME}" action="{ACTION_URL}" method="post">
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_USERNAME}:</label><br />
+                </div>
+                <div class="c60l btn-info" style="line-height: 1;">
+                    <div class="w3-disabled w3-border" id="username" style=" font-size: 1.2525em;">{USERNAME}</div><br />
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_DISPLAY_NAME}:</label><br />
+                </div>
+                <div class="c60l">
+                    <input class="w3-border" type="text" id="display_name" name="display_name" value="{DISPLAY_NAME}" autocomplete="off" /><br />
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_LANGUAGE}:</label><br />
+                </div>
+                <div class="c60l">
+                <select class="w3-border" name="language" id="language">
+                    <!-- BEGIN language_list_block -->
+                        <option value="{CODE}"{SELECTED} style="background: url({FLAG}.png) no-repeat center left; padding-left: 20px;">{NAME} ({CODE})</option>
+                    <!-- END language_list_block -->
+                    </select>
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_TIMEZONE}:</label><br />
+                </div>
+                <div class="c60l">
+                    <select class="w3-border" name="timezone" id="timezone">
+                        <!-- BEGIN timezone_list_block -->
+                            <option value="{VALUE}"{SELECTED}>{NAME}</option>
+                        <!-- END timezone_list_block -->
+                    </select>
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_DATE_FORMAT}:</label><br />
+                </div>
+                <div class="c60l">
+                    <select class="w3-border" name="date_format" id="date_format">
+                        <!-- BEGIN date_format_list_block -->
+                            <option value="{VALUE}"{SELECTED}>{NAME}</option>
+                        <!-- END date_format_list_block -->
+                    </select>
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_TIME_FORMAT}:</label><br />
+                </div>
+                <div class="c60l">
+                    <select class="w3-border" name="time_format" id="time_format">
+                        <!-- BEGIN time_format_list_block -->
+                            <option value="{VALUE}"{SELECTED}>{NAME}</option>
+                        <!-- END time_format_list_block -->
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_EMAIL}:</label><br />
+                </div>
+                <div class="c60l">
+                    <input class="w3-border" type="text" id="email" name="email" value="{EMAIL}" /><br />
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_NEW_PASSWORD}:</label><br />
+                </div>
+                <div class="c60l">
+                    <input class="w3-border" type="password" id="new_password_1" name="new_password_1" value="{EMPTY_STRING}" autocomplete="off" /><br />
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_RETYPE_NEW_PASSWORD}:</label><br />
+                </div>
+                <div class="c60l">
+                    <input class="w3-border" type="password" id="new_password_2" name="new_password_2" value="{EMPTY_STRING}" autocomplete="off" /><br />
+                </div>
+            </div>
+            <div class="subcolumns">
+                <div class="c25l">
+                    <label>{TEXT_NEED_CURRENT_PASSWORD}:</label><br />
+                </div>
+                <div class="c60l">
+                    <input class="w3-border" type="password" id="current_password" name="current_password" value="{EMPTY_STRING}" autocomplete="off" /><br />
+                </div>
+            </div>
+            <div class="subcolumns save_section">
+                <div class="c60l">
+                    <input type="submit" class="btn btn-default" id="submitBtn" name="submit" value="{TEXT_SAVE}" />
+                    <input type="reset" class="btn btn-default" id="resetBtn" name="reset" value="{TEXT_RESET}" />
+                </div>
+                <div class="c25l">&nbsp;</div>
+            </div>
+        {FTAN}
+    </form>
+</div>
+</div>
+<!-- END main_block -->

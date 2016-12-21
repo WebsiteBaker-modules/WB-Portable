@@ -1,5 +1,6 @@
 <!-- BEGIN main_block -->
 <h2>{HEADING_MY_SETTINGS}</h2>
+<div class="block-outer" style="padding: 0.825em;">
 <div class="content_box">
     <form name="{FORM_NAME}" id="{FORM_NAME}" action="{ACTION_URL}" method="post">
             <div class="subcolumns">
@@ -102,13 +103,14 @@
             </div>
             <div class="subcolumns save_section">
                 <div class="c60l">
-                    <input type="submit" id="submitBtn" name="submit" value="{TEXT_SAVE}" />
-                    <input type="reset" id="resetBtn" name="reset" value="{TEXT_RESET}" />
+                    <input type="submit" class="submitBtn" id="submitBtn" name="submit" value="{TEXT_SAVE}" />
+                    <input type="reset" class="submitBtn" id="resetBtn" name="reset" value="{TEXT_RESET}" />
                 </div>
                 <div class="c25l">&nbsp;</div>
             </div>
         {FTAN}
     </form>
+</div>
 </div>
 
 <!-- END main_block -->

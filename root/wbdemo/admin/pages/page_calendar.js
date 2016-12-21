@@ -11,6 +11,7 @@ Calendar.setup(
     step        : 1
     }
 );
+
 Calendar.setup(
     {
     inputField  : end_date,

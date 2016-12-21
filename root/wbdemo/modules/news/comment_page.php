@@ -98,7 +98,7 @@ else
     // Captcha
     if($settings['use_captcha']) {
     ?>
-    <table cellpadding="2" cellspacing="0" border="0">
+    <table>
     <tr>
         <td><?php echo $TEXT['VERIFICATION']; ?>:</td>
         <td><?php call_captcha(); ?></td>

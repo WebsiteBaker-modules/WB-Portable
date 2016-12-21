@@ -1,0 +1,75 @@
+<!-- BEGIN mainBlock -->
+<!DOCTYPE html>
+<html lang="{LANGUAGE}">
+<head>
+<title>{TEXT_LOGIN} - {WB_URL}</title>
+<meta http-equiv="content-type" content="text/html; charset={CHARSET}" />
+<meta name="description" content="{TEXT_LOGIN} - {WB_URL}" />
+<meta name="keywords" content="{TEXT_LOGIN}" />
+<link href="{THEME_URL}/css/w3.css" rel="stylesheet" type="text/css" />
+<link href="{THEME_URL}/css/login.css" rel="stylesheet" type="text/css" />
+</head>
+<body >
+
+<div class="w3-section">
+    <div class=" w3-container w3-quarter w3-margin-bottom" ></div>
+    <div class=" w3-container w3-half w3-margin-bottom" >
+        <img class="w3-image " src="{THEME_URL}/images/logo.png" alt="WebsiteBaker Logo" >
+        <div class=" w3-container " >
+            <header class="w3-container w3-wbblue w3-row w3-theme-d4">
+                <div class="w3-content">
+                <h4 class=" w3-text w3-text-white w3-border-0 w3-medium" >{SECTION_LOGIN} - {WB_URL}</h4>
+                </div>
+            </header>
+            <form name="login" action="{ACTION_URL}" method="post" class="w3-form w3-white">
+                <input type="hidden" name="url" value="{URL}" />
+                <input type="hidden" name="username_fieldname" value="{USERNAME_FIELDNAME}" />
+                <input type="hidden" name="password_fieldname" value="{PASSWORD_FIELDNAME}" />
+                <article class="container w3-col">
+                  <h6 class="w3-center w3-small">{MESSAGE}</h6>
+                  <label class="w3-text-indigo w3-large ">{TEXT_USERNAME}</label>
+                  <input class="w3-input" type="text" placeholder="Enter Username" name="{USERNAME_FIELDNAME}" value="" required>
+                  <label class="w3-text-indigo w3-large ">{TEXT_PASSWORD}</label>
+                  <input class="w3-input" type="password" placeholder="Enter Password" name="{PASSWORD_FIELDNAME}" required>
+                </article>
+                <footer class="container" style="background-color:#f1f1f1">
+                  <ul class="w3-navbar w3-navitem w3-row">
+                      <li class="w3-col m5"><button type="submit" name="submit" class="w3-btn w3-wbblue w3-hover-green " >{TEXT_LOGIN}</button></li>
+                      <li class="w3-col m2">&nbsp;</li>
+                      <li class="w3-col m5"><button type="reset" class="w3-btn w3-wbblue w3-hover-blue">{TEXT_RESET}</button></li>
+                  </ul>
+                  <ul class="w3-navbar w3-navitem w3-small w3-text-indigo">
+                      <li class="w3-text w3-border "><a href="{FORGOTTEN_DETAILS_APP}">{TEXT_FORGOTTEN_DETAILS}</a></li>
+                      <li class="w3-text w3-border "><a target="_blank" href="{WB_URL}/">{TEXT_HOME}</a></li>
+                  </ul>
+                </footer>
+            </form>
+        </div>
+
+        <footer class="w3-text-grey w3-text w3-center  w3-small" style=" margin: 1.025em 0;">
+          <!-- Please note: the below reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+          <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+          <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+          <!-- Please note: the above reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+        </footer>
+    </div>
+    <div class=" w3-container w3-quarter w3-margin-bottom" ></div>
+</div>
+
+<script type="text/javascript">
+<!--
+    elm = document.getElementsByTagName('form');
+    console.info(elm);
+      for (i=0; elm[i]; i++) {
+        if ( (elm[i].className.indexOf('autocomplete') == -1) ) {
+            elm[i].setAttribute('autocomplete', 'off');
+        }
+        if ( (elm[i].className.indexOf('accept-charset') == -1) ) {
+            elm[i].setAttribute('accept-charset', 'utf-8');
+        }
+      }
+-->
+</script>
+</body>
+</html>
+<!-- END mainBlock -->

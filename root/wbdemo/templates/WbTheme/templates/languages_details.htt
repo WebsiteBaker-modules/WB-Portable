@@ -1,0 +1,34 @@
+<!-- BEGIN main_block -->
+
+<h2>{HEADING_LANGUAGE_DETAILS}</h2>
+
+<div class="block-outer">
+<table class="table language">
+<tr>
+    <td width="100">{TEXT_NAME}:</td>
+    <td>{NAME}</td>
+</tr>
+<tr>
+    <td>{TEXT_CODE}:</td>
+    <td>{CODE}</td>
+</tr>
+<tr>
+    <td>{TEXT_AUTHOR}:</td>
+    <td>{AUTHOR}</td>
+</tr>
+<tr>
+    <td>{TEXT_VERSION}:</td>
+    <td>{VERSION}</td>
+</tr>
+<tr>
+    <td>{TEXT_DESIGNED_FOR}:</td>
+    <td>Website Baker {DESIGNED_FOR}</td>
+</tr>
+</table>
+</div>
+
+<br />
+
+<button onclick="window.location = 'index.php';">{TEXT_BACK}</button>
+
+<!-- END main_block -->

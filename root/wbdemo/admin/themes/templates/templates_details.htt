@@ -2,7 +2,7 @@
 
 <h2>{HEADING_TEMPLATE_DETAILS}</h2>
 
-<table summary="" cellpadding="5" cellspacing="0" border="0">
+<table style="width: ;">
 <tr>
     <td width="100">{TEXT_NAME}:</td>
     <td>{NAME}</td>

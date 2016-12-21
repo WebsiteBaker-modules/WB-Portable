@@ -48,7 +48,7 @@ function menulink_make_tree($parent, $link_pid, $tree) {
     $table_p = TABLE_PREFIX."pages";
     // get list of page-trails, recursive
     if($query_page = $database->query("SELECT * FROM `$table_p` WHERE `parent`=$parent ORDER BY `position`")) {
-        while($page = $query_page->fetchRow()) {
+        while($page = $query_page->fetchRow(MYSQLI_ASSOC)) {
             if($admin->page_is_visible($page) ) {
                 $pids = explode(',', $page['page_trail']);
                 $entry = '';
@@ -68,7 +68,7 @@ global $menulink_titles;
 $menulink_titles = array();
 $table_p = TABLE_PREFIX."pages";
 if($query_page = $database->query("SELECT `page_id`,`menu_title` FROM `$table_p`")) {
-    while($page = $query_page->fetchRow())
+    while($page = $query_page->fetchRow(MYSQLI_ASSOC))
         $menulink_titles[$page['page_id']] = $page['menu_title'];
 }
 // now get the tree
@@ -81,16 +81,16 @@ $table_mw = TABLE_PREFIX."mod_wysiwyg";
 $table_s = TABLE_PREFIX."sections";
 foreach($links as $pid=>$l) {
     if($query_section = $database->query("SELECT `section_id`, `module` FROM `$table_s` WHERE `page_id` = '$pid' ORDER BY position")) {
-        while($section = $query_section->fetchRow()) {
+        while($aMenuLink = $query_section->fetchRow(MYSQLI_ASSOC)) {
             // get section-anchor
             if(defined('SEC_ANCHOR') && SEC_ANCHOR!='') {
-                $targets[$pid][] = SEC_ANCHOR.$section['section_id'];
+                $targets[$pid][] = SEC_ANCHOR.$aMenuLink['section_id'];
             } else {
                 $targets[$pid] = array();
             }
-            if($section['module'] == 'wysiwyg') {
-                if($query_page = $database->query("SELECT `content` FROM $table_mw WHERE `section_id` = '{$section['section_id']}' LIMIT 1")) {
-                    $page = $query_page->fetchRow();
+            if($aMenuLink['module'] == 'wysiwyg') {
+                if($query_page = $database->query("SELECT `content` FROM $table_mw WHERE `section_id` = '{$aMenuLink['section_id']}' ")) {
+                    $page = $query_page->fetchRow(MYSQLI_ASSOC);
                     if(preg_match_all('/<(?:a[^>]+name|[^>]+id)\s*=\s*"([^"]+)"/i',$page['content'], $match)) {
                         foreach($match[1] AS $t) {
                             $targets[$pid][$t] = $t;

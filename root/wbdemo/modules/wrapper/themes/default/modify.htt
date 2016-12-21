@@ -34,10 +34,10 @@
         <tr>
             <td align="left">
                 <input type="submit" value="{TEXT_SAVE}" style="width: 100px; margin-top: 5px;" />
-                <input name="pagetree" type="submit" value="{TEXT_SAVE} &amp; {TEXT_BACK}" style="min-width: 100px; margin-top: 5px;" />
+                <input name="pagetree" type="submit" value="{TEXT_SAVE} & {TEXT_BACK}" style="min-width: 100px; margin-top: 5px;" />
             </td>
             <td align="right">
-                <input type="button" value="{TEXT_CANCEL}" onclick="window.location='{CANCEL_URL}';" style="width: 100px; margin-top: 5px;" />
+                <input type="submit" value="{TEXT_CANCEL}" formaction="{CANCEL_URL}" style="width: 100px; margin-top: 5px;" />
             </td>
         </tr>
     </table>

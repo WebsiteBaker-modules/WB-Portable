@@ -1,0 +1,5 @@
+span.title { display :block; }
+.section { margin-top :10px; padding :0px; border :1px solid #999999; font-size :1em; width :100%; background-color :#fdfdfd; height :95px; }
+div#start-block { margin : auto 1%; }
+div#start-block ul { padding : 0;  width :100%; margin-bottom: 1.525em;}
+div#start-block li { list-style-type :none; display :inline; float :left; width :47%; margin :0 1%; }

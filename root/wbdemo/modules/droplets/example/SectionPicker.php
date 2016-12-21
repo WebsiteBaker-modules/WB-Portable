@@ -1,18 +1,12 @@
 //:Load the view.php from any other section-module
 //:Use [[SectionPicker?sid=123]]
-    global $database, $wb, $TEXT, $DGTEXT;
+global $database, $wb, $TEXT, $DGTEXT,$section_id,$page_id;
+    $sRetVal = '';
     $content = '';
     $_sFrontendCss = '';
     $sid = isset( $sid) ? intval( $sid) : 0;
     if ( intval( $sid) > 0) {
         $now = time();
-        $sql = 'SELECT * FROM `'.TABLE_PREFIX.'sections` `s`'
-             . 'WHERE `section_id` = '.( int)$sid.' '
-             .   'AND ('
-             .         '('.$now.'>=`publ_start` OR `publ_start`=0) AND '
-             .         '('.$now.'<=`publ_end` OR `publ_end`=0) '
-             .       ')'
-             . '';
         $sql = 'SELECT `s`.*'
               .     ', `p`.`viewing_groups`'
               .     ', `p`.`visibility`'
@@ -26,7 +20,7 @@
              .         '('.$now.'>=`s`.`publ_start` OR `s`.`publ_start`=0) AND '
              .         '('.$now.'<=`s`.`publ_end` OR `s`.`publ_end`=0) '
              .       ')'
-             .   'AND `p`.`visibility` NOT IN (\'none\',\'hidden\',\'deleted\') '
+             .   'AND `p`.`visibility` NOT IN (\'none\',\'deleted\') '
              .   '  ';
         if ( $oSection = $database->query( $sql)) {
             while ( $aSection = $oSection->fetchRow( MYSQLI_ASSOC)) {
@@ -41,9 +35,23 @@
                 if ( preg_match( '/<link[^>]*?href\s*=\s*\"'.$_sSearch.'\".*?\/>/si', $content)) {
                     $_sFrontendCss = '';
                 } else {
-                    $_sFrontendCss = '<link href="'.WB_URL.$_sFrontendCss.'" rel="stylesheet" type="text/css" media="screen" />';
+//                    $_sFrontendCss = '<link href="'.WB_URL.$_sFrontendCss.'" rel="stylesheet" type="text/css" media="screen" />';
+                    $_sFrontendCss = '
+                      <script type="text/javascript">
+                      <!--
+                         var ModuleCss = WB_URL+"/modules/'.$module.'/frontend.css";
+                         var ModuleJs = WB_URL+"/modules/'.$module.'/frontend.js";
+                          include_file(ModuleJs, "js");
+                          if (typeof LoadOnFly === "undefined"){
+                              include_file(ModuleCss, "css");
+                          } else {
+                              LoadOnFly("head", ModuleCss);
+                          }
+                      -->
+                      </script>
+                      ';
                 }
             }
         }
     }
-    return $_sFrontendCss.$content;
+    return $_sFrontendCss.$content;

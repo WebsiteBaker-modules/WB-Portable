@@ -14,12 +14,10 @@
  * @filesource      $HeadURL: https://localhost:8443/svn/wb283Sp4/SP4/branches/wb/account/signup2.php $
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
-print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />'; 
-print_r( $_POST ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die(); 
  */
-
 // Must include code to stop this file being access directly
 if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
+
 // Create new frontend object
 if (!isset($wb) || !($wb instanceof frontend)) {
     if( !class_exists('wb', false) ){ require(WB_PATH."/framework/class.wb.php"); }
@@ -29,7 +27,9 @@ if (!isset($wb) || !($wb instanceof frontend)) {
 /* 
 if (!$wb->checkFTAN())
 {
-    $error[] =  $MESSAGE['GENERIC_SECURITY_ACCESS']."\n";
+    $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, '.'.PAGE_EXTENSION)).'::';
+    $sDEBUG=(@DEBUG?$sInfo:'');
+    $error[] =  $sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS']."\n";
     return;
 }
 */
@@ -46,9 +46,20 @@ if($groups_id == "") {
     $wb->print_error($MESSAGE['USERS_NO_GROUP'], $js_back, false);
 }
 */
+
+// Check if username already exists
+$sql = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` WHERE `username` = \''.$username.'\'';
+if ($database->get_one($sql)) {
+    $error[] = $MESSAGE['USERS_USERNAME_TAKEN']."\n";
+}
 if(!preg_match('/^[a-z]{1}[a-z0-9_-]{2,}$/i', $username)) {
     $error[] =  $MESSAGE['USERS_NAME_INVALID_CHARS']."\n";
 }
+$sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
+$sql .= 'WHERE  `display_name` LIKE \''.$display_name.'\'';
+if ($database->get_one($sql) > 0) {
+    $error[] = $MESSAGE['USERS_DISPLAYNAME_TAKEN'].'';
+} 
 if($email != "") {
     if($wb->validate_email($email) == false) {
         $error[] = $MESSAGE['USERS_INVALID_EMAIL']."\n";
@@ -57,7 +68,7 @@ if($email != "") {
     $error[] = $MESSAGE['SIGNUP_NO_EMAIL']."\n";
 }
 
-$email = $wb->add_slashes($email);
+$email = $database->escapeString($email);
 $search = array('{SERVER_EMAIL}');
 $replace = array( SERVER_EMAIL);
 // Captcha
@@ -86,17 +97,9 @@ while ($i <= 7) {
     $i++;
 }
 $md5_password = md5($new_pass);
-
-// Check if username already exists
-$sql = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` WHERE `username` = \''.$username.'\'';
-$results = $database->query($sql);
-if($results->numRows() > 0) {
-    $error[] = $MESSAGE['USERS_USERNAME_TAKEN']."\n";
-}
 // Check if the email already exists
 $sql = 'SELECT `user_id` FROM `'.TABLE_PREFIX.'users` WHERE `email` = \''.$database->escapeString($email).'\'';
-$results = $database->query($sql);
-if($results->numRows() > 0) {
+if ($database->get_one($sql)) {
     if(isset($MESSAGE['USERS_EMAIL_TAKEN'])) {
         $error[] = $MESSAGE['USERS_EMAIL_TAKEN']."\n";
     } else {
@@ -105,13 +108,9 @@ if($results->numRows() > 0) {
 }
 
 if(sizeof($error)==0){
-
     // MD5 supplied password
     $md5_password = md5($new_pass);
-
-    // Inser the user into the database
-    $sql = '';
-
+    // Insert the user into the database
     $sql  = 'INSERT INTO `'.TABLE_PREFIX.'users` SET '
           . '`group_id` = '.$database->escapeString($groups_id).', '
           . '`groups_id` = \''.$database->escapeString($groups_id).'\', '
@@ -124,9 +123,7 @@ if(sizeof($error)==0){
           . '`timezone` = \''.$database->escapeString(DEFAULT_TIMEZONE).'\', '
           . '`language` = \''.$database->escapeString(DEFAULT_LANGUAGE).'\''
           .'';
-
     $database->query($sql);
-
     if($database->is_error()) {
         // Error updating database
         $message = $database->get_error();
@@ -149,4 +146,4 @@ if(sizeof($error)==0){
             $error[] = $MESSAGE['FORGOT_PASS_CANNOT_EMAIL']."\n";
         }
     }
-    }
+}

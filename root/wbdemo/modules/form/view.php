@@ -20,25 +20,25 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
 /* -------------------------------------------------------- */
 // load module language file
 $sAddonName = basename(__DIR__);
-require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
-}
-
 include_once(WB_PATH .'/framework/functions.php');
+
+if (!isset($oTrans) || !($oTrans instanceof Translate)) { $oTrans = Translate::getInstance(); }
+$oTrans->enableAddon('modules\\'.$sAddonName);
+
 $aWebsiteTitle = (defined('WEBSITE_TITLE') && WEBSITE_TITLE != '' ? WEBSITE_TITLE : $_SERVER['SERVER_NAME']);
-$replace = array('WEBSITE_TITLE' => $aWebsiteTitle );
-$MOD_FORM['EMAIL_SUBJECT'] = replace_vars($MOD_FORM['EMAIL_SUBJECT'], $replace);
-$MOD_FORM['SUCCESS_EMAIL_TEXT'] = replace_vars($MOD_FORM['SUCCESS_EMAIL_TEXT'], $replace);
-$MOD_FORM['SUCCESS_EMAIL_SUBJECT'] = replace_vars($MOD_FORM['SUCCESS_EMAIL_SUBJECT'], $replace);
+$aReplace = array('WEBSITE_TITLE' => $aWebsiteTitle );
+$MOD_FORM_EMAIL_SUBJECT = replace_vars($oTrans->MOD_FORM_EMAIL_SUBJECT, $aReplace);
+$MOD_FORM_SUCCESS_EMAIL_TEXT = replace_vars($oTrans->MOD_FORM_SUCCESS_EMAIL_TEXT, $aReplace);
+$MOD_FORM_SUCCESS_EMAIL_SUBJECT = replace_vars($oTrans->MOD_FORM_SUCCESS_EMAIL_SUBJECT, $aReplace);
+
 /*
+*/
 function removebreaks($value) {
     return trim(preg_replace('=((<CR>|<LF>|0x0A/%0A|0x0D/%0D|\\n|\\r)\S).*=i', null, $value));
 }
 function checkbreaks($value) {
     return $value === removebreaks($value);
 }
-*/
 $aSuccess =array();
 if (!function_exists('emailAdmin')) {
     function emailAdmin() {
@@ -52,6 +52,7 @@ if (!function_exists('emailAdmin')) {
         return $retval;
     }
 }
+
    $emailAdmin = (function () use ( $database, $wb )
    {
         $retval = $wb->get_email();
@@ -85,7 +86,6 @@ if (!function_exists('make_checkbox')) {
     function make_checkbox(&$key, $idx, $params) {
         $field_id = $params[0][0];
         $seperator = $params[0][1];
-
         $label_id = 'wb_'.preg_replace('/[^a-z0-9]/i', '_', $key).$field_id;
         if(in_array($key, $params[1])) {
             $key = '<input class="frm-field_checkbox" type="checkbox" id="'.$label_id.'" name="field'.$field_id.'['.$idx.']" value="'.$key.'" />'.PHP_EOL.'<label for="'.$label_id.'" class="frm-checkbox_label">'.$key.'</lable>'.$seperator;
@@ -127,176 +127,193 @@ if (!function_exists("new_submission_id") ) {
 //    $sRecallUrl = WB_URL.htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME']));
     $sRecallUrl = WB_URL.PAGES_DIRECTORY.$wb->page['link'].PAGE_EXTENSION ;
 // Work-out if the form has been submitted or not
-if($_POST == array())
-{
-    require_once(WB_PATH.'/include/captcha/captcha.php');
-
-    // Set new submission ID in session
-    $_SESSION['form_submission_id'] = new_submission_id();
-    $out = '';
-    $header = '';
-    $field_loop = '';
-    $footer = '';
-    $form_name = 'form';
-    $use_xhtml_strict = false;
-    // Get settings
-    $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_settings` '
-          . 'WHERE section_id = '.(int)$section_id.' ';
-    if($oSetting = $database->query($sql))
+    if($_POST == array())
     {
-        if($oSetting->numRows() > 0)    // $query_settings  $fetch_settings
+        require_once(WB_PATH.'/include/captcha/captcha.php');
+
+        // Set new submission ID in session
+        $_SESSION['form_submission_id'] = new_submission_id();
+        $out = '';
+        $header = '';
+        $field_loop = '';
+        $footer = '';
+        $form_name = 'form';
+        $use_xhtml_strict = false;
+        // Get settings
+        $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_settings` '
+              . 'WHERE section_id = '.(int)$section_id.' ';
+        if($oSetting = $database->query($sql))
         {
-            $aSettings = $oSetting->fetchRow(MYSQLI_ASSOC);
-            $header = str_replace('{WB_URL}',WB_URL, $aSettings['header']);
-            $field_loop = $aSettings['field_loop'];
-            $footer = str_replace('{WB_URL}',WB_URL, $aSettings['footer']);
-            $use_captcha = $aSettings['use_captcha'];
-            $form_name = 'form';
-            $use_xhtml_strict = false;
-            $page_id = $aSettings['page_id'];
+            if($oSetting->numRows() > 0)    // $query_settings  $fetch_settings
+            {
+                $aSettings = $oSetting->fetchRow(MYSQLI_ASSOC);
+                $header = str_replace('{WB_URL}',WB_URL, $aSettings['header']);
+                $field_loop = $aSettings['field_loop'];
+                $footer = str_replace('{WB_URL}',WB_URL, $aSettings['footer']);
+                $use_captcha = $aSettings['use_captcha'];
+                $form_name = 'form';
+                $use_xhtml_strict = false;
+                $page_id = $aSettings['page_id'];
+            }
         }
-    }
 
-// do not use sec_anchor, can destroy some layouts
+    // do not use sec_anchor, can destroy some layouts
 
-    // Get list of fields
-    $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_fields` '
-          . 'WHERE section_id = '.$section_id.' '
-          . 'ORDER BY position ASC ';
+        // Get list of fields
+        $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_fields` '
+              . 'WHERE section_id = '.$section_id.' '
+              . 'ORDER BY position ASC ';
 
-    if($query_fields = $database->query($sql)) {
-        if($query_fields->numRows() > 0) {
+        if($query_fields = $database->query($sql)) {
+            if($query_fields->numRows() > 0) {
+
+/*
+//                $sActionUrl = htmlspecialchars(strip_tags($_SERVER['SCRIPT_FILENAME']));
+                $sActionUrl = $_SERVER['SCRIPT_FILENAME'];
+                $sActionUrl = WB_URL . str_replace(WB_PATH, '',$sActionUrl);
+                $sActionUrl = htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME']));
+*/
+                $sActionUrl = $_SERVER['SCRIPT_NAME'];
 ?>
-            <form style="float: none;" class="frm-formular" <?php echo ( ( (strlen($form_name) > 0) AND (false == $use_xhtml_strict) ) ? "id=\"".$form_name.$section_id."\"" : ""); ?> action="<?php echo htmlspecialchars(strip_tags($_SERVER['SCRIPT_NAME'])).'';?>" method="post">
+                <form style="float: none;" class="frm-formular" <?php echo ( ( (strlen($form_name) > 0) AND (false == $use_xhtml_strict) ) ? "id=\"".$form_name.$section_id."\"" : ""); ?> action="<?php echo $sActionUrl.'';?>" method="post">
 <?php // echo $admin->getFTAN(); ?>
-            <fieldset class="frm-fieldset">
-                <input type="hidden" name="submission_id" value="<?php echo $_SESSION['form_submission_id']; ?>" />
+                <fieldset class="frm-fieldset">
+                    <input type="hidden" name="submission_id" value="<?php echo $_SESSION['form_submission_id']; ?>" />
 <?php
-                $iFormRequestId = isset($_GET['fri']) ? intval($_GET['fri']) : 0;
-                if($iFormRequestId) {
-                    echo '<input type="hidden" name="fri" value="'.$iFormRequestId.'" />'."\n";
-                }
+                    $iFormRequestId = isset($_GET['fri']) ? intval($_GET['fri']) : 0;
+                    if($iFormRequestId) {
+                        echo '<input type="hidden" name="fri" value="'.$iFormRequestId.'" />'."\n";
+                    }
 ?>
 <?php
-                if(ENABLED_ASP) { // first add some honeypot-fields
+                    if(ENABLED_ASP) { // first add some honeypot-fields
 ?>
-                    <input type="hidden" name="submitted_when" value="<?php $t=time(); echo $t; $_SESSION['submitted_when']=$t; ?>" />
-                    <p class="nixhier">
-                    email address:
-                    <label for="email">Leave this field email-address blank:</label>
-                    <input id="email" name="email" size="56" value="" /><br />
-                    Homepage:
-                    <label for="homepage">Leave this field homepage blank:</label>
-                    <input id="homepage" name="homepage" size="55" value="" /><br />
-                    URL:
-                    <label for="url">Leave this field url blank:</label>
-                    <input id="url" name="url" size="61" value="" /><br />
-                    Comment:
-                    <label for="comment">Leave this field comment blank:</label>
-                    <textarea id="comment" name="comment" cols="50" rows="10"></textarea><br />
-                    </p>
+                        <input type="hidden" name="submitted_when" value="<?php $t=time(); echo $t; $_SESSION['submitted_when']=$t; ?>" />
+                        <p class="nixhier">
+                        email address:
+                        <label for="email">Leave this field email-address blank:</label>
+                        <input id="email" name="email" size="56" value="" /><br />
+                        Homepage:
+                        <label for="homepage">Leave this field homepage blank:</label>
+                        <input id="homepage" name="homepage" size="55" value="" /><br />
+                        URL:
+                        <label for="url">Leave this field url blank:</label>
+                        <input id="url" name="url" size="61" value="" /><br />
+                        Comment:
+                        <label for="comment">Leave this field comment blank:</label>
+                        <textarea id="comment" name="comment" cols="50" rows="10"></textarea><br />
+                        </p>
 <?php }
 
-    // Print header  MYSQL_ASSOC
-           echo $header."\n";
-            while($field = $query_fields->fetchRow(MYSQLI_ASSOC)) {
-                // Set field values
-                $field_id = $field['field_id'];
-                $value = $field['value'];
-                // Print field_loop after replacing vars with values
-                $vars = array('{TITLE}', '{REQUIRED}');
-                if (($field['type'] == "radio") || ($field['type'] == "checkbox")) {
-                    $field_title = $field['title'];
-                } elseif($field['type'] == 'heading') {
-                    $field_title = PHP_EOL.'<label>'.$field['title'].'</label>'.PHP_EOL;
-                }else {
-                    $field_title = PHP_EOL.'<label for="field'.$field_id.'">'.$field['title'].'</label>'.PHP_EOL;
+        // Print header  MYSQL_ASSOC
+               echo $header."\n";
+                while($field = $query_fields->fetchRow(MYSQLI_ASSOC)) {
+                    // Set field values
+                    $field_id = $field['field_id'];
+                    $value = $field['value'];
+                    // Print field_loop after replacing vars with values
+                    $vars = array('{TITLE}', '{REQUIRED}');
+                    if (($field['type'] == "radio") || ($field['type'] == "checkbox")) {
+                        $field_title = PHP_EOL.'<label>'.$field['title'].'</label>'.PHP_EOL;
+                    } elseif($field['type'] == 'heading') {
+                        $field_title = PHP_EOL.'<label>'.$field['title'].'</label>'.PHP_EOL;
+                    } else {
+                        $field_title = PHP_EOL.'<label for="field'.$field_id.'">'.$field['title'].'</label>'.PHP_EOL;
+                    }
+                    $values = array($field_title);
+                    if ($field['required'] == 1) {
+                        $values[] = '<span class="frm-required">*</span>';
+                    } else {
+                        $values[] = '';
+                    }
+                    if($field['type'] == 'textfield') {
+                        $vars[] = '{FIELD}';
+                        $max_lenght_para = (intval($field['extra']) ? ' maxlength="'.intval($field['extra']).'"' : '');
+                        $values[] = '<input type="text" name="field'.$field_id.'" id="field'.$field_id.'"'.$max_lenght_para.' value="'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:$value).'" class="frm-textfield" />';
+                    } elseif($field['type'] == 'textarea') {
+                        $vars[] = '{FIELD}';
+                        $values[] = '<textarea name="field'.$field_id.'" id="field'.$field_id.'" class="frm-textarea" cols="30" rows="8">'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:$value).'</textarea>';
+                    } elseif($field['type'] == 'select') {
+                        $vars[] = '{FIELD}';
+                        $options = explode(',', $value);
+                        array_walk($options, 'make_option', (isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:array()));
+                        $field['extra'] = explode(',',$field['extra']);
+                        $field['extra'][1] = ($field['extra'][1]=='multiple') ? $field['extra'][1].'="'.$field['extra'][1].'"' : '';
+                        $values[] = '<select name="field'.$field_id.'[]" id="field'.$field_id.'" size="'.$field['extra'][0].'" '.$field['extra'][1].' class="frm-select">'.implode($options).'</select>'."\n";
+                    } elseif($field['type'] == 'heading') {
+                        $vars[] = '{FIELD}';
+                        $str = '<input type="hidden" name="field'.$field_id.'" id="field'.$field_id.'" value="===['.$field['title'].']===" />';
+                        $values[] = ( true == $use_xhtml_strict) ? "<div>".$str."</div>" : $str;
+                        $tmp_field_loop = $field_loop;        // temporarily modify the field loop template
+                        $field_loop = $field['extra'];
+                    } elseif($field['type'] == 'checkbox') {
+                        $vars[] = '{FIELD}';
+                        $options = explode(',', $value);
+                        array_walk($options, 'make_checkbox', array(array($field_id,$field['extra']),(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:array())));
+    //                    array_walk($options, 'make_radio', array($field_id,$field['title'],$field['extra'], (isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:array())));
+                        $x = sizeof($options)-1;
+                        $options[$x]=substr($options[$x],0,strlen($options[$x]));
+                        $values[] = implode($options);
+                    } elseif($field['type'] == 'radio') {
+                        $vars[] = '{FIELD}';
+                        $options = explode(',', $value);
+                        array_walk($options, 'make_radio', array($field_id,$field['title'],$field['extra'], (isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:'')));
+                        $x = sizeof($options)-1;
+                        $options[$x]=substr($options[$x],0,strlen($options[$x]));
+                        $values[] = implode($options);
+                    } elseif($field['type'] == 'email') {
+                        $vars[] = '{FIELD}';
+                        $max_lenght_para = (intval($field['extra']) ? ' maxlength="'.intval($field['extra']).'"' : '');
+                        $values[] = '<input type="text" name="field'.$field_id.'" id="field'.$field_id.'" value="'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:'').'"'.$max_lenght_para.' class="frm-email" />';
+                    }
+                    if(isset($_SESSION['field'.$field_id])) unset($_SESSION['field'.$field_id]);
+                    if($field['type'] != '') {
+                        echo str_replace($vars, $values, $field_loop);
+                    }
+                    if (isset($tmp_field_loop)){ $field_loop = $tmp_field_loop; }
+                } // end while
+                // Captcha
+                if($use_captcha) { ?>
+                    <tr>
+                    <td class="frm-field_title"><label><?php echo $oTrans->TEXT_VERIFICATION; ?></label>:</td>
+                    <td><?php call_captcha(); ?></td>
+                    </tr>
+                    <?php
                 }
-                $values = array($field_title);
-                if ($field['required'] == 1) {
-                    $values[] = '<span class="frm-required">*</span>';
-                } else {
-                    $values[] = '';
-                }
-                if($field['type'] == 'textfield') {
-                    $vars[] = '{FIELD}';
-                    $max_lenght_para = (intval($field['extra']) ? ' maxlength="'.intval($field['extra']).'"' : '');
-                    $values[] = '<input type="text" name="field'.$field_id.'" id="field'.$field_id.'"'.$max_lenght_para.' value="'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:$value).'" class="frm-textfield" />';
-                } elseif($field['type'] == 'textarea') {
-                    $vars[] = '{FIELD}';
-                    $values[] = '<textarea name="field'.$field_id.'" id="field'.$field_id.'" class="frm-textarea" cols="30" rows="8">'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:$value).'</textarea>';
-                } elseif($field['type'] == 'select') {
-                    $vars[] = '{FIELD}';
-                    $options = explode(',', $value);
-                    array_walk($options, 'make_option', (isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:array()));
-                    $field['extra'] = explode(',',$field['extra']);
-                    $field['extra'][1] = ($field['extra'][1]=='multiple') ? $field['extra'][1].'="'.$field['extra'][1].'"' : '';
-                    $values[] = '<select name="field'.$field_id.'[]" id="field'.$field_id.'" size="'.$field['extra'][0].'" '.$field['extra'][1].' class="frm-select">'.implode($options).'</select>'."\n";
-                } elseif($field['type'] == 'heading') {
-                    $vars[] = '{FIELD}';
-                    $str = '<input type="hidden" name="field'.$field_id.'" id="field'.$field_id.'" value="===['.$field['title'].']===" />';
-                    $values[] = ( true == $use_xhtml_strict) ? "<div>".$str."</div>" : $str;
-                    $tmp_field_loop = $field_loop;        // temporarily modify the field loop template
-                    $field_loop = $field['extra'];
-                } elseif($field['type'] == 'checkbox') {
-                    $vars[] = '{FIELD}';
-                    $options = explode(',', $value);
-                    array_walk($options, 'make_checkbox', array(array($field_id,$field['extra']),(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:array())));
-                    $x = sizeof($options)-1;
-                    $options[$x]=substr($options[$x],0,strlen($options[$x]));
-                    $values[] = implode($options);
-                } elseif($field['type'] == 'radio') {
-                    $vars[] = '{FIELD}';
-                    $options = explode(',', $value);
-                    array_walk($options, 'make_radio', array($field_id,$field['title'],$field['extra'], (isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:'')));
-                    $x = sizeof($options)-1;
-                    $options[$x]=substr($options[$x],0,strlen($options[$x]));
-                    $values[] = implode($options);
-                } elseif($field['type'] == 'email') {
-                    $vars[] = '{FIELD}';
-                    $max_lenght_para = (intval($field['extra']) ? ' maxlength="'.intval($field['extra']).'"' : '');
-                    $values[] = '<input type="text" name="field'.$field_id.'" id="field'.$field_id.'" value="'.(isset($_SESSION['field'.$field_id])?$_SESSION['field'.$field_id]:'').'"'.$max_lenght_para.' class="frm-email" />';
-                }
-                if(isset($_SESSION['field'.$field_id])) unset($_SESSION['field'.$field_id]);
-
-                if($field['type'] != '') {
-                    echo str_replace($vars, $values, $field_loop);
-                }
-                if (isset($tmp_field_loop)){ $field_loop = $tmp_field_loop; }
-            } // end while
-            // Captcha
-            if($use_captcha) { ?>
-                <tr>
-                <td class="frm-field_title"><?php echo $TEXT['VERIFICATION']; ?>:</td>
-                <td><?php call_captcha(); ?></td>
-                </tr>
-                <?php
-            }
-        // Print footer
-        // $out = $footer.PHP_EOL;
-        $out .= str_replace('{SUBMIT_FORM}', $MOD_FORM['SUBMIT_FORM'], $footer);
-        echo $out;
-// Add form end code
+            // Print footer
+            // $out = $footer.PHP_EOL;
+            $out .= str_replace('{SUBMIT_FORM}', $oTrans->MOD_FORM_SUBMIT_FORM, $footer);
+            echo $out;
+    // Add form end code
 ?>
-        </fieldset>
-</form>
+            </fieldset>
+    </form>
 <?php
+            }
         }
-    }
-
-} else {  // $_POST == array()
-
+    } else {  // $_POST form was send
     // Check that submission ID matches
-    if( isset($_SESSION['form_submission_id']) 
-        && isset($_POST['submission_id']) 
+    if( isset($_SESSION['form_submission_id'])
+        && isset($_POST['submission_id'])
         && ($_SESSION['form_submission_id'] == $_POST['submission_id'])
     ) {
+        $aMailValues = array();
+        $aMailValues = array (
+            'is_authenticated' => false,
+            'mail_replyto' => '',
+            'mail_replyName' => '',
+        );
+        $mail_replyto = '';
+        $mail_replyName = '';
 
-       $mail_replyto = '';
-       $mail_replyName = '';
-        if( $wb->is_authenticated() && $wb->get_email() ) {
-           $mail_replyto = $wb->get_email();
-           $mail_replyName = htmlspecialchars($wb->add_slashes($wb->get_display_name()));
+        if ($wb->is_authenticated() && $wb->get_email()) {
+          $mail_replyto = $wb->get_email();
+          $mail_replyName = htmlspecialchars($database->escapeString($wb->get_display_name()));
+          $aMailValues = array (
+              'is_authenticated' => true,
+              'mail_replyto' => $mail_replyto,
+              'mail_replyName' => $mail_replyName,
+          );
         }
 
         // Set new submission ID in session
@@ -317,55 +334,51 @@ if($_POST == array())
         // First start message settings
         $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_settings` '
               . 'WHERE `section_id` = '.(int)$section_id.'';
-        if($oSetting = $database->query($sql) ) {
+        if($oSetting = $database->query($sql) )
+        {
             if($oSetting->numRows() > 0)
             {
                 $aSettings = $oSetting->fetchRow(MYSQLI_ASSOC);
+                // who should manage the formular
                 $email_to = (($aSettings['email_to'] != '') ? $aSettings['email_to'] : $emailAdmin());
-                $email_from = $wb->add_slashes(SERVER_EMAIL);
-/*
-                if(substr($email_from, 0, 5) == 'field') {
-                    // Set the email from field to what the user entered in the specified field
-                    $email_from = htmlspecialchars($wb->add_slashes($_POST[$email_from]));
-                }
-*/
+                $mail_replyName = $email_toname = @$_SESSION['DISPLAY_NAME']?:$oTrans->TEXT_GUEST;
+                // where the formular comes from
+                $email_from = $database->escapeString(SERVER_EMAIL);
                 $email_fromname = $aSettings['email_fromname'];
-                $email_fromname = (($mail_replyName='') ? $aSettings['email_fromname'] : $mail_replyName);
-//                 $email_fromname = (($mail_replyName='') ? htmlspecialchars($wb->add_slashes($aSettings['email_fromname'])) : $mail_replyName);
 
                 if(substr($email_fromname, 0, 5) == 'field') {
                     // Set the email_fromname to field to what the user entered in the specified field
-                    $email_fromname = htmlspecialchars($wb->add_slashes($_POST[$email_fromname]));
+                    $email_fromname = htmlspecialchars($database->escapeString($_POST[$email_fromname]));
                 }
 
-                $email_subject = (($aSettings['email_subject'] != '') ? $aSettings['email_subject'] : $MOD_FORM['EMAIL_SUBJECT']);
+                $email_subject = (($aSettings['email_subject'] != '') ? $aSettings['email_subject'] : $MOD_FORM_EMAIL_SUBJECT);
                 $success_page = $aSettings['success_page'];
                 $success_email_to = $mail_replyto;
-                $success_email_from = $wb->add_slashes(SERVER_EMAIL);
+                $success_email_toName = $mail_replyName;
+                $success_email_from = $database->escapeString(SERVER_EMAIL);
                 $success_email_fromname = $aSettings['success_email_fromname'];
-/*
-*/
-                if($mail_replyto == '') {
+
+                if ($mail_replyto == '') {
                     $success_email_to = (($aSettings['success_email_to'] != '') ? $aSettings['success_email_to'] : '');
                     if(substr($success_email_to, 0, 5) == 'field') {
                         // Set the success_email to field to what the user entered in the specified field
-                         $mail_replyto = $success_email_to = htmlspecialchars($wb->add_slashes($_POST[$success_email_to]));
+                        $success_email_to = htmlspecialchars($database->escapeString($_POST[$success_email_to]));
+                        $mail_replyto = ($aMailValues['is_authenticated']?$mail_replyto:$success_email_to);
                     }
-                    $success_email_to = '';
-                    $email_fromname = $TEXT['GUEST'];
-//                    $success_email_fromname = $TEXT['UNKNOWN'];
-//                    $email_from = $TEXT['UNKNOWN'];
+//                    $success_email_to = '';
                 }
 
-                $success_email_text = htmlspecialchars($wb->add_slashes($aSettings['success_email_text']));
-                $success_email_text = (($success_email_text != '') ? $success_email_text : $MOD_FORM['SUCCESS_EMAIL_TEXT']);
-                $success_email_subject = (($aSettings['success_email_subject'] != '') ? $aSettings['success_email_subject'] : $MOD_FORM['SUCCESS_EMAIL_SUBJECT']);
+                $success_email_text = $aSettings['success_email_text'];
+                $success_email_text = (($success_email_text != '') ? $success_email_text : $MOD_FORM_SUCCESS_EMAIL_TEXT);
+//                $success_email_text = preg_replace('/[\n\r]/', '',nl2br(htmlspecialchars($success_email_text)));
+
+                $success_email_subject = (($aSettings['success_email_subject'] != '') ? $aSettings['success_email_subject'] : $MOD_FORM_SUCCESS_EMAIL_SUBJECT);
                 $max_submissions = $aSettings['max_submissions'];
                 $stored_submissions = $aSettings['stored_submissions'];
                 $use_captcha = $aSettings['use_captcha'];
 
             } else {
-                exit($TEXT['UNDER_CONSTRUCTION']);
+                exit($oTrans->TEXT_UNDER_CONSTRUCTION);
             }
         }
 
@@ -379,45 +392,25 @@ if($_POST == array())
                 // Check for a mismatch get email user_id
                 if(!isset($_POST['captcha']) || !isset($_SESSION['captcha']) || $_POST['captcha'] != $_SESSION['captcha']) {
                     $replace = array('webmaster_email' => $emailAdmin() );
-                    $captcha_error = replace_vars($MOD_FORM['INCORRECT_CAPTCHA'], $replace);
+                    $captcha_error = replace_vars($oTrans->MOD_FORM_INCORRECT_CAPTCHA, $replace);
                     $aRequired[]= '';
                 }
             } else {
                 $replace = array('webmaster_email'=>$emailAdmin() );
-                $captcha_error = replace_vars($MOD_FORM['INCORRECT_CAPTCHA'],$replace );
+                $captcha_error = replace_vars($oTrans->MOD_FORM_INCORRECT_CAPTCHA,$replace );
                 $aRequired[]= '';
             }
         }
         if(isset($_SESSION['captcha'])) { unset($_SESSION['captcha']); }
-
-/* for StripCodeFromText test only
-[[loginbox]]
-
-<script type="text/javascript">
-var WB_URL = '{WB_URL}';
-var THEME_URL = '{THEME_URL}';
-var ADMIN_URL = '{ADMIN_URL}';
-var LANGUAGE = '{LANGUAGE}';
-</script>
-
-Hier testen wir Module und stellen Tutorials zur Verfügung
-
-<?php
-function confirm_link(message, url) {
-    if(confirm(message)) location.href = url;
-}
-?>
-*/
-//
 
         // Loop through fields and add to message body
         // Get list of fields
         $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'mod_form_fields` '
               . 'WHERE `section_id` = '.(int)$section_id.' '
               . 'ORDER BY position ASC';
-        if($oField = $database->query($sql)) 
+        if($oField = $database->query($sql))
         {
-            while($aFields = $oField->fetchRow(MYSQLI_ASSOC)) 
+            while($aFields = $oField->fetchRow(MYSQLI_ASSOC))
             {
                 // Add to message body $field
                 if($aFields['type'] != '') {
@@ -461,13 +454,39 @@ function confirm_link(message, url) {
             } //  while
         } //  query
 
+// only for dump to test if all parameters are set
+                $aMailValues = array_merge (
+                        $aMailValues,
+                        array (
+                        'email_from' => $email_from,
+                        'email_to' => $email_to,
+                        'email_subject' => $email_subject,
+                        'email_body' => $email_body,
+                        'email_fromname' => $email_fromname,
+                        'email_toname' => $email_toname,
+                        'mail_replyto' => $mail_replyto,
+                        'mail_replyName' => $mail_replyName,
+                        'success_page' => $success_page,
+                        'SERVER_EMAIL' => SERVER_EMAIL,
+                        'success_email_from' => $success_email_from,
+                        'success_email_to' => $success_email_to,
+                        'success_email_subject' => $success_email_subject,
+                        'success_email_text' => $success_email_text."\n".$email_body.$oTrans->MOD_FORM_SUCCESS_EMAIL_TEXT_GENERATED,
+                        'success_email_toName' => $success_email_toName,
+                        'success_email_fromname' => $success_email_fromname,
+                        )
+                );
+/*
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+print_r( $aMailValues ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+*/
 // Check if the user forgot to enter values into all the required fields
         if(sizeof($aRequired )) {
             echo "<div class=\"frm-warning\">\n";
-            if(!isset($MESSAGE['MOD_FORM_REQUIRED_FIELDS'])) {
+            if(!isset($oTrans->MESSAGE_MOD_FORM_REQUIRED_FIELDS)) {
                 echo '<h3>You must enter details for the following fields</h3>';
             } else {
-                echo '<h3>'.$MESSAGE['MOD_FORM_REQUIRED_FIELDS'].'</h3>';
+                echo '<h3>'.$oTrans->MESSAGE_MOD_FORM_REQUIRED_FIELDS.'</h3>';
             }
             echo "<ol>\n";
             foreach($aRequired AS $field_title) {
@@ -485,7 +504,7 @@ function confirm_link(message, url) {
             $aRequired = array();
             echo "</ol>\n";
             echo "</div>\n";
-            echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'."\n";
+            echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$oTrans->TEXT_BACK.'</a></p>'."\n";
         } else {
             if(isset($email_error)) {
             echo "<div class=\"frm-warning\">\n";
@@ -493,19 +512,18 @@ function confirm_link(message, url) {
                 echo '<li>'.$email_error.'</li>'."\n";
                 echo '</ol>'."\n";
             echo "</div>\n";
-                echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'."\n";
+                echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$oTrans->TEXT_BACK.'</a></p>'."\n";
             } elseif(isset($captcha_error)) {
             echo "<div class=\"frm-warning\">\n";
                 echo '<br /><ol>'."\n";
                 echo '<li>'.$captcha_error.'</li>'."\n";
                 echo '</ol>'."\n";
             echo "</div>\n";
-                echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'."\n";
+                echo '<p class="frm-warning"><a href="'.$sRecallUrl.'">'.$oTrans->TEXT_BACK.'</a></p>'."\n";
             } else {
                 $success = false;
 // Check how many times form has been submitted in last hour
                 $last_hour = time()-3600;
-
                 $sql  = 'SELECT `submission_id` FROM `'.TABLE_PREFIX.'mod_form_submissions` '
                       . 'WHERE `submitted_when` >= '.$last_hour.'';
                 if($oSubmissions = $database->query($sql))
@@ -513,7 +531,7 @@ function confirm_link(message, url) {
                     if($oSubmissions->numRows() > $max_submissions)
                     {
 // Too many submissions so far this hour
-                        echo $MESSAGE['MOD_FORM_EXCESS_SUBMISSIONS'];
+                        echo $oTrans->MESSAGE_MOD_FORM_EXCESS_SUBMISSIONS;
                         $success = false;
                     } else {
                         // Adding the IP to the body and try to send the email
@@ -522,10 +540,17 @@ function confirm_link(message, url) {
                         if($iFormRequestId) {
                             $email_body .= "\n\nFormRequestID: ".$iFormRequestId;
                         }
-                        $recipient = preg_replace( "/[^a-z0-9 !?:;,.\/_\-=+@#$&\*\(\)]/im", "", $email_fromname );
-                        $email_fromname = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $recipient );
-                        $email_body = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $email_body );
                         $aAttachment=null;
+                        $aArray = array(
+                            'SERVER_EMAIL' => SERVER_EMAIL,
+                            'email_to' => $email_to,
+                            'email_subject' => $email_subject,
+                            'email_fromname' => $email_fromname,
+                            'mail_replyto' => $mail_replyto,
+                            'mail_replyName' => $mail_replyName,
+                            );
+
+// $aMailValues['is_authenticated']
                         if($email_from != '') {
                             if($mail_replyto != '') {
                                 // send form to admin, can replyto to given e-mail adress
@@ -535,9 +560,9 @@ function confirm_link(message, url) {
                                     $email_subject,
                                     $email_body,
                                     $email_fromname,
-                                    '',
+                                    $email_toname,
                                     $mail_replyto,
-                                    '',
+                                    $mail_replyName,
                                     '',
                                     $aAttachment
                                 );
@@ -548,20 +573,19 @@ function confirm_link(message, url) {
                                     $email_subject,
                                     $email_body,
                                     $email_fromname,
-                                    '',
-                                    $mail_replyto,
-                                    '',
+                                    $email_toname,
+                                    $success_email_to,
+                                    $success_email_fromname,
                                     '',
                                     $aAttachment
                                 );
                             }
                         }
-                        if($success==true)
+// send only if is_authenticated
+                        if (($success==true) && $aMailValues['is_authenticated'])
                         {
-                            $recipient = preg_replace( "/[^a-z0-9 !?:;,.\/_\-=+@#$&\*\(\)]/im", "", $success_email_fromname );
-                            $success_email_fromname = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $recipient );
-                            $success_email_text = preg_replace( "/(content-type:|bcc:|cc:|to:|from:)/im", "", $success_email_text );
-                            if($success_email_to != '')
+                            $success = true;
+                            if ($success_email_to != '')
                             {
                                 if($success_email_from != '')
                                 {
@@ -570,30 +594,31 @@ function confirm_link(message, url) {
                                         $success_email_from,
                                         $success_email_to,
                                         $success_email_subject,
-                                        ($success_email_text)."\n".($email_body).$MOD_FORM['SUCCESS_EMAIL_TEXT_GENERATED'],
+                                        ($success_email_text)."\n".($email_body).$oTrans->MOD_FORM_SUCCESS_EMAIL_TEXT_GENERATED,
                                         $success_email_fromname,
-                                        '',
+                                        $success_email_toName,
                                         '',
                                         '',
                                         '',
                                         $aAttachment
                                     );
-                                } else {
+                                }/* else {
                                     $success = $wb->mail(
                                         SERVER_EMAIL,
                                         $success_email_to,
                                         $success_email_subject,
-                                        ($success_email_text)."\n".($email_body).$MOD_FORM['SUCCESS_EMAIL_TEXT_GENERATED'],
+                                        ($success_email_text)."\n".($email_body).$oTrans->MOD_FORM_SUCCESS_EMAIL_TEXT_GENERATED,
                                         $success_email_fromname,
-                                        '',
+                                        $success_email_toName,
                                         '',
                                         '',
                                         '',
                                         $aAttachment
                                     );
-                                }
+                                }*/
                             }
                         }
+
                         if($success==true)
                         {
                             $aSuccess[] .= 'INSERT INTO '.TABLE_PREFIX.'mod_form_submissions<br /> ';;
@@ -643,7 +668,7 @@ function confirm_link(message, url) {
         }  // email_error
     } else {
 
-    echo '<p>&nbsp;</p>'."\n".'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'."\n";
+    echo '<p>&nbsp;</p>'."\n".'<p><a href="'.$sRecallUrl.'">'.$oTrans->TEXT_BACK.'</a></p>'."\n";
     }
 
     $success_page = ( (isset($success_page) ) ? $success_page : $page_id);
@@ -674,10 +699,10 @@ function confirm_link(message, url) {
                 if($get_user->numRows() != 0) {
                     $user = $get_user->fetchRow(MYSQLI_ASSOC);
                 } else {
-                    $Message = $MOD_FORM['PRINT'];
+                    $Message = $oTrans->MOD_FORM_PRINT;
                     $NixHier = '';
-                    $user['display_name'] = $TEXT['GUEST'];
-                    $user['username'] = $TEXT['UNKNOWN'];
+                    $user['display_name'] = $oTrans->TEXT_GUEST;
+                    $user['username'] = $oTrans->TEXT_UNKNOWN;
                 }
             }
 
@@ -688,30 +713,36 @@ function confirm_link(message, url) {
             $oTpl->set_file('page', 'submessage.htt');
             $oTpl->debug = false; // false, true
             $oTpl->set_block('page', 'main_block', 'main');
-            $oTpl->set_var(array(
+
+            $aPaths = array(
                     'ADMIN_URL' => ADMIN_URL,
                     'THEME_URL' => THEME_URL,
                     'MODULE_URL' => WB_URL.'/modules/form',
                     'WB_URL' => WB_URL
-                )
-            );
-            $oTpl->set_var(array(
+                );
+            $oTpl->set_var($aPaths);
+
+            $aDatas = array (
                     'SUCCESS_EMAIL_TEXT' => $success_email_text,
-                    'TEXT_SUBMISSION_ID' => $TEXT['SUBMISSION_ID'],
+                    'TEXT_SUBMISSION_ID' => $oTrans->TEXT_SUBMISSION_ID,
                     'submission_submission_id' => $submission['submission_id'],
-                    'TEXT_SUBMITTED' => $TEXT['SUBMITTED'],
                     'submission_submitted_when' => gmdate( DATE_FORMAT .', '.TIME_FORMAT, $submission['submitted_when']+TIMEZONE ),
+            );
+            $oTpl->set_var($aDatas);
+
+            $aLangs = array(
+                    'TEXT_SUBMITTED' => $oTrans->TEXT_SUBMITTED,
                     'NIX_HIER' => $NixHier,
-                    'TEXT_USER' => $TEXT['USER'],
-                    'TEXT_USERNAME' => $TEXT['USERNAME'],
-                    'TEXT_PRINT_PAGE' => $TEXT['PRINT_PAGE'],
-                    'TEXT_REQUIRED_JS' => $TEXT['REQUIRED_JS'],
+                    'TEXT_USER' => $oTrans->TEXT_USER,
+                    'TEXT_USERNAME' => $oTrans->TEXT_USERNAME,
+                    'TEXT_PRINT_PAGE' => $oTrans->TEXT_PRINT_PAGE,
+                    'TEXT_REQUIRED_JS' => $oTrans->TEXT_REQUIRED_JS,
                     'user_display_name' => $user['display_name'],
                     'user_username' => $user['username'],
                     'SUCCESS_PRINT' => $Message,
                     'submission_body' => nl2br($submission['body'])
-                    )
-                );
+                    );
+            $oTpl->set_var($aLangs);
 
             $oTpl->parse('main', 'main_block', false);
             $output = $oTpl->finish($oTpl->parse('output', 'page'));
@@ -719,7 +750,7 @@ function confirm_link(message, url) {
             print $output;
 
         } else {
-            echo "<script type='text/javascript'>location.href='".$sSuccessLink."';</script>";
+            echo "<script>location.href='".$sSuccessLink."';</script>";
         }
         // clearing session on success
         $sql  = 'SELECT `field_id` FROM `'.TABLE_PREFIX.'mod_form_fields` '
@@ -731,9 +762,8 @@ function confirm_link(message, url) {
         }
     } else {
         if(isset($success) && $success == false) {
-            echo '<br />'.$MOD_FORM['ERROR'];
-            echo '<p>&nbsp;</p>'."\n".'<p><a href="'.$sRecallUrl.'">'.$TEXT['BACK'].'</a></p>'."\n";
+            echo '<br />'.$oTrans->MOD_FORM_ERROR;
+            echo '<p>&nbsp;</p>'."\n".'<p><a href="'.$sRecallUrl.'">'.$oTrans->TEXT_BACK.'</a></p>'."\n";
         }
     }
-
 }

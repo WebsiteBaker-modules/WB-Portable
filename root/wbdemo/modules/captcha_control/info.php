@@ -20,9 +20,9 @@
 if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 $module_directory   = 'captcha_control';
-$module_name        = 'Captcha and Spam-Protection (ASP) Control';
+$module_name        = 'Captcha/Spam-Protection v1.2.2';
 $module_function    = 'tool';
-$module_version     = '1.2.0';
+$module_version     = '1.2.2';
 $module_platform    = '2.8.3 SP6';
 $module_author      = 'Thomas Hornik (thorn)';
 $module_license     = 'GNU General Public License';

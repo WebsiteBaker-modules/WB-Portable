@@ -39,6 +39,7 @@ class database {
     private $connected  = false;
     private $sCharset   = '';
     private $error      = '';
+    private $error_no   = array();
     private $error_type = '';
     private $message    = array();
     private $sActionFile  = '';
@@ -51,7 +52,7 @@ class database {
             throw new DatabaseException($this->get_error());
         }
     }
-    
+
     // Connect to the database   DB_CHARSET
     function connect() {
 
@@ -75,7 +76,7 @@ class database {
         }
         return $this->connected;
     }
-    
+
     // Disconnect from the database
     function disconnect() {
         if($this->connected==true) {
@@ -85,7 +86,7 @@ class database {
             return false;
         }
     }
-    
+
     // Run a query
     function query($statement) {
         $mysql = new mysql($this->db_handle);
@@ -111,23 +112,28 @@ class database {
             return $result;
         }
     }
-    
+
     // Set the DB error
     function set_error($message = null) {
         $this->error = $message;
         $this->error_type = 'unknown';
+        if ($message!=''){
+        }
     }
-    
+
     // Return true if there was an error
     function is_error() {
         return (!empty($this->error)) ? true : false;
     }
-    
+
     // Return the error
     function get_error() {
         return $this->error;
     }
-
+    // Return the errno
+    function get_errno() {
+        return $this->is_error() ? mysqli_errno($this->db_handle) : 0;
+    }
 /**
  * default Getter for some properties
  * @param string $sPropertyName
@@ -162,7 +168,7 @@ class database {
 /**
  * Last inserted Id
  * @return bool|int false on error, 0 if no record inserted
- */    
+ */
     public function getLastInsertId()
     {
         return mysqli_insert_id($this->db_handle);
@@ -197,25 +203,24 @@ class database {
         $number_fields = intval($number_fields);
         $keys = 0;
         $sql = 'SHOW INDEX FROM `'.$table_name.'`';
-        if( ($res_keys = $this->query($sql)) )
-        {
-            while(($rec_key = $res_keys->fetchRow()))
-            {
-                if( $rec_key['Key_name'] == $index_name )
-                {
+        if (($res_keys = $this->query($sql))) {
+            while (($rec_key = $res_keys->fetchRow(MYSQLI_ASSOC))) {
+                if ($rec_key['Key_name'] == $index_name ) {
                     $keys++;
                 }
             }
-
         }
-        if( $number_fields == 0 )
-        {
+        if ( $number_fields == 0 ) {
             return ($keys != $number_fields);
-        }else
-        {
+        } else {
             return ($keys == $number_fields);
         }
     }
+/*
+    public function index_exists1($sTableName, $sIndexName, $number_fields = 0){
+      $sql  = 'SHOW INDEX FROM `'.$sTableName.'` WHERE `Column_name`= \''.$sIndexName.'\'';
+    }
+*/
 /*
  * @param string $table_name: full name of the table (incl. TABLE_PREFIX)
  * @param string $field_name: name of the field to add
@@ -276,31 +281,31 @@ class database {
 
 /*
  * @param string $table_name: full name of the table (incl. TABLE_PREFIX)
- * @param string $index_name: name of the new index
+ * @param string $index_name: name of the new index (empty string for PRIMARY)
  * @param string $field_list: comma seperated list of fields for this index
- * @param string $index_type: kind of index (UNIQUE, PRIMARY, '')
+ * @param string $index_type: kind of index (PRIMARY, UNIQUE, KEY, FULLTEXT)
  * @return bool: true if successful, otherwise false and error will be set
  */
-    public function index_add($table_name, $index_name, $field_list, $index_type = '')
+    public function index_add($table_name, $index_name, $field_list, $index_type = 'KEY')
     {
-        $retval = false;
-        $field_list = str_replace(' ', '', $field_list);
-        $field_list = explode(',', $field_list);
-        $number_fields = sizeof($field_list);
-        $field_list = '`'.implode('`,`', $field_list).'`';
-        if( $this->index_exists($table_name, $index_name, $number_fields) ||
+       $retval = false;
+       $field_list = explode(',', (str_replace(' ', '', $field_list)));
+       $number_fields = sizeof($field_list);
+       $field_list = '`'.implode('`,`', $field_list).'`';
+       $index_name = (($index_type == 'PRIMARY') ? $index_type : $index_name);
+       if ( $this->index_exists($table_name, $index_name, $number_fields) ||
             $this->index_exists($table_name, $index_name))
-        {
-            $sql  = 'ALTER TABLE `'.$table_name.'` ';
-            $sql .= 'DROP INDEX `'.$index_name.'`';
-            if( $this->query($sql))
-            {
-                $sql  = 'ALTER TABLE `'.$table_name.'` ';
-                $sql .= 'ADD '.$index_type.' `'.$index_name.'` ( '.$field_list.' ); ';
-                if( $this->query($sql)) { $retval = true; }
-            }
-        }
-        return $retval;
+       {
+           $sql  = 'ALTER TABLE `'.$table_name.'` ';
+           $sql .= 'DROP INDEX `'.$index_name.'`';
+           if (!$this->query($sql)) { return false; }
+       }
+       $sql  = 'ALTER TABLE `'.$table_name.'` ';
+       $sql .= 'ADD '.$index_type.' ';
+       $sql .= (($index_type == 'PRIMARY') ? 'KEY ' : '`'.$index_name.'` ');
+       $sql .= '( '.$field_list.' ); ';
+       if ($this->query($sql)) { $retval = true; }
+       return $retval;
     }
 
 /*
@@ -311,8 +316,8 @@ class database {
     public function index_remove($table_name, $index_name)
     {
         $retval = false;
-        if( $this->index_exists($table_name, $index_name) )
-        { // modify a existing field in a table
+        if ($this->index_exists($table_name, $index_name)) {
+        // modify a existing field in a table
             $sql  = 'ALTER TABLE `'.$table_name.'` DROP INDEX `'.$index_name.'`';
             $retval = ( $this->query($sql) ? true : false );
         }
@@ -386,15 +391,18 @@ class database {
         $aReplace[] = $sCharset;                                                  /* step 5 */
         $aReplace[] = $sTblCollation;                                             /* step 6 */
         // read file into an array
-        $aSql = file( $sSqlDump, FILE_SKIP_EMPTY_LINES );
-        // remove possible BOM from file
-        $aSql[0] = preg_replace('/^[\xAA-\xFF]{3}/', '', $aSql[0]);
-        // replace placeholders by replacements over the whole file
-        $aSql = preg_replace($aSearch, $aReplace, $aSql);
+        if (($aSql = file( $sSqlDump, FILE_SKIP_EMPTY_LINES ))) {
+            if (sizeof($aSql) > 0) {
+                // remove possible BOM from file
+                $aSql[0] = preg_replace('/^[\xAA-\xFF]{3}/', '', $aSql[0]);
+                // replace placeholders by replacements over the whole file
+                $aSql = preg_replace($aSearch, $aReplace, $aSql);
+            } else { $aSql = false; }
+        }
 
-        while ( sizeof($aSql) > 0 ) {
+        while ((bool)$aSql) {
             $sSqlLine = trim(array_shift($aSql));
-            if (!preg_match('/^[-\/]+.*/', $sSqlLine)) {
+            if (!preg_match('/^[\-\/]+.*/', $sSqlLine)) {
                 $sSqlBuffer .= ' '.$sSqlLine;
                 if ((substr($sSqlBuffer,-1,1) == ';')) {
                     if (
@@ -403,20 +411,26 @@ class database {
                         ($sAction == 'install' || $sAction == 'uninstall')
                     ) {
                         if (!$this->query($sSqlBuffer)) {
-                            $bRetval = false;
-                            unset($aSql);
+                            $aSql = $bRetval = false;
                             break;
                         }
-                    } else if (
+                   } else if (
                         // create and alter tables on install or upgrade
                         (preg_match('/^\s*CREATE TABLE/siU', $sSqlBuffer) ||
-                        preg_match('/^\s*ALTER TABLE/siU', $sSqlBuffer)) &&
+                         preg_match('/^\s*ALTER TABLE/siU', $sSqlBuffer)) &&
                         ($sAction == 'install' || $sAction == 'upgrade')
                     ) {
-                        if (!$this->query($sSqlBuffer)) {
-                            $bRetval = false;
-                            unset($aSql);
-                            break;
+                        if (!$this->query($sSqlBuffer))
+                        {
+                            switch ($this->get_errno()):
+                                case 0: // no error
+                                case 1060:
+                                case 1061:
+                                    break;
+                                default: // all other errors
+                                    $aSql = $bRetval = false;
+                                    break;
+                            endswitch;
                         }
                     } else if (
                         // insert default data on install
@@ -424,8 +438,7 @@ class database {
                         ( $sAction == 'install' )
                     ) {
                         if (!$this->query($sSqlBuffer)) {
-                            $bRetval = false;
-                            unset($aSql);
+                            $aSql = $bRetval = false;
                             break;
                         }
                     }
@@ -473,14 +486,26 @@ class mysql {
     public function __construct($handle) {
         $this->db_handle = $handle;
     }
-
-    // Run a query
-    public function query($statement) {
-        $this->result = mysqli_query($this->db_handle, $statement);
+/**
+ * query sql statement
+ * @param  string $statement
+ * @return object
+ * @throws WbDatabaseException
+ */
+    public function query($sStatement)
+    {
+        $this->result = @mysqli_query($this->db_handle, $sStatement);
+        if (defined('DEBUG')&& DEBUG && ($this->result === false)) {
+            if (DEBUG) {
+                throw new DatabaseException(mysqli_error($this->db_handle));
+            } else {
+                throw new DatabaseException('Error in SQL-Statement');
+            }
+        }
         $this->error = mysqli_error($this->db_handle);
         return $this->result;
     }
-    
+
     // Fetch num rows
     public function numRows() {
         return mysqli_num_rows($this->result);
@@ -489,6 +514,60 @@ class mysql {
     // Fetch row  $typ = MYSQLI_ASSOC, MYSQLI_NUM, MYSQLI_BOTH
     public function fetchRow($typ = MYSQLI_BOTH) {
         return mysqli_fetch_array($this->result, $typ);
+    }
+/**
+ * fetchAssoc
+ * @return array with assotiative indexes
+ * @description get current record and increment pointer
+ */
+    public function fetchAssoc()
+    {
+        return mysqli_fetch_assoc($this->result);
+    }
+/**
+ * fetchArray
+ * @param  int $iType MYSQL_ASSOC(default) | MYSQL_BOTH | MYSQL_NUM
+ * @return array of current record
+ * @description get current record and increment pointer
+ */
+    public function fetchArray($iType = MYSQLI_ASSOC)
+    {
+        if ($iType < MYSQLI_ASSOC || $iType > MYSQLI_BOTH) {
+            $iType = MYSQLI_ASSOC;
+        }
+        return mysqli_fetch_array($this->result, $iType);
+    }
+/**
+ * fetchObject
+ * @param  string $sClassname Name of the class to use. Is no given use stdClass
+ * @param  string $aParams    optional array of arguments for the constructor
+ * @return object
+ * @description get current record as an object and increment pointer
+ */
+    public function fetchObject($sClassName = null, array $aParams = null)
+    {
+        if ($sClassName === null || class_exists($sClassName)) {
+            return mysqli_fetch_object($this->result, $sClassName, $aParams);
+        } else {
+            throw new DatabaseException('Class <'.$sClassName.'> not available on request of mysqli_fetch_object()');
+        }
+    }
+/**
+ * fetchAll
+ * @param  int $iType MYSQL_ASSOC(default) | MYSQL_NUM
+ * @return array of rows
+ * @description get all records of the result set
+ */
+    public function fetchAll($iType = MYSQLI_ASSOC)
+    {
+        $iType = $iType != MYSQLI_NUM ? MYSQLI_ASSOC : MYSQLI_NUM;
+
+        if (function_exists('mysqli_fetch_all')) { # Compatibility layer with PHP < 5.3
+            $aRetval = mysqli_fetch_all($this->result, $iType);
+        } else {
+            for ($aRetval = array(); ($aTmp = mysqli_fetch_array($this->result, $iType));) { $aRetval[] = $aTmp; }
+        }
+        return $aRetval;
     }
 
     public function rewind()
@@ -514,7 +593,7 @@ class mysql {
 
 } // end of class mysql
 
-class DatabaseException extends Exception {}
+class DatabaseException extends AppException {}
 
 /* this function is placed inside this file temporarely until a better place is found */
 /*  function to update a var/value-pair(s) in table ****************************
@@ -546,7 +625,7 @@ class DatabaseException extends Exception {}
             {
                 $sql = 'UPDATE ';
                 $sql_where = 'WHERE `name` = \''.$index.'\'';
-            }else {
+            } else {
                 $sql = 'INSERT INTO ';
                 $sql_where = '';
             }

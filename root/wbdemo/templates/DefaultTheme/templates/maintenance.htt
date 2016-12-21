@@ -1,0 +1,62 @@
+<!-- BEGIN mainBlock -->
+<!DOCTYPE html>
+<html lang="{LANGUAGE}">
+<head>
+<title>{TEXT_LOGIN}</title>
+<meta http-equiv="content-type" content="text/html; charset={CHARSET}" />
+<meta name="description" content="{TEXT_LOGIN}" />
+<meta name="keywords" content="{TEXT_LOGIN}" />
+<link href="{THEME_URL}/css/w3.css" rel="stylesheet" type="text/css" />
+<link href="{THEME_URL}/css/login.css" rel="stylesheet" type="text/css" />
+</head>
+<body >
+
+<div class="w3-wrap w3-row-padding w3-section w3-row">
+    <div class=" w3-container w3-quarter w3-margin-bottom" ></div>
+    <div class=" w3-container w3-half w3-margin-bottom " >
+        <div class=" w3-container w3-margin-bottom " >
+            <header class="w3-container w3-blue-wb w3-row w3-theme-d4">
+                <div class="imgcontainer w3-col s5 w3-hide-small" >
+                    <img class="w3-image " src="{THEME_URL}/images/logo.png" alt="WebsiteBaker Logo" >
+                </div>
+                <div class="w3-col s7 w3-container">
+                <h4 class=" w3-text w3-text-white w3-border-0" style="padding: 0.925em 0.225em 0; margin-bottom: 0;">OFF-LINE - {WB_URL}</h4>
+                </div>
+            </header>
+            <article class="w3-container w3-col w3-white">
+              <h5>{LEER}</h5>
+              <div class="w3-container w3-center">
+                  <h4>{PAGE_TITLE}</h4>
+                  <img src="{THEME_URL}/images/{PAGE_ICON}.png" alt="{PAGE_TITLE}" /><br />
+                  <h3>{CHECK_BACK}</h3>
+              </div>
+            </article>
+        </div>
+
+        <footer class="w3-text-white w3-text w3-center" style="font-size:1.025em;margin: 1.025em 0;">
+          <!-- Please note: the below reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+          <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+          <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+          <!-- Please note: the above reference to the GNU GPL should not be removed, as it provides a link for users to read about warranty, etc. -->
+        </footer>
+    </div>
+    <div class=" w3-container w3-quarter w3-margin-bottom" ></div>
+</div>
+
+<script type="text/javascript">
+<!--
+    elm = document.getElementsByTagName('form');
+    console.info(elm);
+      for (i=0; elm[i]; i++) {
+        if ( (elm[i].className.indexOf('autocomplete') == -1) ) {
+            elm[i].setAttribute('autocomplete', 'off');
+        }
+        if ( (elm[i].className.indexOf('accept-charset') == -1) ) {
+            elm[i].setAttribute('accept-charset', 'utf-8');
+        }
+      }
+-->
+</script>
+</body>
+</html>
+<!-- END mainBlock -->

@@ -64,11 +64,15 @@ function build_page( &$admin, &$database )
     $user_time = true;
     include_once( ADMIN_PATH.'/interface/timezones.php' );
     $template->set_block('main_block', 'timezone_list_block', 'timezone_list');
+    $iActualTimezone = ((DEFAULT_TIMEZONE <> 0)  ? DEFAULT_TIMEZONE : 0);
+    $iActualTimezone = (($iActualTimezone == $admin->get_timezone())? 'system_default':$admin->get_timezone());
+    $iActualTimezone = (($iActualTimezone!='system_default')?intval($iActualTimezone):$iActualTimezone);
     foreach( $TIMEZONES AS $hour_offset => $title )
     {
+        $iTmpOffset = (is_numeric($hour_offset)?$hour_offset*3600:$hour_offset);
         $template->set_var('VALUE',    $hour_offset);
         $template->set_var('NAME',     $title);
-        $template->set_var('SELECTED', ($admin->get_timezone() == ($hour_offset * 3600) ? ' selected="selected"' : '') );
+        $template->set_var('SELECTED', (($iTmpOffset === $iActualTimezone) ? ' selected="selected"' : ''));
         $template->parse('timezone_list', 'timezone_list_block', true);
     }
 // Insert date format list

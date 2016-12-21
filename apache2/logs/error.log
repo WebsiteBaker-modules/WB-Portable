@@ -1,5 +1,9 @@
-[Tue Mar 22 19:41:32.645758 2016] [mpm_winnt:notice] [pid 7856:tid 708] AH00455: Apache/2.4.6 (Win32) PHP/5.4.17 configured -- resuming normal operations
-[Tue Mar 22 19:41:32.645758 2016] [mpm_winnt:notice] [pid 7856:tid 708] AH00456: Apache Lounge VC10 Server built: Jul 16 2013 11:15:41
-[Tue Mar 22 19:41:32.645758 2016] [core:notice] [pid 7856:tid 708] AH00094: Command line: 'L:\\wdsnet2\\home\\wb-portable\\WB-Portable-2.8.3-SP6/apache2/bin/httpd_usbwv8.exe -d L:/wdsnet2/home/wb-portable/WB-Portable-2.8.3-SP6/apache2'
-[Tue Mar 22 19:41:32.649759 2016] [mpm_winnt:notice] [pid 7856:tid 708] AH00418: Parent: Created child process 8356
-[Tue Mar 22 19:41:32.940084 2016] [mpm_winnt:notice] [pid 8356:tid 696] AH00354: Child: Starting 64 worker threads.
+PHP Warning:  PHP Startup: Unable to load dynamic library 'L:/wdsnet2/home/wb-wdsnet/htdocs/WebsiteBaker/WBFullPackage/Wb-Portable-2.8.3-SP7\\php\\ext\\php_curl.dll' - Das angegebene Modul wurde nicht gefunden.\r\n in Unknown on line 0
+PHP Warning:  PHP Startup: Unable to load dynamic library 'L:/wdsnet2/home/wb-wdsnet/htdocs/WebsiteBaker/WBFullPackage/Wb-Portable-2.8.3-SP7\\php\\ext\\php_pgsql.dll' - Das Betriebssystem kann %1 nicht ausf\xef\xbf\xbdhren.\r\n in Unknown on line 0
+[Wed Dec 14 18:42:28.118839 2016] [mpm_winnt:notice] [pid 5704:tid 688] AH00455: Apache/2.4.6 (Win32) PHP/5.6.26 configured -- resuming normal operations
+[Wed Dec 14 18:42:28.118839 2016] [mpm_winnt:notice] [pid 5704:tid 688] AH00456: Apache Lounge VC10 Server built: Jul 16 2013 11:15:41
+[Wed Dec 14 18:42:28.118839 2016] [core:notice] [pid 5704:tid 688] AH00094: Command line: 'L:\\wdsnet2\\home\\wb-wdsnet\\htdocs\\WebsiteBaker\\WBFullPackage\\Wb-Portable-2.8.3-SP7/apache2/bin/httpd_usbwv8.exe -d L:/wdsnet2/home/wb-wdsnet/htdocs/WebsiteBaker/WBFullPackage/Wb-Portable-2.8.3-SP7/apache2'
+[Wed Dec 14 18:42:28.125841 2016] [mpm_winnt:notice] [pid 5704:tid 688] AH00418: Parent: Created child process 1080
+PHP Warning:  PHP Startup: Unable to load dynamic library 'L:/wdsnet2/home/wb-wdsnet/htdocs/WebsiteBaker/WBFullPackage/Wb-Portable-2.8.3-SP7\\php\\ext\\php_curl.dll' - Das angegebene Modul wurde nicht gefunden.\r\n in Unknown on line 0
+PHP Warning:  PHP Startup: Unable to load dynamic library 'L:/wdsnet2/home/wb-wdsnet/htdocs/WebsiteBaker/WBFullPackage/Wb-Portable-2.8.3-SP7\\php\\ext\\php_pgsql.dll' - Das Betriebssystem kann %1 nicht ausf\xef\xbf\xbdhren.\r\n in Unknown on line 0
+[Wed Dec 14 18:42:28.724014 2016] [mpm_winnt:notice] [pid 1080:tid 708] AH00354: Child: Starting 64 worker threads.

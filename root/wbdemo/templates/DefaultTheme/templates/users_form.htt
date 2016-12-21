@@ -1,0 +1,168 @@
+<!-- BEGIN main_block -->
+<form name="user" action="{ACTION_URL}" method="post" class="{DISPLAY_ADD} access" style="margin: auto; width: 100%;" >
+    <input type="hidden" name="user_id" value="{USER_ID}" />
+    <input type="hidden" name="username_fieldname" value="{USERNAME_FIELDNAME}" />
+    {FTAN}
+    <h2 style="{DISPLAY_EXTRA}">{HEADING_MODIFY_USER}&nbsp;</h2>
+    <div class="block-outer" style="padding: 0.825em;">
+    <table style=" border-collapse: collapse; border-spacing: 0; width: 100%;" >
+        <thead class="value_label">
+        <tr>
+        <th></th>
+        <th style=" width: 70%;"></th>
+        </tr>
+        </thead>
+        <tbody class="value_label">
+            <tr>
+                <td>{TEXT_USERNAME}:</td>
+                <td class="value_input">
+            <!-- BEGIN user_add_block -->
+                    <input type="text" name="{USERNAME_FIELDNAME}" maxlength="30" value="{USERNAME}" style="width: 52%;" />
+            <!-- END user_add_block -->
+            <!-- BEGIN user_display_block -->
+                    <div id="username" style="width: 52%;" >{USERNAME}</div>
+            <!-- END user_display_block -->
+                </td>
+
+            </tr>
+            <tr class="ui-helper-clearfix">
+                <td class="setting_name">
+                    <label for="pwLen" >Passwordlength:</label>
+                </td>
+                <td class="value_input">
+                  <input type="text" onchange="onChange(this);" id="pwLen" value="8" name="length" style="width: 15%;" />
+                </td>
+            </tr>
+
+            <tr>
+                <td>{TEXT_PASSWORD}:</td>
+                <td class="value_input">
+                    <input type="text" id="password" name="password" maxlength="30" value="" style="width: 52%;" />
+                    <input class="btn btn-default" type="button" value="generate" onclick="onClick(this);" style="width: 15%;" />
+                </td>
+            </tr>
+            <tr>
+                <td>{TEXT_RETYPE_PASSWORD}:</td>
+                <td class="value_input">
+                    <input type="password" id="password2" name="password2" maxlength="30" value="" style="width: 52%;" />
+                </td>
+            </tr>
+            <tr style="{DISPLAY_EXTRA}">
+                <td>&nbsp;</td>
+                <td >
+                  <div class="w3-panel w3-pale-red w3-leftbar w3-border-red  w3-left-align" style="min-height: 4.225em; width: 100%;" >
+                      <p>{CHANGING_PASSWORD}</p>
+                  </div>
+                </td>
+            </tr>
+            <tr>
+                <td>{TEXT_DISPLAY_NAME}:</td>
+                <td class="value_input">
+                    <input type="text" name="display_name" maxlength="255" value="{DISPLAY_NAME}" style="width: 52%;" />
+                </td>
+            </tr>
+            <tr>
+                <td>{TEXT_EMAIL}:</td>
+                <td class="value_input">
+                    <input type="text" name="email" maxlength="255" value="{EMAIL}" style="width: 52%;" />
+                </td>
+            </tr>
+            <tr style="{DISPLAY_HOME_FOLDERS}">
+                <td>{TEXT_HOME_FOLDER}:</td>
+                <td class="value_input">
+                    <select name="home_folder" style="width: 53%;" >
+                        <option value="">{TEXT_NONE}</option>
+                        <!-- BEGIN folder_list_block -->
+                        <option value="{FOLDER}"{SELECTED}>{NAME}</option>
+                        <!-- END folder_list_block -->
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>{TEXT_GROUP}:</td>
+                <td class="value_input">
+                    <select name="groups[]" multiple="multiple" size="5" style="width: 53%;" >
+                    <!-- BEGIN group_list_block -->
+                        <option value="{ID}" {SELECTED}>{NAME}</option>
+                    <!-- END group_list_block -->
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td style="text-align: left;">
+                    <input type="radio" name="active[]" id="active" value="1" {ACTIVE_CHECKED} />
+                    <label for="active">{TEXT_ACTIVE}</label>
+                    <input type="radio" name="active[]" id="disabled" value="0" {DISABLED_CHECKED} />
+                    <label for="disabled">{TEXT_DISABLED}</label>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td style="text-align: left;">
+                    <input class="btn btn-default" type="submit" name="submit" value="{SUBMIT_TITLE}" />
+                    <input class="btn btn-default" type="reset" name="reset" value="{TEXT_RESET}" />
+                    <input class="btn btn-default" type="button" onclick="javascript: window.location = 'index.php';" value="{TEXT_CANCEL}">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</form>
+<script type="text/javascript">
+    function toggle_radio(radio_on, radio_off) {
+       document.getElementById(radio_on).checked = true;
+       document.getElementById(radio_off).checked = true;
+    }
+</script>
+<script src="{ADMIN_URL}/users/PasswordGenerator.js"></script>
+<script>
+    var _options = _options || window._options || { };
+            _options.length = 8;
+            _options.lowercase = true;
+            _options.uppercase = true;
+            _options.numbers = true;
+            _options.special_character = true;
+            _options.brackets = true;
+            _options.minus = true;
+            _options.underscore = true;
+            _options.space = true;
+/*
+    passwort.set({
+        length: 50,
+        lowercase: false,
+        uppercase: false,
+        numbers: false,
+        special_character: true,
+        brackets: false,
+        minus: false,
+        underscore: false,
+        space: false
+    });
+ */
+
+    _options.el   = document.querySelector('#password');
+    _options.el2  = document.querySelector('#password2');
+    var passwort  = new PasswordGenerator(_options);
+console.info( _options.el );
+console.info( _options.el2 );
+console.info( passwort.get() );
+//    passwort.render();
+    //set option with onChange event
+    function onChange(e) {
+        var obj = {};
+        if(e.name == 'length') {
+            obj[e.name] = parseInt(e.value);
+        } else {
+            obj[e.name] = e.checked ? true : false;
+        }
+        passwort.set(obj);
+        passwort.render();
+    }
+    function onClick(e){
+        passwort.render();
+        return false;
+    }
+</script>
+
+<!-- END main_block -->

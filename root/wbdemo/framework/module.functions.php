@@ -70,19 +70,19 @@ if (!function_exists('edit_module_css')) {
 
       // check if the required edit_module_css.php file exists
       if(!file_exists(WB_PATH .'/modules/edit_module_files.php')) return;
-      
+
       // check if specified module directory is valid
       if(check_module_dir($mod_dir) == '') return;
-      
+
       // check if frontend.css or backend.css exist
       $frontend_css = mod_file_exists($mod_dir, 'frontend.css');
       $backend_css = mod_file_exists($mod_dir, 'backend.css');
-      
+
       // output the edit CSS submtin button if required
       if($frontend_css || $backend_css) {
          // default text used for the edit CSS routines if not defined in the WB core language files
-         $edit_css_caption = (isset($GLOBALS['TEXT']['CAP_EDIT_CSS'])) ?$GLOBALS['TEXT']['CAP_EDIT_CSS'] :'Edit CSS';
-         ?>
+         $edit_css_caption = (isset($GLOBALS['TEXT_CAP_EDIT_CSS'])) ?$GLOBALS['TEXT_CAP_EDIT_CSS'] :'Edit CSS';
+?>
          <form name="edit_module_file" action="<?php echo WB_URL .'/modules/edit_module_files.php?page_id='.$page_id;?>" 
             method="post" style="margin: 0; text-align:right;">
             <?php echo $admin->getFTAN();?>
@@ -93,7 +93,7 @@ if (!function_exists('edit_module_css')) {
             <input type="hidden" name="action" value="edit" />
             <input type="submit" value="<?php echo $edit_css_caption;?>" class="mod_<?php echo $mod_dir;?>_edit_css" />
          </form>
-         <?php
+<?php
     }
   }
 }

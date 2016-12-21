@@ -22,12 +22,12 @@ $admin = new admin('Media', 'media', false);
 require_once(WB_PATH.'/framework/functions.php');
 
 // check if theme language file exists for the language set by the user (e.g. DE, EN)
-$sAddonName = basename(__DIR__);
-require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+if(file_exists(THEME_PATH .'/languages/EN.php')) {
+require(THEME_PATH .'/languages/EN.php');
 }
-
+if(file_exists(THEME_PATH .'/languages/'.LANGUAGE .'.php')) {
+    require(THEME_PATH .'/languages/'.LANGUAGE .'.php');
+}
 //Save post vars to the parameters file
 if ( !is_null($admin->get_post("save"))) {
 /*
@@ -53,7 +53,7 @@ if ( !is_null($admin->get_post("save"))) {
         $r = str_replace(array('/',' '),'_',$r);
         $w = (int)$admin->get_post($r.'-w');
         $h = (int)$admin->get_post($r.'-h');
-        $pathsettings[$r]['width']=$w; 
+        $pathsettings[$r]['width']=$w;
         $pathsettings[$r]['height']=$h;
     }
     $pathsettings['global']['admin_only'] = ($admin->get_post('admin_only')!=''?'checked':'');
@@ -80,7 +80,7 @@ $template->set_block('page', 'main_block', 'main');
 if ($_SESSION['GROUP_ID'] != 1) {
     $template->set_var('DISPLAY_ADMIN', 'hide');
 }
-$template->set_var(array( 
+$template->set_var(array(
                 'TEXT_HEADER' => $TEXT['TEXT_HEADER'],
                 'SAVE_TEXT' => $TEXT['SAVE'],
                 'BACK' => $TEXT['BACK'],
@@ -94,7 +94,7 @@ $dirs[] = WB_PATH.MEDIA_DIRECTORY;
 
 $array_lowercase = array_map('strtolower', $dirs);
 array_multisort($array_lowercase, SORT_ASC, SORT_STRING, $dirs);
-
+$id=0;
 foreach($dirs AS $name) {
     $relative = str_replace(WB_PATH, '', $name);
     $safepath = str_replace(array('/',' '),'_',$relative);
@@ -103,11 +103,11 @@ foreach($dirs AS $name) {
     if (isset($pathsettings[$safepath]['height'])) $cur_height = $pathsettings[$safepath]['height'];
     $cur_width = ($cur_width ? (int)$cur_width : '-');
     $cur_height = ($cur_height ? (int)$cur_height : '-');
+    $id++;
 
     if($row_bg_color == 'DEDEDE') $row_bg_color = 'EEEEEE';
     else $row_bg_color = 'DEDEDE';
-
-    $template->set_var(array( 
+    $template->set_var(array(
                     'ADMIN_URL' => ADMIN_URL,
                     'PATH_NAME' => $relative,
                     'WIDTH' => $TEXT['WIDTH'],
@@ -122,7 +122,8 @@ foreach($dirs AS $name) {
                     'NO_SHOW_THUMBS' => $TEXT['NO_SHOW_THUMBS'],
                     'NO_SHOW_THUMBS_SELECTED' => $pathsettings['global']['show_thumbs'],
                     'ROW_BG_COLOR' => $row_bg_color,
-                    'FTAN' => $admin->getFTAN()
+                    'FTAN' => $admin->getFTAN(),
+                    'FILE_ID' => $id,
                 )
         );
     $template->parse('list', 'list_block', true);

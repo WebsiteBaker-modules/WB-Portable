@@ -25,4 +25,5 @@
         border:dotted 1px #303030;
         color:#303030;
     }
-/* ]]> */
+table.account tr { line-height: 2.525; }
+

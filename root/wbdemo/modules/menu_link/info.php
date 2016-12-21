@@ -22,10 +22,10 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
 /* -------------------------------------------------------- */
 
 $module_directory = 'menu_link';
-$module_name = 'Menu Link';
+$module_name = 'Menu Link v2.8.6';
 $module_function = 'page';
-$module_version = '2.8.4';
-$module_platform = '2.8.x';
+$module_version = '2.8.6';
+$module_platform = '2.8.3';
 $module_author = 'Ryan Djurovich, thorn';
 $module_license = 'GNU General Public License';
 $module_description = 'This module allows you to insert a link into the menu.';

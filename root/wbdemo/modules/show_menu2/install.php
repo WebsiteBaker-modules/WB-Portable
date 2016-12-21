@@ -11,14 +11,11 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
- * @version         $Id: install.php 1420 2011-01-26 17:43:56Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/show_menu2/install.php $
- * @lastmodified    $Date: 2011-01-26 18:43:56 +0100 (Mi, 26. Jan 2011) $
+ * @version         $Id: install.php 2114 2014-12-01 10:22:07Z darkviper $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/ShowMenu2/install.php $
+ * @lastmodified    $Date: 2014-12-01 11:22:07 +0100 (Mo, 01. Dez 2014) $
  *
  */
 
 // Must include code to stop this file being access directly
 if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
-
-
-?>

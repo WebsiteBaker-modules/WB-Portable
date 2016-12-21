@@ -28,11 +28,13 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
         if( !$admin->get_permission($sAddonName,'module' ) ) {
             $admin->print_error($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES'], $js_back);
         }
+
         $SettingsDenied = array( 'at_replacement', 'dot_replacement', 'email_filter', 'mailto_filter', 'OutputFilterMode' );
         if ($database->field_exists( TABLE_PREFIX.'mod_output_filter', 'sys_rel')) {
             include('cmdUpgrade.inc' );
         } else {
         }
+        if (is_readable(dirname(__DIR__).'/info.php')) {require dirname(__DIR__).'/info.php';}
 
         if (is_readable(dirname(__DIR__).'/OutputFilterApi.php')) {
             if (!function_exists('getOutputFilterSettings')) {
@@ -84,7 +86,7 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
             }
         }
 //        $aAllowedFilters  = array_keys ( $aDefaultSettings );
-// Create new template object   
+// Create new template object
         $oTpl = new Template( $sAddonThemePath );
 //        $oTpl->debug = true;
         $oTpl->set_file('page', 'tool.htt');
@@ -93,38 +95,38 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
         $oTpl->set_var('FTAN', $admin->getFTAN());
         $oTpl->set_var($TEXT);
         $oTpl->set_var('ADMIN_URL', $oReg->AcpUrl);
-        $oTpl->set_var('MODULE_NAME', $sAddonName); 
+        $oTpl->set_var('MODULE_NAME', $sAddonName);
         $msgTxt = '';
         $msgCls = 'msg-box';
 
         $msgTxt = $module_description;
         $msgCls = 'info-box';
 
-        $oTpl->set_var('TOOL_NAME', $toolName); 
+        $oTpl->set_var('TOOL_NAME', $toolName);
         $oTpl->set_var('REQUEST_URI', $_SERVER['REQUEST_URI']);
-        $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'/admintools/index.php');
-        $oTpl->set_var('TOOL_URL', $oReg->AcpUrl.'/admintools/tool.php?tool='.$sAddonName);
+        $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'admintools/index.php');
+        $oTpl->set_var('TOOL_URL', $oReg->AcpUrl.'admintools/tool.php?tool='.$sAddonName);
 //        $oTpl->set_var($MESSAGE);
         $oTpl->set_var($MOD_MAIL_FILTER);
         $oTpl->set_var($HEADING);
 // check if data was submitted
         if($doSave) {
-    // save changes 
+    // save changes
             $oTpl->parse('headline', 'headline_block', true);
-            $oTpl->set_var('TOOL_URL', $oReg->AcpUrl.'/admintools/tool.php?tool='.$sAddonName);
-            $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'/admintools/tool.php?tool='.$sAddonName);
+            $oTpl->set_var('TOOL_URL', $oReg->AcpUrl.'admintools/tool.php?tool='.$sAddonName);
+            $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'admintools/tool.php?tool='.$sAddonName);
             include(__DIR__.'/cmdSave.inc');
             $aFilterSettings = getOutputFilterSettings();
         } else {
             $oTpl->set_block('main_block', 'headline_block', '');
-            $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'/admintools/index.php');
+            $oTpl->set_var('CANCEL_URL', $oReg->AcpUrl.'admintools/index.php');
         }
         $oTpl->set_block('main_block', 'core_info_block', 'core_info');
         if( $debugMessage != '') {
         // write message box if needed
 //            echo '<div class="'.$msgCls.'">'.$msgTxt.'</div>';
-            $oTpl->set_var('CORE_MSGCLS', $msgCls); 
-            $oTpl->set_var('CORE_MSGTXT', $print_r); 
+            $oTpl->set_var('CORE_MSGCLS', $msgCls);
+            $oTpl->set_var('CORE_MSGTXT', $print_r);
             $oTpl->parse('core_info', 'core_info_block', true);
         } else {
             $oTpl->set_block('core_info', 'core_info_block', '');
@@ -133,8 +135,8 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
         if( $msgTxt != '') {
         // write message box if needed
 //            echo '<div class="'.$msgCls.'">'.$msgTxt.'</div>';
-            $oTpl->set_var('MSGCLS', $msgCls); 
-            $oTpl->set_var('MSGTXT', $msgTxt); 
+            $oTpl->set_var('MSGCLS', $msgCls);
+            $oTpl->set_var('MSGTXT', $msgTxt);
         }
         $oTpl->parse('message', 'message_block', true);
 

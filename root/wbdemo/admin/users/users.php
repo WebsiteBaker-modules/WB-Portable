@@ -14,7 +14,7 @@
  * @filesource      $HeadURL: https://localhost:8443/svn/wb283Sp4/SP4/branches/wb/admin/users/users.php $
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
-*/
+ */
 
  // Include config file and admin class file
 if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
@@ -25,6 +25,13 @@ $action = 'cancel';
 $action = (isset($_POST['modify']) ? 'modify' : $action );
 $action = (isset($_POST['delete']) ? 'delete' : $action );
 
+$oTrans = Translate::getInstance();
+$oTrans->enableAddon('admin\\users');
+/*
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.''.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+print_r( $oTrans ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+*/
+
 switch ($action):
     case 'modify' :
             // Print header
@@ -32,12 +39,12 @@ switch ($action):
             $user_id = intval($admin->checkIDKEY('user_id', 0, $_SERVER['REQUEST_METHOD']));
             // Check if user id is a valid number and doesnt equal 1
             if($user_id == 0){
-            $admin->print_error($MESSAGE['GENERIC_FORGOT_OPTIONS'] );
+            $admin->print_error($oTrans->MESSAGE_GENERIC_FORGOT_OPTIONS );
             }
             if( ($user_id < 2 ) )
             {
                 // if($admin_header) { $admin->print_header(); }
-                $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+                $admin->print_error($oTrans->MESSAGE_GENERIC_SECURITY_ACCESS, ADMIN_URL );
             }
             // Get existing values
 
@@ -56,9 +63,9 @@ switch ($action):
             $template->set_block('page', 'main_block', 'main');
             $template->set_block('main_block', 'user_add_block', 'user_add');
 
-            $template->set_var(    array(
+            $template->set_var(array(
                                 'ACTION_URL' => ADMIN_URL.'/users/save.php',
-                                'SUBMIT_TITLE' => $TEXT['SAVE'],
+                                'SUBMIT_TITLE' => $oTrans->TEXT_SAVE,
                                 'USER_ID' => $user['user_id'],
                                 'USERNAME' => $user['username'],
                                 'DISPLAY_NAME' => $user['display_name'],
@@ -78,48 +85,47 @@ switch ($action):
             }
             // Add groups to list
             $template->set_block('main_block', 'group_list_block', 'group_list');
-            $results = $database->query("SELECT group_id, name FROM ".TABLE_PREFIX."groups WHERE group_id != '1' ORDER BY name");
-            if($results->numRows() > 0) {
+            $sql  = 'SELECT `group_id`, `name` FROM `'.TABLE_PREFIX.'groups` '
+                  . 'WHERE `group_id` != 1 '
+                  . 'ORDER BY `name`';
+            $results = $database->query($sql);
+            if ($database->query($sql))
+            {
                 $template->set_var('ID', '');
-                $template->set_var('NAME', $TEXT['PLEASE_SELECT'].'...');
+                $template->set_var('NAME', $oTrans->TEXT_PLEASE_SELECT.'...');
                 $template->set_var('SELECTED', '');
                 $template->parse('group_list', 'group_list_block', true);
-                while($group = $results->fetchRow()) {
+                while($group = $results->fetchRow(MYSQLI_ASSOC))
+                {
                     $template->set_var('ID', $group['group_id']);
                     $template->set_var('NAME', $group['name']);
-                    if(in_array($group['group_id'], explode(",",$user['groups_id']))) {
+                    $template->set_var('SELECTED', '');
+                    if ($admin->is_group_match($group['group_id'], $user['groups_id']))
+                    {
                         $template->set_var('SELECTED', ' selected="selected"');
-                    } else {
-                        $template->set_var('SELECTED', '');
                     }
                     $template->parse('group_list', 'group_list_block', true);
                 }
             }
 
             // Only allow the user to add a user to the Administrators group if they belong to it
-            if(in_array(1, $admin->get_groups_id()))
+            if ($admin->ami_group_member('1'))
             {
                 $template->set_var('ID', '1');
                 $users_groups = $admin->get_groups_name();
                 $template->set_var('NAME', $users_groups[1]);
-
-                $in_group = FALSE;
-                foreach($admin->get_groups_id() as $cur_gid){
-                    if (in_array($cur_gid, explode(",", $user['groups_id']))) {
-                        $in_group = TRUE;
-                    }
-                }
-
-                if($in_group) {
+                if ($admin->is_group_match('1', $user['groups_id']))
+                {
                     $template->set_var('SELECTED', ' selected="selected"');
                 } else {
                     $template->set_var('SELECTED', '');
                 }
                 $template->parse('group_list', 'group_list_block', true);
             } else {
-                if($results->numRows() == 0) {
+                if($results->numRows() == 0)
+                {
                     $template->set_var('ID', '');
-                    $template->set_var('NAME', $TEXT['NONE_FOUND']);
+                    $template->set_var('NAME', $oTrans->TEXT_NONE_FOUND);
                     $template->set_var('SELECTED', ' selected="selected"');
                     $template->parse('group_list', 'group_list_block', true);
                 }
@@ -161,22 +167,22 @@ switch ($action):
 
             // Insert language text and messages
             $template->set_var(array(
-                                'TEXT_RESET' => $TEXT['RESET'],
-                                'TEXT_CANCEL' => $TEXT['CANCEL'],
-                                'TEXT_ACTIVE' => $TEXT['ACTIVE'],
-                                'TEXT_DISABLED' => $TEXT['DISABLED'],
-                                'TEXT_PLEASE_SELECT' => $TEXT['PLEASE_SELECT'],
-                                'TEXT_USERNAME' => $TEXT['USERNAME'],
-                                'TEXT_PASSWORD' => $TEXT['PASSWORD'],
-                                'TEXT_RETYPE_PASSWORD' => $TEXT['RETYPE_PASSWORD'],
-                                'TEXT_DISPLAY_NAME' => $TEXT['DISPLAY_NAME'],
-                                'TEXT_EMAIL' => $TEXT['EMAIL'],
-                                'TEXT_GROUP' => $TEXT['GROUP'],
-                                'TEXT_NONE' => $TEXT['NONE'],
-                                'TEXT_HOME_FOLDER' => $TEXT['HOME_FOLDER'],
+                                'TEXT_RESET' => $oTrans->TEXT_RESET,
+                                'TEXT_CANCEL' => $oTrans->TEXT_CANCEL,
+                                'TEXT_ACTIVE' => $oTrans->TEXT_ACTIVE,
+                                'TEXT_DISABLED' => $oTrans->TEXT_DISABLED,
+                                'TEXT_PLEASE_SELECT' => $oTrans->TEXT_PLEASE_SELECT,
+                                'TEXT_USERNAME' => $oTrans->TEXT_USERNAME,
+                                'TEXT_PASSWORD' => $oTrans->TEXT_PASSWORD,
+                                'TEXT_RETYPE_PASSWORD' => $oTrans->TEXT_RETYPE_PASSWORD,
+                                'TEXT_DISPLAY_NAME' => $oTrans->TEXT_DISPLAY_NAME,
+                                'TEXT_EMAIL' => $oTrans->TEXT_EMAIL,
+                                'TEXT_GROUP' => $oTrans->TEXT_GROUP,
+                                'TEXT_NONE' => $oTrans->TEXT_NONE,
+                                'TEXT_HOME_FOLDER' => $oTrans->TEXT_HOME_FOLDER,
                                 'USERNAME_FIELDNAME' => $username_fieldname,
-                                'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
-                                'HEADING_MODIFY_USER' => $HEADING['MODIFY_USER'],
+                                'CHANGING_PASSWORD' => $oTrans->MESSAGE_USERS_CHANGING_PASSWORD,
+                                'HEADING_MODIFY_USER' => $oTrans->HEADING_MODIFY_USER,
                                 'CANCEL_LINK' => ADMIN_URL.'/users/index.php',
                                 )
                         );
@@ -194,26 +200,28 @@ switch ($action):
             $user_id = intval($admin->checkIDKEY('user_id', 0, $_SERVER['REQUEST_METHOD']));
             // Check if user id is a valid number and doesnt equal 1
             if($user_id == 0){
-            $admin->print_error($MESSAGE['GENERIC_FORGOT_OPTIONS'] );
+            $admin->print_error($oTrans->MESSAGE_GENERIC_FORGOT_OPTIONS );
             }
             if( ($user_id < 2 ) )
             {
                 // if($admin_header) { $admin->print_header(); }
-                $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL  );
+                $admin->print_error($oTrans->MESSAGE_GENERIC_SECURITY_ACCESS, ADMIN_URL  );
             }
             $sql  = 'SELECT `active` FROM `'.TABLE_PREFIX.'users` ';
             $sql .= 'WHERE `user_id` = '.$user_id.'';
             if( ($iDeleteUser = $database->get_one($sql)) == 1 ) {
+                $sMessage = $oTrans->MESSAGE_USERS_DEACTIVATED;
                 // Delete the user
                 $database->query("UPDATE `".TABLE_PREFIX."users` SET `active` = 0 WHERE `user_id` = '".$user_id."' ");
             } else {
+                $sMessage = $oTrans->MESSAGE_USERS_DELETED;
                 $database->query("DELETE FROM `".TABLE_PREFIX."users` WHERE `user_id` = ".$user_id);
             }
 
             if($database->is_error()) {
                 $admin->print_error($database->get_error());
             } else {
-                $admin->print_success($MESSAGE['USERS_DELETED']);
+                $admin->print_success($sMessage);
             }
             // Print admin footer
             $admin->print_footer();

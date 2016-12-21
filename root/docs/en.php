@@ -14,7 +14,7 @@ include ("head.php");
 
 // content begins here
 ?><h2>What is WebsiteBaker portable about</h2>
-        <p>The <a href="http://www.websitebaker.org/" target="_blank">WebsiteBaker</a> portable project combines the easy to use content management system WebsiteBaker with the out of the box server solution <a href="http://www.usbwebserver.net/en/" target="_blank">USBWebserver8</a>.</p>
+        <p>The <a href="http://websitebaker.org/" target="_blank">WebsiteBaker</a> portable project combines the easy to use content management system WebsiteBaker with the out of the box server solution <a href="http://www.usbwebserver.net/en/" target="_blank">USBWebserver8</a>.</p>
         <p><strong>This allows you to demonstrate WebsiteBaker live or test and run it in a local test environment by one click.</strong></p>
         <br />
         <hr />
@@ -36,12 +36,15 @@ include ("head.php");
         <hr />
         <br />
         <h2>WebsiteBaker official support</h2>
-        <p>Please visit the <a href="http://www.websitebaker.org/en/help/help-project.php" target="_blank">official WebsiteBaker Help site</a> to learn more about WebsiteBaker. If you have any problems or questions, please do not hesitate to visit the&nbsp;<a href="http://www.websitebaker.org/forum/" target="_blank"> WebsiteBaker Forum</a>.</p>
+        <p>
+        Please visit the <a href="http://help.websitebaker.org/" target="_blank">official WebsiteBaker Help site</a>
+         to learn more about WebsiteBaker. If you have any problems or questions, please do not hesitate to visit the&nbsp;<a href="http://forum.websitebaker.org/" target="_blank"> WebsiteBaker Forum</a>.
+         </p>
         <br />
         <hr />
         <br />
         <h2>WebsiteBaker Add-ons (modules and templates)</h2>
-        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://www.websitebaker.org/en/add-ons/add-ons-project.php" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
+        <p>There exists numerous WebsiteBaker templates, designs, modules and add-ons. Check out the <a href="http://addons.websitebaker.org/" target="_blank">official WebsiteBaker Add-ons Repository</a> to find what you need.</p>
         <br />
         <hr />
         <br />
@@ -52,7 +55,7 @@ include ("head.php");
             <li><a target="_blank" href="http://localhost:4001/wbdemo/admin/"><strong>Direct access to the backend</strong></a> (admin)<br /><br />
                  <b>Loginname: </b>admin<br />
                  <b>Password: </b>admin</li>
-            </ul>        
+            </ul>
         </fieldset>
         <br />
         <hr />
@@ -60,7 +63,6 @@ include ("head.php");
         <h2>About USBWebserver8</h2>
         <p>You can display the USBWebserver8 WAMP Infos (e.g. phpinfo) <a href="http://localhost:4001/docs/usbw-info/" target="_blank">by clicking here!</a><br />
         USBWebserver-manual: <a href="http://www.usbwebserver.net/downloads/manual.pdf" target="_blank" title="USBWebserver8 manual">Click!</a><br />
-        Access to database via <b>MySQLDumper</b>: <a href="http://localhost:4001/mysqldumper" target="_blank">Click!</a><br />
         Access to database via <b>phpMyAdmin</b>: <a href="http://localhost:4001/phpmyadmin" target="_blank">Click!</a><br /><br /></p>
         <hr />
         <br />
@@ -72,6 +74,6 @@ include ("head.php");
         <p>All the people who supported this project, especially Martin Freudenreich (aka mr-fan) for starting this portable project .</p>
         <p>Have fun baking!<br />
         <strong>WebsiteBaker Org e.V.</strong></p>
-        
+
     <?php
-include ("foot.php");        
+include ("foot.php");

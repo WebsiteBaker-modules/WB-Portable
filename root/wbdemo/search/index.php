@@ -17,10 +17,15 @@
  */
 
 // Include the config file
-require('../config.php');
+//require('../config.php');
+if ( !defined( 'WB_PATH' ) ){ require(dirname(__DIR__).'/config.php'); }
+if ( !class_exists('frontend')) { require(WB_PATH.'/framework/class.frontend.php');  }
+// Create new frontend object
+if (!isset($wb) || !($wb instanceof frontend)) { $wb = new frontend(); }
 
 // Required page details
 $page_id = 0;
+$page_id = @$_SESSION['PAGE_ID'] ?: 0;
 $page_description = '';
 $page_keywords = '';
 define('PAGE_ID', 0);
@@ -35,8 +40,8 @@ define('PAGE_CONTENT', 'search.php');
 
 // Find out what the search template is
 // $database = new database();
-$query_template = $database->query("SELECT value FROM ".TABLE_PREFIX."search WHERE name = 'template' LIMIT 1");
-$fetch_template = $query_template->fetchRow();
+$query_template = $database->query("SELECT `value` FROM `".TABLE_PREFIX."search` WHERE `name` = 'template' LIMIT 1");
+$fetch_template = $query_template->fetchRow(MYSQLI_ASSOC);
 $template = $fetch_template['value'];
 if($template != '') {
     define('TEMPLATE', $template);
@@ -53,4 +58,3 @@ if(isset($_REQUEST['referrer']) && is_numeric($_REQUEST['referrer']) && intval($
 // Include index (wrapper) file
 require(WB_PATH.'/index.php');
 
-?>

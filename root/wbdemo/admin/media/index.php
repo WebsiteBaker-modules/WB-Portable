@@ -81,14 +81,13 @@ $template->set_var(array(
                     'HOME_DIRECTORY' => $currentHome,
                     'DISPLAY_UP_ARROW' => $display_up_arrow, // **!
                     'HEADING_CREATE_FOLDER' => $HEADING['CREATE_FOLDER'],
-                    'HEADING_UPLOAD_FILES' => $HEADING['UPLOAD_FILES']
+                    'HEADING_UPLOAD_FILES' => $HEADING['UPLOAD_FILES'],
                 )
             );
 // insert urls
 $template->set_var(array(
                     'ADMIN_URL' => ADMIN_URL,
                     'WB_URL' => WB_URL,
-                    'WB_PATH' => WB_PATH,
                     'THEME_URL' => THEME_URL
                 )
             );

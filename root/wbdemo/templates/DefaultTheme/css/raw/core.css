@@ -1,0 +1,29 @@
+* html body * { overflow :visible; }
+* html div{ height :1em;  }
+html { overflow: -moz-scrollbars-vertical; }
+html {
+  color: #404040;
+  font-family: Verdana,"Trebuchet MS",Arial,Helvetica,sans-serif;
+  font-size: 100.1%;
+  font-weight: normal;
+  overflow-x: auto;
+  overflow-y: scroll;
+}
+body{ margin :0 auto; padding :0px; background :#a8bccb; text-align :left; font-size :0.8em; }
+body { background-color :#a8bccb; background-repeat :repeat-x; }
+
+.rounded { border-radius :10px; -khtml-border-radius :10px; -webkit-border-radius :10px; -moz-border-radius :10px; }
+.bigger { font-size :150%; }
+.strong { font-weight :bold; }
+.msg-box { background :#e5ffe6; border :0.2em #009900 solid; color :#336600; margin-bottom :1em; padding :0.63em; text-align :center; }
+.error-box { background :#ffeeee; border :0.2em #884444 solid; color :#440000; margin-bottom :1em; padding :0.63em; text-align :center; }
+.msg-box p,
+.error-box p { font-size :120%; }
+/* FORMS */
+.submit, .cancel { width :100px; margin-top :5px; }
+.form_submit .right { text-align :right; }
+.input_small { width :20px; }
+.input_normal { width :120px; }
+.input_medium { width :150px; }
+.input_wide { width :200px; }
+.input_large { width :300px; }

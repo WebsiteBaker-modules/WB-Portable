@@ -17,8 +17,11 @@
  */
 
 // include required libraries
-// include configuration file
-   require('../config.php');
+if(!defined('WB_PATH'))
+{
+    require(dirname(__DIR__).'/config.php');
+}
+
 // include edit area wrapper script
    require_once(WB_PATH.'/include/editarea/wb_wrapper_edit_area.php');
 // include functions to edit the optional module CSS files (frontend.css, backend.css)
@@ -29,20 +32,16 @@
 // Tells script to update when this page was last updated
    $update_when_modified = false;
 // show the info banner
-//   $print_info_banner = true;
+//    $print_info_banner = true;
 // Include WB admin wrapper script
-   require(WB_PATH.'/modules/admin.php');
-  if(!$admin->checkFTAN()) {
-    $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
-  }
+    require(WB_PATH.'/modules/admin.php');
+    if(!$admin->checkFTAN()) {
+      $admin->print_header();
+      $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL.'/pages/modify.php?page_id='.$page_id );
+    }
 // After check print the header
 $admin->print_header();
 
-/*
-   $page_id = (isset($_REQUEST['page_id']) ? intval($_REQUEST['page_id']) : 0  );
-   $section_id = (isset($_POST['section_id']) ? intval($_POST['section_id']) : 0  );
-*/
    $_action = (isset($_POST['action']) ? strtolower($_POST['action']) : '');
    $_action = ($_action != 'save' ? 'edit' : 'save');
    $mod_dir = (isset($_POST['mod_dir']) ? $_POST['mod_dir'] : '');
@@ -111,9 +110,9 @@ $admin->print_header();
         <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
         <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
         <input type="hidden" name="mod_dir" value="<?php echo $mod_dir; ?>" />
-      <input type="hidden" name="edit_file" value="<?php echo $css_file; ?>" />
+        <input type="hidden" name="edit_file" value="<?php echo $css_file; ?>" />
         <input type="hidden" name="action" value="save" />
-      <textarea id="code_area" name="css_data" cols="100" rows="25" wrap="VIRTUAL" style="margin:2px;width:100%;">
+        <textarea id="code_area" name="css_data" cols="100" rows="25" wrap="VIRTUAL" style="margin:2px;width:100%;">
 <?php echo htmlspecialchars($css_content); ?>
       </textarea>
            <table cellpadding="0" cellspacing="0" border="0" width="100%">

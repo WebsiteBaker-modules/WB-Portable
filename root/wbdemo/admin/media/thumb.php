@@ -16,30 +16,43 @@
  *
  */
 
-require('../../config.php');
-include_once('resize_img.php');
-require_once(WB_PATH.'/framework/functions.php');
-
-if (isset($_GET['img']) && isset($_GET['t'])) {
-    $image = addslashes($_GET['img']);
-
-    // Check to see if it contains ..
-    if (!check_media_path($image)) {
-        $admin->print_error($MESSAGE['MEDIA']['DIR_DOT_DOT_SLASH'], WB_URL, false);
-    }
-
-    $type = addslashes($_GET['t']);
-    $media = WB_PATH.MEDIA_DIRECTORY;
-    $img=new RESIZEIMAGE($media.$image);
-    if ($img->imgWidth) {
-        if ($type == 1) {
-            $img->resize_limitwh(50,50);
-        } else if ($type == 2) {
-            $img->resize_limitwh(200,200);
-        } 
-        $img->close();
-    } else {
-        header ("Content-type: image/jpeg");
-        readfile ( "nopreview.jpg" );
+if(!defined('WB_URL'))
+{
+    $config_file = realpath('../../config.php');
+    if(file_exists($config_file) && !defined('WB_URL'))
+    {
+        require($config_file);
     }
 }
+//if(!class_exists('admin', false)){ include(WB_PATH.'/framework/class.admin.php'); }
+$modulePath = dirname(__FILE__);
+
+/*
+// Get image
+    $requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
+    $image = (isset(${$requestMethod}['img']) ? ${$requestMethod}['img'] : '');
+print '<pre style="text-align: left;"><strong>function '.__FUNCTION__.'( '.''.' );</strong>  basename: '.basename(__FILE__).'  line: '.__LINE__.' -> <br />';
+print_r( $_GET ); print '</pre>';  die(); // flush ();sleep(10);
+*/
+
+if (isset($_GET['img']) && isset($_GET['t'])) {
+    if(!class_exists('PhpThumbFactory', false)){ include($modulePath.'/inc/ThumbLib.inc.php'); }
+//    require_once($modulePath.'/inc/ThumbLib.inc.php');
+    $image = addslashes($_GET['img']);
+    $type = intval($_GET['t']);
+//    $media = WB_PATH.MEDIA_DIRECTORY.'/';
+    $thumb = PhpThumbFactory::create(WB_PATH.MEDIA_DIRECTORY.'/'.$image);
+
+    if ($type == 1) {
+        $thumb->adaptiveResize(20,20);
+//        $thumb->resize(30,30);
+//        $thumb->cropFromCenter(80,50);
+//         $thumb->resizePercent(40);
+    } else {
+        $thumb->Resize(300,300);
+//         $thumb->resizePercent(25);
+//        $thumb->cropFromCenter(80,50);
+    }
+    $thumb->show();
+
+ }

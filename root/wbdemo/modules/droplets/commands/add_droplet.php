@@ -11,36 +11,17 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: add_droplet.php 1503 2011-08-18 02:18:59Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/droplets/add_droplet.php $
- * @lastmodified    $Date: 2011-08-18 04:18:59 +0200 (Do, 18. Aug 2011) $
+ * @version         $Id: add_droplet.php 16 2016-09-13 20:52:49Z dietmar $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2-modules/addons/droplets/commands/add_droplet.php $
+ * @lastmodified    $Date: 2016-09-13 22:52:49 +0200 (Di, 13. Sep 2016) $
  *
  */
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
 if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
-$droplet_id = 0;
-if($admin->get_permission('admintools') == true) {
-
+$droplet_id = $oApp->getIDKEY(0);
+if ($oApp->get_permission('admintools') == true) {
     $modified_when = time();
-    $modified_by = intval($admin->get_user_id());
-
-    // Insert new row into database
-    $sql = 'INSERT INTO `'.TABLE_PREFIX.'mod_droplets` SET '
-    . '`name` = \'\', '
-    . '`code` = \'\', '
-    . '`description` = \'\', '
-    . '`comments` = \'\', '
-    . '`active` = 1, '
-    . '`admin_edit` = 0, '
-    . '`admin_view` = 0, '
-    . '`show_wysiwyg`= 0, '
-    . '`modified_when` = '.$modified_when.', '
-    . '`modified_by` = '.$modified_by.' ';
-    $database->query($sql);
-
-    // Get the id 
-    $droplet_id = intval( $database->getLastInsertId());
-
+    $modified_by = intval($oApp->get_user_id());
 }

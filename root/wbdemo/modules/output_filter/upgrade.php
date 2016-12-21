@@ -32,6 +32,7 @@
  */
 
     // forwarding to the dispatcher
+    $callingScript = $_SERVER["SCRIPT_NAME"];
     $sCommand = 'upgrade';
     include __DIR__.'/addon.php';
 

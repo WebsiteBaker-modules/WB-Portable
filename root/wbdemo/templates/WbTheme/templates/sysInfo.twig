@@ -1,0 +1,112 @@
+<!-- BEGIN mainBlock -->
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+<style type="text/css">
+<!--
+body { background: #EAEAEA; }
+.group {
+  background: #f3f3f3 none repeat scroll 0 0;
+  border: 1px solid #999;
+  border-radius: 4px;
+  box-shadow: 2px 2px 5px #ccc;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+}
+.group h2 {
+  background-color: #5C9AB8;
+  box-shadow: 1px 1px 15px #999 inset;
+  color: #fff;
+  font-size: 1.6em;
+  font-weight: normal;
+  margin-top: 0;
+  padding: 0.1em 0.3em;
+  text-shadow: 0 1px 0 #777;
+}
+.icon {
+  background-image: url("{{ THEME_URL }}/images/help_16.png") !important;
+  background-position: left top !important;
+  background-repeat: no-repeat !important;
+  height: 16px;
+  margin: 0 0 0 0.3em;
+  padding: 0 !important;
+  width: 16px;
+}
+a img {
+  border: 0 none;
+}
+img, button {
+  vertical-align: middle;
+}
+-->
+</style>
+  </head>
+  <body>
+    <div class="sysinfo-box" style="margin: 1.125em auto; width: 100%;">
+      <div class="group">
+        <h2>
+          Datenbank-Server/Client
+        </h2>
+        <ul>
+          <li id="li_server_info">
+            Server: {{ server.host_info }}
+          </li>
+          <li id="li_server_version">
+            Server-Version: {{ getSqlServer }}
+          </li>
+          <li id="li_mysql_proto">
+            Protokoll-Version: {{ server.protocol_version }}
+          </li>
+          <li id="li_mysql_client_version">
+            Datenbank-Client Version: {{ client_info }}
+          </li>
+          <li id="li_mysql_client_encoding">
+            Datenbank-Client encoding: {{ client_encoding }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="group">
+        <h2>
+          Webserver
+        </h2>
+        <ul>
+          <li id="li_web_server_software">
+            Webserver Software: {{ getOsVersion }}
+          </li>
+          <li id="li_used_php_extension">
+            PHP-Erweiterung: mysqli
+            <a target="documentation" href="https://secure.php.net/manual/de/book.mysqli.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}/images/dot.gif"></a>
+            curl
+            <a target="documentation" href="https://secure.php.net/manual/de/book.curl.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}/images/dot.gif"></a>
+            mbstring
+            <a target="documentation" href="https://secure.php.net/manual/de/book.mbstring.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}/images/dot.gif"></a>
+          </li>
+          <li id="li_used_wb_version">
+            PHP-Version: {{ php_version }}
+          </li>
+          <li id="li_used_php_version">
+            WebsiteBaker-Version: {{ WbVersion }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="group">
+        <h2>Webspace writable folders</h2>
+          {% if aWritablePaths %}
+            <ul>
+                  {% for nane, writable in aWritablePaths %}
+                      <li style="color: {% if writable %}#207D12{% else %}#F63513{% endif %};">{{ nane }}</li>
+                  {% else %}
+                      <li><em>no path found</em></li>
+                  {% endfor %}
+            </ul>
+              {% endif %}
+      </div>
+
+    </div>
+  </body>
+
+</html>
+<!-- END mainBlock -->

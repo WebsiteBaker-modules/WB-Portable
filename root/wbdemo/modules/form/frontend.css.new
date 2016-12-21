@@ -1,0 +1,2 @@
+/* switch path to default or ownstyle */
+@import url("templates/default/css/frontend.css");

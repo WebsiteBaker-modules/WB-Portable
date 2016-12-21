@@ -1,0 +1,36 @@
+<!-- BEGIN main_block -->
+
+<h2>{HEADING_LANGUAGE_DETAILS}</h2>
+
+<div class="block-outer">
+<table class="addons language">
+  <tbody>
+    <tr>
+        <td class="setting_name">{TEXT_NAME}:</td>
+        <td>{NAME}</td>
+    </tr>
+    <tr>
+        <td class="setting_name">{TEXT_CODE}:</td>
+        <td>{CODE}</td>
+    </tr>
+    <tr>
+        <td class="setting_name">{TEXT_AUTHOR}:</td>
+        <td>{AUTHOR}</td>
+    </tr>
+    <tr>
+        <td class="setting_name">{TEXT_VERSION}:</td>
+        <td>{VERSION}</td>
+    </tr>
+    <tr>
+        <td class="setting_name">{TEXT_DESIGNED_FOR}:</td>
+        <td>Website Baker {DESIGNED_FOR}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<br />
+
+<button class="btn btn-default" onclick="window.location = 'index.php';">{TEXT_BACK}</button>
+
+<!-- END main_block -->

@@ -47,7 +47,8 @@ if(!defined('WB_URL')) {
         $jscal_lang = 'en';
     }
     // today
-    $jscal_today = gmdate('Y/m/d H:i');
+    $timezones = (time()+TIMEZONE);
+    $jscal_today = gmdate('Y/m/d H:i', $timezones);
     // first-day-of-week
     $jscal_firstday = '1'; // monday
     if(LANGUAGE=='EN')

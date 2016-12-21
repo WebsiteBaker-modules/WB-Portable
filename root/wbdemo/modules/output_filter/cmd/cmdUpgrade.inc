@@ -27,10 +27,14 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
     $FAIL = "<span class=\"error\">FAILED</span>";
     $iErr = false;
     $aOldSettings = array();
+    $tmp = 'upgrade-script.php';
+    $globalStarted = substr_compare($callingScript, $tmp,(0-strlen($tmp)),strlen($tmp)) === 0;
+
     $msg = array(
         '<div style="margin:1em auto;font-size:1.1em;">',
         '<h4>Step '.$i++.': Updating Output Filter Settings</h4>'
     );
+//    print $callingScript.'<br /><br />';
     $sInstallStruct = $sAddonPath.'/install-struct.sql';
     if ( !is_readable($sInstallStruct)) {
         $msg[] = '<strong>\'missing or not readable file [install-struct.sql]\'</strong> '.$FAIL.'<br />';
@@ -46,7 +50,7 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
             );
             foreach ( $aFiles  as $sFilterFile) {
                 $key = preg_replace('=^.*?filter([^\.\/\\\\]+)(\.[^\.]+)?$=is', '\1', $sFilterFile);
-                $aDefaults[$key] = '1';
+                $aDefaults[$key] = '0';
             }
           return $aDefaults;
         });
@@ -57,16 +61,16 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
         // read settings first
         $sql = 'SELECT * FROM `'.$sTable.'`';
         // check if table already upgraded
-        if ( $bOldStructure = $database->field_exists($sTable, 'sys_rel') ) 
+        if ( $bOldStructure = $database->field_exists($sTable, 'sys_rel') )
         {
-            if (($oSettings = $database->query($sql))) 
+            if (($oSettings = $database->query($sql)))
             {
-              // 
+              //
                 if (!($aOldSettings = $oSettings->fetchRow(MYSQLI_ASSOC))) {
                     $msg[] = '<strong>\'Output Filter backup old settings\'</strong> '.$FAIL.'<br />';
                     $iErr = true;
                 } else {
-                    // add new defaults to old settings without invalide values 
+                    // add new defaults to old settings without invalide values
                     $aNewSettings = array_intersect_key( $aOldSettings, $aDefaults );
                     $aOldSettings = array_replace_recursive( $aDefaults, $aNewSettings );
                 }
@@ -76,7 +80,7 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
               // overwrite standardsettings ($aOldSettings)
               $sql = 'SELECT * FROM `'.$sTable.'`';
               if (($oSettings = $database->query($sql))) {
-                while( $aSettings = $oSettings->fetchRow( MYSQLI_ASSOC ) ) 
+                while( $aSettings = $oSettings->fetchRow( MYSQLI_ASSOC ) )
                 {
                     $key = $aSettings['name'];
                     $aOldSettings[$key] = $aSettings['value'];
@@ -98,7 +102,7 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
             }
         }
           // drop old table and create new one
-          if ($database->SqlImport($sInstallStruct, TABLE_PREFIX, false)) 
+          if ($database->SqlImport($sInstallStruct, TABLE_PREFIX, false))
           {
               if ($aOldSettings) {
               // restore old settings if there any
@@ -131,5 +135,6 @@ if(!defined('WB_PATH')) { throw new RuntimeException('Illegal access'); }
         unset($getDefaultSettings);
     }
     $msg[] = '</div>';
-    print implode("\n", $msg)."\n";
+    if (!$globalStarted) {print implode("\n", $msg)."\n";}
+
 

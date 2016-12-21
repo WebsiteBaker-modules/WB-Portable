@@ -40,13 +40,12 @@ if( (!($page_id = $admin->checkIDKEY('page_id', 0, $_SERVER['REQUEST_METHOD'])))
     exit();
 }
 */
+$field_set = $database->field_add(TABLE_PREFIX.'pages', 'page_code', 'INT(11) NOT NULL AFTER `modified_by`');
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `page_id` = '.$page_id;
 $results = $database->query($sql);
 $results_array = $results->fetchRow(MYSQLI_ASSOC);
-
 $old_admin_groups = explode(',', $results_array['admin_groups']);
 $old_admin_users = explode(',', $results_array['admin_users']);
-
 // Work-out if we should check for existing page_code
 $field_set = $database->field_exists(TABLE_PREFIX.'pages', 'page_code');
 
@@ -62,7 +61,6 @@ if((!$in_old_group) && !is_numeric(array_search($admin->get_user_id(), $old_admi
 {
     $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }
-
 // Get page details
 /* $database = new database();  */
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `page_id`='.$page_id;
@@ -76,10 +74,9 @@ if($results->numRows() == 0) {
     $admin->print_error($MESSAGE['PAGES_NOT_FOUND']);
 }
 $results_array = $results->fetchRow(MYSQLI_ASSOC);
-
+$aCurrentPage['seo_title'] = basename($results_array['link']);
 // Get display name of person who last modified the page
 $user=$admin->get_user_details($results_array['modified_by']);
-
 // Convert the unix ts for modified_when to human a readable form
 if($results_array['modified_when'] != 0)
 {
@@ -87,7 +84,6 @@ if($results_array['modified_when'] != 0)
 } else {
     $modified_ts = 'Unknown';
 }
-
 // Setup template object, parse vars to it, then parse it
 // Create new template object
 $template = new Template(dirname($admin->correct_theme_source('pages_settings.htt')));
@@ -95,37 +91,39 @@ $template = new Template(dirname($admin->correct_theme_source('pages_settings.ht
 $template->set_file('page', 'pages_settings.htt');
 $template->set_block('page', 'main_block', 'main');
 $template->set_var('FTAN', $admin->getFTAN());
-
 $template->set_var(array(
-                'PAGE_ID' => $results_array['page_id'],
-                // 'PAGE_IDKEY' => $admin->getIDKEY($results_array['page_id']),
-                'PAGE_IDKEY' => $results_array['page_id'],
-                'PAGE_TITLE' => ($results_array['page_title']),
-                'MENU_TITLE' => ($results_array['menu_title']),
-                'DESCRIPTION' => ($results_array['description']),
-                'KEYWORDS' => ($results_array['keywords']),
-                'MODIFIED_BY' => $user['display_name'],
+                'PAGE_ID'              => $results_array['page_id'],
+                // 'PAGE_IDKEY' => $admin->getIDKEY($aCurrentPage['page_id']),
+                'PAGE_IDKEY'           => $results_array['page_id'],
+                'PAGE_TITLE'           => ($results_array['page_title']),
+                'MENU_TITLE'           => ($results_array['menu_title']),
+                'SEO_TITLE'            => ($aCurrentPage['seo_title']=='') ? $results_array['menu_title'] : $aCurrentPage['seo_title'],
+                'DESCRIPTION'          => ($results_array['description']),
+                'KEYWORDS'             => ($results_array['keywords']),
+                'MODIFIED_BY'          => $user['display_name'],
                 'MODIFIED_BY_USERNAME' => $user['username'],
-                'MODIFIED_WHEN' => $modified_ts,
+                'MODIFIED_WHEN'        => $modified_ts,
                 'ADMIN_URL' => ADMIN_URL,
                 'WB_URL' => WB_URL,
                 'THEME_URL' => THEME_URL
                 )
         );
-
+$template->set_block('main_block', 'show_section_block', 'show_section');
 // Work-out if we should show the "manage sections" link
 $sql = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'sections` WHERE `page_id`='.$page_id.' AND `module`="menu_link"';
 $sections_available = (intval($database->get_one($sql)) != 0);
 if ($sections_available)
 {
     $template->set_var('DISPLAY_MANAGE_SECTIONS', 'display:none;');
+    $template->parse('show_section', '');
 } elseif(MANAGE_SECTIONS == 'enabled')
 {
     $template->set_var('TEXT_MANAGE_SECTIONS', $HEADING['MANAGE_SECTIONS']);
+    $template->parse('show_section', 'show_section_block', true);
 } else {
     $template->set_var('DISPLAY_MANAGE_SECTIONS', 'display:none;');
+    $template->parse('show_section', '');
 }
-
 // Visibility
 if($results_array['visibility'] == 'public') {
     $template->set_var('PUBLIC_SELECTED', ' selected="selected"');
@@ -138,12 +136,8 @@ if($results_array['visibility'] == 'public') {
 } elseif($results_array['visibility'] == 'none') {
     $template->set_var('NO_VIS_SELECTED', ' selected="selected"');
 }
-// Group list 1 (admin_groups)
-    $admin_groups = explode(',', str_replace('_', '', $results_array['admin_groups']));
-
     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'groups`';
     $get_groups = $database->query($sql);
-
     $template->set_block('main_block', 'group_list_block', 'group_list');
     // Insert admin group and current group first
     $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
@@ -170,10 +164,12 @@ if($results_array['visibility'] == 'public') {
             $flag_cursor =   'default';
             $flag_color =    '000000';
         }
-
+// Group list 1 (admin_groups)
+//    $admin_groups = explode(',', str_replace('_', '', $results_array['admin_groups']));
         // Check if the group is allowed to edit pages
-        $system_permissions = explode(',', $group['system_permissions']);
-        if(is_numeric(array_search('pages_modify', $system_permissions))) {
+//        $system_permissions = explode(',', $group['system_permissions']);
+//        if(is_numeric(array_search('pages_modify', $system_permissions))) {
+        if ($admin->get_permission('pages_modify')) {
             $template->set_var(array(
                                             'ID' => $group['group_id'],
                                             'TOGGLE' => $group['group_id'],
@@ -184,7 +180,8 @@ if($results_array['visibility'] == 'public') {
                                             'CHECKED' => $flag_checked
                                             )
                                     );
-            if(is_numeric(array_search($group['group_id'], $admin_groups))) {
+//            if(is_numeric(array_search($group['group_id'], $admin_groups))) {
+            if ($admin->is_group_match($group['group_id'], $results_array['admin_groups'])) {
                 $template->set_var('CHECKED', ' checked="checked"');
             } else {
                 if (!$flag_checked) $template->set_var('CHECKED', '');
@@ -192,13 +189,9 @@ if($results_array['visibility'] == 'public') {
             $template->parse('group_list', 'group_list_block', true);
         }
     }
-
 // Group list 2 (viewing_groups)
-    $viewing_groups = explode(',', str_replace('_', '', $results_array['viewing_groups']));
-
     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'groups`';
     $get_groups = $database->query($sql);
-
     $template->set_block('main_block', 'group_list_block2', 'group_list2');
     // Insert admin group and current group first
     $admin_group_name = $get_groups->fetchRow(MYSQLI_ASSOC);
@@ -213,7 +206,6 @@ if($results_array['visibility'] == 'public') {
                                     )
                             );
     $template->parse('group_list2', 'group_list_block2', true);
-
     while($group = $get_groups->fetchRow(MYSQLI_ASSOC))
     {
         // check if the user is a member of this group
@@ -228,7 +220,6 @@ if($results_array['visibility'] == 'public') {
             $flag_cursor =   'default';
             $flag_color =    '000000';
         }
-
         $template->set_var(array(
                                         'ID' => $group['group_id'],
                                         'TOGGLE' => $group['group_id'],
@@ -239,17 +230,16 @@ if($results_array['visibility'] == 'public') {
                                         'CHECKED' => $flag_checked
                                         )
                                 );
-        if(is_numeric(array_search($group['group_id'], $viewing_groups)))
+//        $viewing_groups = explode(',', str_replace('_', '', $results_array['viewing_groups']));
+//        if(is_numeric(array_search($group['group_id'], $viewing_groups)))
+        if ($admin->is_group_match($group['group_id'], $results_array['viewing_groups']))
         {
             $template->set_var('CHECKED', 'checked="checked"');
         } else {
             if (!$flag_checked) {$template->set_var('CHECKED', '');}
         }
-
         $template->parse('group_list2', 'group_list_block2', true);
-
     }
-
 // Show private viewers
 if($results_array['visibility'] == 'private' OR $results_array['visibility'] == 'registered')
 {
@@ -257,13 +247,14 @@ if($results_array['visibility'] == 'private' OR $results_array['visibility'] == 
 } else {
     $template->set_var('DISPLAY_VIEWERS', 'display:none;');
 }
-
 //-- insert page_code 20090904-->
 $template->set_var('DISPLAY_CODE_PAGE_LIST', ' id="multi_lingual" style="display:none;"');
-
 // Work-out if page languages feature is enabled
-if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB_PATH.'/modules/mod_multilingual/update_keys.php') )
-{
+if (
+    (defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) &&
+      $field_set &&
+      file_exists(WB_PATH.'/modules/mod_multilingual/update_keys.php')
+    ) {
     // workout field is set but module missing
     $TEXT['PAGE_CODE'] = empty($TEXT['PAGE_CODE']) ? 'Pagecode' : $TEXT['PAGE_CODE'];
     $template->set_var( array(
@@ -271,27 +262,22 @@ if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB
             'TEXT_PAGE_CODE' => '<a href="'.WB_URL.'/modules/mod_multilingual/update_keys.php?page_id='.$page_id.'">'.$TEXT['PAGE_CODE'].'</a>'
         )
     );
-
     // Page_code list
    /*     $database = new database();  */
     function page_code_list($parent)
     {
         global $admin, $database, $template, $results_array, $pageCode;
         $default_language = DEFAULT_LANGUAGE;
-
         $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent.' AND `language` = "'.$default_language.'" ORDER BY `position` ASC';
         $get_pages = $database->query($sql);
-
         while($page = $get_pages->fetchRow(MYSQLI_ASSOC))
         {
             if(($admin->page_is_visible($page)==false) && ($page['visibility'] <> 'none') ) { continue; }
-
             $template->set_var('FLAG_CODE_ICON',' none ');
             if( $page['parent'] == 0 )
             {
                 $template->set_var('FLAG_CODE_ICON','url('.THEME_URL.'/images/flags/'.strtolower($page['language']).'.png)');
             }
-
             // If the current page cannot be parent, then its children neither
             $list_next_level = true;
             // Stop users from adding pages with a level of more than the set page level limit
@@ -300,7 +286,6 @@ if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB
                 // Get user perms
                 $admin_groups = explode(',', str_replace('_', '', $page['admin_groups']));
                 $admin_users = explode(',', str_replace('_', '', $page['admin_users']));
-
                 $in_group = FALSE;
                 foreach($admin->get_groups_id() as $cur_gid)
                 {
@@ -309,14 +294,12 @@ if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB
                         $in_group = TRUE;
                     }
                 }
-
                 if(($in_group) OR is_numeric(array_search($admin->get_user_id(), $admin_users)))
                 {
                     $can_modify = true;
                 } else {
                     $can_modify = false;
                 }
-
                 $title_prefix = '';
                 for($i = 1; $i <= $page['level']; $i++) { $title_prefix .= ' - - &nbsp;'; }
                 // $space = str_repeat('&nbsp;', 3);  $space.'&lt;'..'&gt;'
@@ -341,41 +324,38 @@ if((defined('PAGE_LANGUAGES') && PAGE_LANGUAGES) && $field_set && file_exists(WB
                 page_code_list($page['page_id']);
         }
     } // end page_code_list
-
     // Insert code_page values from page to modify
     $template->set_block('main_block', 'page_code_list_block', 'page_code_list');
-    if($admin->get_permission('pages_add_l0') == true OR $results_array['level'] == 0) {
+
+    if($admin->get_permission('pages_add_l0') == true OR $results_array['level'] == 0)
+    {
         if($results_array['parent'] == 0) { $selected = ' selected'; } else { $selected = ''; }
-        $template->set_var(array(
-                                    'VALUE' => '',
-                                    'PAGE_CODE' => $TEXT['NONE'],
-                                    'PAGE_VALUE' => '',
-                                    'SELECTED' => $selected
-                                )
-                            );
+        $aPageCodeList = array(
+                'VALUE' => '',
+                'PAGE_CODE' => $TEXT['NONE'],
+                'PAGE_VALUE' => '',
+                'SELECTED' => $selected
+              );
+        $template->set_var($aPageCodeList);
         $template->parse('page_code_list', 'page_code_list_block', true);
     }
     // get pagecode form this page_id
        page_code_list(0);
 }
 //-- page code -->
-
 // Parent page list
 /* $database = new database();  */
 function parent_list($parent)
 {
     global $admin, $database, $template, $results_array,$field_set;
-
     $sql = 'SELECT * FROM `'.TABLE_PREFIX.'pages` WHERE `parent` = '.$parent.' ORDER BY `position` ASC';
     $get_pages = $database->query($sql);
-
     while($page = $get_pages->fetchRow(MYSQLI_ASSOC))
     {
         if($admin->page_is_visible($page)==false)
         {
           continue;
         }
-
         // if parent = 0 set flag_icon
         $template->set_var('FLAG_ROOT_ICON',' none ');
         if( $page['parent'] == 0  && $field_set)
@@ -410,11 +390,10 @@ function parent_list($parent)
             $template->set_var(array(
                                 'ID' => $page['page_id'],
                                 'TITLE' => ($title_prefix.$page['menu_title']),
-                                'MENU-TITLE' => ($title_prefix.$page['menu_title']),
                                 'PAGE-TITLE' => ($title_prefix.$page['page_title']),
+                                'MENU-TITLE' => ($title_prefix.$page['menu_title']),
                                 'FLAG_ICON' => ' none ',
                                 ));
-
             if($results_array['parent'] == $page['page_id'])
             {
                 $template->set_var('SELECTED', ' selected="selected"');
@@ -434,16 +413,14 @@ function parent_list($parent)
         {
           parent_list($page['page_id']);
         }
-
     }
 }
-
 $template->set_block('main_block', 'page_list_block2', 'page_list2');
 if($admin->get_permission('pages_add_l0') == true OR $results_array['level'] == 0) {
     if($results_array['parent'] == 0)
     {
         $selected = ' selected="selected"';
-    } else { 
+    } else {
         $selected = '';
     }
     $template->set_var(array(
@@ -454,14 +431,12 @@ if($admin->get_permission('pages_add_l0') == true OR $results_array['level'] == 
     $template->parse('page_list2', 'page_list_block2', true);
 }
 parent_list(0);
-
 if($modified_ts == 'Unknown')
 {
     $template->set_var('DISPLAY_MODIFIED', 'hide');
 } else {
     $template->set_var('DISPLAY_MODIFIED', '');
 }
-
 // Templates list
 $template->set_block('main_block', 'template_list_block', 'template_list');
 
@@ -485,7 +460,6 @@ if( ($res_templates = $database->query($sql)) )
         }
     }
 }
-
 // Menu list
 if(MULTIPLE_MENUS == false)
 {
@@ -522,10 +496,8 @@ foreach($menu AS $number => $name)
     }
     $template->parse('menu_list', 'menu_list_block', true);
 }
-
 // Insert language values
 $template->set_block('main_block', 'language_list_block', 'language_list');
-
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "language" ORDER BY `name`';
 if( ($res_languages = $database->query($sql)) )
 {
@@ -535,7 +507,6 @@ if( ($res_languages = $database->query($sql)) )
         $l_names[$rec_language['name']] = entities_to_7bit($rec_language['name']); // sorting-problem workaround
     }
     asort($l_names);
-
     foreach($l_names as $l_name=>$v)
     {
         $langIcons = (empty($l_codes[$l_name])) ? 'none' : strtolower($l_codes[$l_name]);
@@ -555,7 +526,6 @@ if( ($res_languages = $database->query($sql)) )
         $template->parse('language_list', 'language_list_block', true);
     }
 }
-
 // Select disabled if searching is disabled
 if($results_array['searching'] == 0)
 {
@@ -574,9 +544,9 @@ switch ($results_array['target'])
         $template->set_var('BLANK_SELECTED', ' selected="selected"');
         break;
 }
-
 // Insert language text
 $template->set_var(array(
+                'DISPLAY_ADVANCED' => ' disabled="disabled"',
                 'HEADING_MODIFY_PAGE_SETTINGS' => $HEADING['MODIFY_PAGE_SETTINGS'],
                 'TEXT_CURRENT_PAGE' => $TEXT['CURRENT_PAGE'],
                 'TEXT_MODIFY' => $TEXT['MODIFY'],
@@ -584,6 +554,7 @@ $template->set_var(array(
                 'LAST_MODIFIED' => $MESSAGE['PAGES']['LAST_MODIFIED'],
                 'TEXT_PAGE_TITLE' => $TEXT['PAGE_TITLE'],
                 'TEXT_MENU_TITLE' => $TEXT['MENU_TITLE'],
+                'TEXT_SEO_TITLE' => $TEXT['FILE'].'-'.$TEXT['LINK'],
                 'TEXT_TYPE' => $TEXT['TYPE'],
                 'TEXT_MENU' => $TEXT['MENU'],
                 'TEXT_PARENT' => $TEXT['PARENT'],
@@ -612,11 +583,10 @@ $template->set_var(array(
                 'TEXT_BACK' => $TEXT['BACK'],
                 'TEXT_RESET' => $TEXT['RESET'],
                 'LAST_MODIFIED' => $MESSAGE['PAGES']['LAST_MODIFIED'],
-                'HEADING_MODIFY_PAGE' => $HEADING['MODIFY_PAGE']
+                'HEADING_MODIFY_PAGE' => $HEADING['MODIFY_PAGE'],
+                'TEXT_PAGE_REORG' => ' Reorgansition'
             ) );
-
 $template->parse('main', 'main_block', false);
 $template->pparse('output', 'page');
-
 // Print admin footer
 $admin->print_footer();

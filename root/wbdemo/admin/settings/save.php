@@ -20,7 +20,7 @@
 //if(!isset($_POST['default_language']) || $_POST['default_language'] == '') die(header('Location: index.php'));
 
 // Find out if the user was view advanced options or not
-$bAdvanced = intval ( isset( $_POST['advanced'] ) && ($_POST['advanced'] == 1) ? 1 : 0 );
+$bAdvanced = intval ((@intval($_POST['advanced'])) ?: 0);
 
 // Print admin header
 if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
@@ -35,7 +35,7 @@ if(!$bAdvanced)
 }
 
 // Create a javascript back link
-$js_back = ADMIN_URL.'/settings/index.php?advanced='.$bAdvanced;
+$js_back = ADMIN_URL.'/settings/index.php?advanced='.($bAdvanced);
 
 if( !$admin->checkFTAN() )
 {
@@ -155,9 +155,9 @@ if( !$bAdvanced )
                 '<br /><strong>Email: '.htmlentities($_POST['server_email']).'</strong>', $js_back);
         }
     }
-    
+
     if(isset($_POST['wbmailer_routine']) && ($_POST['wbmailer_routine']=='smtp')) {
-    
+
         $checkSmtpHost = (isset($_POST['wbmailer_smtp_host']) && ($_POST['wbmailer_smtp_host']=='') ? false : true);
         $checkSmtpUser = (isset($_POST['wbmailer_smtp_username']) && ($_POST['wbmailer_smtp_username']=='') ? false : true);
         $checkSmtpPassword = (isset($_POST['wbmailer_smtp_password']) && ($_POST['wbmailer_smtp_password']=='') ? false : true);
@@ -165,13 +165,13 @@ if( !$bAdvanced )
             $admin->print_error($TEXT['REQUIRED'].' '.$TEXT['WBMAILER_SMTP_AUTH'].
                 '<br /><strong>'.$MESSAGE['GENERIC_FILL_IN_ALL'].'</strong>', $js_back);
         }
-    
+
     }
 }
 
-$allow_tags_in_fields = array('website_header', 'website_footer');
-$allow_empty_values = array('website_header','website_footer','sec_anchor','pages_directory','page_spacer','wbmailer_smtp_secure');
-$disallow_in_fields = array('pages_directory', 'media_directory','wb_version');
+$allow_tags_in_fields = array('website_header', 'website_footer','website_signature');
+$allow_empty_values   = array('website_header','website_footer','website_signature','sec_anchor','pages_directory','page_spacer','wbmailer_smtp_secure');
+$disallow_in_fields   = array('pages_directory', 'media_directory','wb_version');
 
 // Query current settings in the db, then loop through them and update the db with the new value
 $settings = array();
@@ -257,8 +257,8 @@ while($search_setting = $res_search->fetchRow()) :
 
     // hold old value if post is empty
     // check search template
-    $value = (($admin->get_post($post_name) == '') && ($setting_name != 'template')) 
-             ? $old_value 
+    $value = (($admin->get_post($post_name) == '') && ($setting_name != 'template'))
+             ? $old_value
              : $admin->get_post($post_name);
     if (isset($value)) {
         $value = $database->escapeString($value);

@@ -20,7 +20,7 @@ if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.bas
 /* -------------------------------------------------------- */
 // Get content
 $get_content = $database->query("SELECT `content` FROM `".TABLE_PREFIX."mod_code` WHERE `section_id` = '$section_id'");
-$fetch_content = $get_content->fetchRow();
+$fetch_content = $get_content->fetchRow(MYSQLI_ASSOC);
 $content = $fetch_content['content'];
 eval($content);
 

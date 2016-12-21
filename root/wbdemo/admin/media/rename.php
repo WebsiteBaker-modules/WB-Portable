@@ -16,8 +16,9 @@
  *
  */
 
+require(dirname(dirname(__DIR__)).'/config.php');
+
 // Create admin object
-require('../../config.php');
 require_once(WB_PATH.'/framework/class.admin.php');
 $admin = new admin('Media', 'media_rename', false);
 
@@ -34,20 +35,21 @@ $rootlink = 'browse.php?dir=';
 
 // first Check to see if it contains ..
 if (!check_media_path($directory)) {
-    $admin->print_error($MESSAGE['MEDIA']['DIR_DOT_DOT_SLASH'],$rootlink, false);
+    $admin->print_error($MESSAGE['MEDIA_DIR_DOT_DOT_SLASH'],$rootlink, false);
 }
 
 // Get the temp id
-$file_id = intval($admin->checkIDKEY('id', false, $_SERVER['REQUEST_METHOD']));
-if (!$file_id) {
+$file_id = intval($admin->checkIDKEY('id', false, $_SERVER['REQUEST_METHOD']))-1;
+if ($file_id===false) {
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'],$dirlink, false);
 }
 
+$DIR  = array();
+$FILE = array();
 // Get home folder not to show
 $home_folders = get_home_folders();
 // Check for potentially malicious files
 $forbidden_file_types  = preg_replace( '/\s*[,;\|#]\s*/','|',RENAME_FILES_ON_UPLOAD);
-
 // Figure out what folder name the temp id is
 if($handle = opendir(WB_PATH.MEDIA_DIRECTORY.'/'.$directory)) {
     // Loop through the files and dirs an add to list
@@ -66,33 +68,45 @@ if($handle = opendir(WB_PATH.MEDIA_DIRECTORY.'/'.$directory)) {
             }
         }
     }
-
-    $temp_id = 0;
-    if(isset($DIR)) {
-        sort($DIR);
-        foreach($DIR AS $name) {
-            $temp_id++;
-            if($file_id == $temp_id) {
-                $rename_file = $name;
-                $type = 'folder';
-            }
-        }
-    }
-
-    if(isset($FILE)) {
-        sort($FILE);
-        foreach($FILE AS $name) {
-            $temp_id++;
-            if($file_id == $temp_id) {
-                $rename_file = $name;
-                $type = 'file';
-            }
-        }
-    }
+closedir($handle);
 }
 
+    $iSortFlags = ((version_compare(PHP_VERSION, '5.4.0', '<'))?SORT_REGULAR:SORT_NATURAL|SORT_FLAG_CASE);
+    sort($DIR, $iSortFlags);
+    sort($FILE, $iSortFlags);
+    $aListDir = array_merge($DIR,$FILE);
+    $temp_id = 0;
+    if(isset($aListDir)) {
+        foreach($aListDir AS $name)
+        {
+            if(!isset($rename_file)&& ($file_id == $temp_id)) {
+                $rename_file = $name;
+                $type = is_dir(WB_PATH.MEDIA_DIRECTORY.$directory.'/'.$rename_file)?'folder':'file';
+            }
+            $temp_id++;
+        }
+    }
+/*
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.$file_id.'=='.$temp_id.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+print_r( $rename_file.' '.$type ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+print '<pre  class="mod-pre rounded">function <span>'.__FUNCTION__.'( '.' );</span>  filename: <span>'.basename(__FILE__).'</span>  line: '.__LINE__.' -> <br />';
+print_r( $aListDir ); print '</pre>'; flush (); //  ob_flush();;sleep(10); die();
+*/
+
 if(!isset($rename_file)) {
-    $admin->print_error($MESSAGE['MEDIA']['FILE_NOT_FOUND'], $dirlink, false);
+    $admin->print_error($MESSAGE['MEDIA_FILE_NOT_FOUND'], $dirlink, false);
+}
+
+$sExtension = '';
+$sBasename = $rename_file;
+preg_match (
+    '/^(?:.*?[\/])?([^\/]*?)\.([^\.]*)$/iU',
+    str_replace('\\', '/', $rename_file),
+    $aMatches
+);
+if (sizeof($aMatches) == 3) {
+    $sBasename  = $aMatches[1];
+    $sExtension = $aMatches[2];
 }
 
 // Setup template object, parse vars to it, then parse it
@@ -118,11 +132,12 @@ if($type == 'folder') {
 $template->set_var(array(
                     'THEME_URL' => THEME_URL,
                     'FILENAME' => $rename_file,
+                    'BASENAME' => $sBasename,
                     'DIR' => $directory,
                     'FILE_ID' => $admin->getIDKEY($file_id),
                     // 'FILE_ID' => $file_id,
                     'TYPE' => $type,
-                    'EXTENSION' => $extension,
+                    'EXTENSION' => $sExtension,
                     'FTAN' => $admin->getFTAN()
                 )
             );

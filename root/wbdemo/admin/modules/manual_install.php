@@ -25,6 +25,7 @@
  */
 // Include config file and admin class file
 if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
+
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Include the WB functions file
 if ( !function_exists( 'get_modul_version' ) ) { require(WB_PATH.'/framework/functions.php'); }
@@ -51,7 +52,7 @@ if( !$admin->checkFTAN() )
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back);
 }
 
-if ($admin->get_permission('admintools') == false) { 
+if ($admin->get_permission('admintools') == false) {
     $admin->print_header();
     $admin->print_error($MESSAGE['ADMIN_INSUFFICIENT_PRIVELLIGES'], $js_back);
   }
@@ -62,8 +63,8 @@ $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] :
 $referer = '';
 // if referer is set, check if script was invoked from "admin/modules/index.php"
 $required_url = ADMIN_URL . '/modules/index.php';
-if ($referer != '' && (!(strpos($referer, $required_url) !== false || strpos($referer, $required_url) !== false))) 
-{ 
+if ($referer != '' && (!(strpos($referer, $required_url) !== false || strpos($referer, $required_url) !== false)))
+{
     $admin->print_header();
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back);
 }
@@ -134,7 +135,7 @@ switch ($sAction)
         upgrade_module($sAddonName, false);
         $admin->print_success($msg, $js_back);
         break;
-    
+
     case 'uninstall':
         $admin->print_success($msg, $js_back);
         break;

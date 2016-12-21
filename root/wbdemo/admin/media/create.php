@@ -67,7 +67,7 @@ if ( !make_dir( $directory ) )
 {
     $admin->print_error($MESSAGE['MEDIA_DIR_NOT_MADE']);
 } else {
-    createFolderProtectFile($directory);
+//    createFolderProtectFile($directory);
     $usedFiles = array();
     // feature freeze
     // require_once(ADMIN_PATH.'/media/dse.php');

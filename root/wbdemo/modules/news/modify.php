@@ -24,10 +24,10 @@ if(function_exists('ini_set')) {
 }
 
 $sql = 'DELETE FROM `'.TABLE_PREFIX.'mod_news_posts`  WHERE `section_id` = 0 OR title=\'\'';
-$database->query($sql); 
+$database->query($sql);
 
 $sql = 'DELETE FROM `'.TABLE_PREFIX.'mod_news_groups`  WHERE `section_id` = 0 OR title=\'\'';
-$database->query($sql); 
+$database->query($sql);
 
 $sModulName = basename(__DIR__);
 $ModuleRel = '/modules/'.basename(__DIR__).'/';
@@ -37,7 +37,7 @@ $ModulePath = WB_PATH.'/modules/'.basename(__DIR__).'/';
 $FTAN = $admin->getFTAN('');
 $sFtan = $FTAN['name'].'='.$FTAN['value'];
 // load module language file
-$sAddonName = basename(__DIR__);
+$sModulName = $sAddonName = basename(__DIR__);
 require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
 if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
     require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
@@ -48,8 +48,8 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
 ?><table style="width: 100%;">
 <?php  ?>
 <tbody>
-<tr style="width: 100%;">
-    <td>
+<tr style="width: 100%;line-height: 2.825em;">
+    <td style="width: 25%;">
         <form action="<?php echo WB_URL; ?>/modules/news/add_post.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
@@ -57,7 +57,7 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
             <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['POST']; ?>" style="width: 100%;" />
         </form>
     </td>
-    <td>
+    <td style="width: 25%;">
         <form action="<?php echo WB_URL; ?>/modules/news/add_group.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
@@ -65,7 +65,7 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
             <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['GROUP']; ?>" style="width: 100%;" />
         </form>
     </td>
-    <td >
+    <td style="width: 25%;">
         <form action="<?php echo WB_URL; ?>/modules/news/modify_settings.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
@@ -73,8 +73,8 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
             <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
         </form>
     </td>
-<?php if( $admin->ami_group_member('1') ) {  ?>
-    <td >
+<?php if(defined('DEBUG')&& DEBUG && $admin->ami_group_member('1') ) {  ?>
+    <td style="width: 25%;">
         <form action="<?php echo WB_URL; ?>/modules/news/reorgPosition.php" method="get" >
             <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
             <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
@@ -94,11 +94,11 @@ if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.p
 <?php
 
 // Loop through existing posts
-$query_posts = $database->query("SELECT * FROM `".TABLE_PREFIX."mod_news_posts` WHERE section_id = '$section_id' ORDER BY position DESC");
+$query_posts = $database->query("SELECT * FROM `".TABLE_PREFIX."mod_news_posts` WHERE `section_id` = '$section_id' ORDER BY `position`");
 if($query_posts->numRows() > 0) {
     $num_posts = $query_posts->numRows();
 ?><div class="jsadmin hide"></div>
-    <table class="news-post">
+    <table class="news-post" id="tableData">
         <thead>
             <tr >
                 <th style=" width: 3%;">&nbsp;</th>
@@ -109,7 +109,7 @@ if($query_posts->numRows() > 0) {
                 <th style=" text-align: left; width: 3%;"><?php echo '';  ?></th>
                 <th style="width: 12%;" colspan="3"><?php echo $TEXT['ACTIONS']; ?></th>
                 <th style="padding-right: 5px; width: 3%;">Pos</th>
-                
+
             </tr>
         </thead>
         <tbody>
@@ -130,7 +130,7 @@ if($query_posts->numRows() > 0) {
                 </a>
             </td>
             <td >
-                <?php 
+                <?php
                 // Get group title
                 $query_title = $database->query("SELECT title FROM ".TABLE_PREFIX."mod_news_groups WHERE group_id = '".$post['group_id']."'");
                 if($query_title->numRows() > 0) {
@@ -142,7 +142,7 @@ if($query_posts->numRows() > 0) {
                 ?>
             </td>
             <td >
-                <?php 
+                <?php
                 // Get number of comments
                 $query_title = $database->query("SELECT title FROM ".TABLE_PREFIX."mod_news_comments WHERE post_id = '".$post['post_id']."'");
                 echo $query_title->numRows();
@@ -170,15 +170,15 @@ if($query_posts->numRows() > 0) {
             </td>
             <td style="text-align: center;">
             <?php if($post['position'] != 1 ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="^" />
+                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>&amp;move_id=<?php echo $post['post_id']; ?>&amp;position=<?php echo $post['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="^" />
                 </a>
             <?php } ?>
             </td>
             <td style="text-align: center;">
             <?php if($post['position'] != $num_posts ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
-                    <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="v" />
+                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;post_id=<?php echo $pid; ?>&amp;move_id=<?php echo $post['post_id']; ?>&amp;position=<?php echo $post['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
+                    <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="v" />
                 </a>
             <?php } ?>
             </td>
@@ -210,17 +210,18 @@ $query_groups = $database->query("SELECT * FROM `".TABLE_PREFIX."mod_news_groups
 if($query_groups->numRows() > 0) {
     $num_groups = $query_groups->numRows();
     ?>
-    <table class="news-group">
+    <table class="news-group" id="NewsGroupDataTable">
         <thead>
             <tr >
                 <th style="padding-left: 5px; width: 3%;">&nbsp;</th>
                 <th style="padding-left: 5px; text-align: left; width: 65%;"><?php print $TEXT['GROUP']; ?></th>
-                <th style="" style="width: 20%;"> </th>
+                <th style="width: 20%;"> </th>
                 <th style="width: 10%;" > </th>
                 <th style="width: 3%;"><?php print $TEXT['ACTIVE']; ?></th>
                 <th style="width: 3%;" > </th>
-                <th  style="width: 10%;"  colspan="3"><?php echo $TEXT['ACTIONS']; ?></th>
-                <th style="width: 3%;" style="padding-right: 5px;">Pos</th>
+                <th style="width: 3%;" > </th>
+                <th style="width: 10%;"  colspan="3"><?php echo $TEXT['ACTIONS']; ?></th>
+                <th style="width: 3%;padding-right: 5px;">Pos</th>
             </tr>
         </thead>
         <tbody>
@@ -233,7 +234,7 @@ if($query_groups->numRows() > 0) {
                 <a href="<?php echo WB_URL; ?>/modules/news/modify_group.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>" title="<?php echo $TEXT['MODIFY']; ?>">
                     <img src="<?php echo THEME_URL; ?>/images/modify_16.png" alt="Modify - " />
                 </a>
-            </td> 
+            </td>
             <td colspan="3" style="padding-left: 5px;">
                 <a href="<?php echo WB_URL; ?>/modules/news/modify_group.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>">
                     <?php echo $group['title'].' ('.$group['group_id'].')'; ?>
@@ -243,16 +244,17 @@ if($query_groups->numRows() > 0) {
                 <?php if($group['active'] == 1) { echo $TEXT['YES']; } else { echo $TEXT['NO']; } ?>
             </td>
             <td  style="text-align: right;"> </td>
+            <td  style="text-align: right;"> </td>
             <td  style="text-align: center;">
             <?php if($group['position'] != 1 ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
+                <a href="<?php echo WB_URL; ?>/modules/news/move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>&amp;move_id=<?php echo $group['group_id']; ?>&amp;position=<?php echo $group['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
                     <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="^" />
                 </a>
             <?php } ?>
             </td>
             <td  style="text-align: center;">
             <?php if($group['position'] != $num_groups ) { ?>
-                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
+                <a href="<?php echo WB_URL; ?>/modules/news/move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;group_id=<?php echo $gid; ?>&amp;move_id=<?php echo $group['group_id']; ?>&amp;position=<?php echo $group['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
                     <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="v" />
                 </a>
             <?php } ?>
@@ -269,7 +271,13 @@ if($query_groups->numRows() > 0) {
     ?>
         </tbody>
     </table>
-    <?php
+<?php
 } else {
     echo $TEXT['NONE_FOUND'];
 }
+    // include the required file for Javascript admin
+    if(file_exists(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php'))
+    {
+//        $js_buttonCell = 6;
+        include(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php');
+    }

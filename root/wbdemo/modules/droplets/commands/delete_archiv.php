@@ -24,9 +24,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.4 and higher
- * @version         $Id:  $
- * @filesource      $HeadURL:  $
- * @lastmodified    $Date:  $
+ * @version         $Id: delete_archiv.php 16 2016-09-13 20:52:49Z dietmar $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2-modules/addons/droplets/commands/delete_archiv.php $
+ * @lastmodified    $Date: 2016-09-13 22:52:49 +0200 (Di, 13. Sep 2016) $
  *
  */
  /* -------------------------------------------------------- */
@@ -34,15 +34,15 @@
 if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 
-if( !$admin->checkFTAN() ){
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl );
+if( !$oApp->checkFTAN() ){
+    $oApp->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], $ToolUrl );
     exit();
 }
 if ( @$aRequestVars['zipFiles'] == '' ) {
     msgQueue::add( $Droplet_Message['GENERIC_MISSING_ARCHIVE_FILE'] );
 } else { 
 
-    $sArchFile = WB_PATH.$aRequestVars['zipFiles'];
+    $sArchFile = $oReg->AppPath.$aRequestVars['zipFiles'];
     $unlink = @unlink($sArchFile);
 
     if( $unlink==false ) {

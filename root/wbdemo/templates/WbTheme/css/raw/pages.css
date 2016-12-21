@@ -1,0 +1,83 @@
+div.pages_list { width :100%; font-size :0.7em; }
+
+table.pages_list,
+table.pages_view,
+table.pages_section { width :100%; margin :0 auto; border :0; border-spacing :0px; background-color : transparent;border-collapse: collapse; }
+
+table.pages_list { font-size: 1.625em; }
+table.pages_view { font-size: 1.625em; }
+table.pages_section { font-size: 1.125em; }
+
+table.pages_list thead tr,
+table.pages_section thead tr {
+    background: rgba(0, 0, 0, 0) linear-gradient(#7eb7bf 0%, #507279 100%) repeat scroll 0 0;
+    color: #fff;
+    line-height: 1.925em;
+}
+
+table.header_list_page_title,.list_page_title { text-align :left; width: 34.225em; color: #287486; }
+
+table.pages_list thead th:first-child,
+table.pages_list tbody td:first-child { padding: 0 0.2525em; text-align: left; }
+table.pages_list thead th:first-child { width: 35.525em; min-width: 35.525em; }
+table.pages_list tbody td:nth-child(2) { text-align: left; }
+table.pages_list tbody td:nth-child(3) { padding-bottom: 0.3525em; }
+table.pages_list tbody td:last-child { padding: 0 0.4525em; text-align: left; }
+table.pages_list tbody td div { margin: 0.4525em auto; padding: 0.3525em 0; height: 1.625em; }
+table.pages_list tbody tr:nth-child(even) { background: #C9DDE2; }
+table.pages_list tbody tr:hover { background: #E1F6B5; }
+table.pages_view tbody td a span.modify_link { padding-top : 0.525em; display :inline; color: #1D7EA4; font-weight: normal; }
+
+
+.pages_list li table.pages_view { line-height: 1.925em; white-space: nowrap; }
+.pages_list > li:nth-child(even) { background: #99C1CA; }
+.pages_list li table.pages_view:hover { background: #E5F6C0; }
+
+.header_list_block { width :180px; text-align :left; }
+.header_list_page_id { width : 2.125em; padding-right : 1.125em; text-align :right; }
+.list_actions { width : 1.725em; text-align :center; }
+.header_list_actions { width : 175px; text-align :left; }
+.sections_header { width :100%; margin-bottom :10px; border :none; background-color :#f0f0f0; height :50px; }
+.sections_header td { padding :5px; }
+.list_menu_title { width: auto; }
+.sections_list { padding-left :10px; font-weight :bold; }
+.value_page_code { width :240px; color :#006400; font-weight :400; }
+
+table.pages_section tbody tr { line-height: 1.925em; white-space: nowrap; }
+table.pages_section tbody td:first-child { padding: 0 0.2525em; text-align: left; }
+table.pages_section tbody tr.sectionrow:nth-child(even) { background: #DBF0F0; }
+table.pages_section tbody td:last-child { padding: 0 0.4525em; text-align: left; }
+table.pages_section tbody td.modify_link { padding-top : 0.525em; display :inline; vertical-align :middle; color: #1D7EA4; font-weight: bold; }
+table.pages_section tbody tr.sectionrow:hover { background: #E5F6C0; }
+
+img.page_list_rights { border :none; margin-right :5px; float :left; margin-top :2px; margin-bottom :2px; }
+.form_submit .left, .header_list_menu_title, .list_menu_title, .header_list_type { text-align :left; padding: 0 0.525em; }
+
+.content input { font-size : 0.825em; }
+.list_section_id, .list_page_id, .header_list_section_id { width :2em; text-align :right; padding: 0 0.525em;}
+.list_page_code, .list_page_language { width :240px; }
+.header_title, .sections_list table, .setting_value input, .setting_value select, .setting_value textarea, .value_input input, .value_input text, .value_input select, .form_submit, .input_full { width :100%; }
+.header_list_pubdate_start, .header_list_pubdate_end, .list_pubdate_start, .list_pubdate_end { width :200px; text-align :left; white-space: nowrap; }
+
+.pages_tree {
+    overflow: hidden;
+    padding: 0.925em;
+}
+.pages_tree table.pages_add td:first-child {
+  color: #0d4b6e;
+  text-align: right;
+  font-weight: bold;
+  padding-right: 0.525em;
+}
+/*
+table.pages_view li:nth-child(odd) { background: #99C1CA; }
+.pages_list .icon_col td img { border-style :none; float :left; padding-right :7px; display :block; }
+.pages_list ul { margin :0; padding :0px; font-weight :normal; }
+.pages_list ul li { margin :2px 0; padding :0px; list-style-type :none; }
+.page_list_show li { display :block; }
+
+.pages_list table td, table.pages_view td { padding :3px; }
+.header_list_sections_actions { width :30px; text-align :left; }
+
+*/
+

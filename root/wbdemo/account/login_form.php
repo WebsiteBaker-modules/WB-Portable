@@ -28,14 +28,15 @@ if(defined('SMART_LOGIN') && SMART_LOGIN == 'true') {
 }
 
 $thisApp->redirect_url = (isset($thisApp->redirect_url) && ($thisApp->redirect_url!='')  ? $thisApp->redirect_url : $_SESSION['HTTP_REFERER'] );
+
 ?>
 <div style="margin: 1em auto;">
     <button type="button" value="cancel" onClick="javascript: window.location = '<?php print $_SESSION['HTTP_REFERER'] ?>';"><?php print $TEXT['CANCEL'] ?></button>
 </div>
 <h1>&nbsp;Login</h1>
-&nbsp;<?php 
+&nbsp;<?php
 
-    echo $thisApp->getMessage(); 
+    echo $thisApp->getMessage();
 ?>
 <br />
 <br />

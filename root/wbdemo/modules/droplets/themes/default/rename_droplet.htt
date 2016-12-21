@@ -1,0 +1,47 @@
+<!-- BEGIN main_block -->
+<div id="openModal" class="modal-Dialog">
+    <div>
+        <form name="modify" action="{ToolUrl}" method="post" style="margin: 0;">
+            <input type="hidden" name="command" value="save_droplet" />
+            <input type="hidden" name="subCommand" value="{action}" />
+            <input type="hidden" name="data_codepress" value="" />
+            <input type="hidden" name="droplet_id" value="{iDropletIdKey}" />
+            <input type="hidden" name="existingTitle" value="{DropletName}" />
+            <input type="hidden" name="CopyDropletId" value="{iDropletAddId}" />
+            <input type="hidden" name="show_wysiwyg" value="{show_wysiwyg}" />
+            <input type="hidden" name="{FTAN_NAME}" value="{FTAN_VALUE}" />
+            <span id="customConfirm" style="display: block;">
+                <button name="cancel" class="close" type="button" onclick="window.location='{ToolUrl}';">X</button>
+                <header class="modal-label"><h2>{HEADER_DROPLET}</h2></header>
+                <div class="modal-inner ">
+                     <h3 style="padding-left: 1.825em;">{sDropletHelp}</h3>
+                    <div class="subcolumn" class="block-outer" >
+                        <input type="text" name="title" value="{DropletName}" class="rename-input form-field " maxlength="32" />
+                    </div>
+                    <div class="footer">
+            <!-- BEGIN show_admin_edit_block -->
+                        <button name="command" type="submit" value="save_rename?droplet_id={iDropletIdKey}" class="confirm">{sSubmitButton}</button>
+            <!-- END show_admin_edit_block -->
+                        <button name="cancel" class="cancel" type="button" onclick="window.location='{ToolUrl}';">{CANCEL}</button>
+                    </div>
+                </div>
+                <footer class="modal-label">
+<!--
+            <a href="http://websitebaker.org/" title="external">WebsiteBaker</a> is released under the
+            <a href="http://www.gnu.org/licenses/gpl.html" title="WebsiteBaker is released under the GNU General Public License">GNU General Public License</a>
+-->
+                </footer>
+            </span>
+        </form>
+    </div>
+</div>
+<script >
+<!--
+domReady(function() {
+    LoadOnFly('head', "{sAddonThemeUrl}/css/dialogBox.css");
+    LoadOnFly('head', "{sAddonThemeUrl}/css/customAlert.css");
+    LoadOnFly('head', "{sAddonThemeUrl}/css/form.css");
+});
+-->
+</script>
+<!-- END main_block -->

@@ -20,15 +20,18 @@
 if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 
-$sMediaUrl = WB_URL.MEDIA_DIRECTORY;
 // Get page content   htmlspecialchars
 $sql = 'SELECT `content` FROM `'.TABLE_PREFIX.'mod_wysiwyg` WHERE `section_id`='.(int)$section_id;
 if ( ($content = $database->get_one($sql)) ) {
-    $content = htmlspecialchars(str_replace('{SYSVAR:MEDIA_REL}', $sMediaUrl, $content));
+    $sFilterApi = WB_PATH.'/modules/output_filter/OutputFilterApi.php';
+    if (is_readable($sFilterApi)) {
+        require_once($sFilterApi);
+        $content = OutputFilterApi('ReplaceSysvar', $content);
+    }
+    $content = htmlspecialchars($content);
 } else {
     $content = '';
 }
-
 if(mb_detect_encoding($content, 'UTF-8, '.strtoupper(DEFAULT_CHARSET)) === 'UTF-8'){
   # der String ist in UTF-8 kodiert
 //$content = (utf8_decode($content));
@@ -59,8 +62,7 @@ if(!isset($wysiwyg_editor_loaded)) {
     <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
     <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
 <?php
-echo $admin->getFTAN()."\n"; 
-
+echo $admin->getFTAN()."\n";
 show_wysiwyg_editor('content'.$section_id,'content'.$section_id,$content,'100%','350', false);
 ?>
     <table  style="padding-bottom: 10px; width: 100%;">

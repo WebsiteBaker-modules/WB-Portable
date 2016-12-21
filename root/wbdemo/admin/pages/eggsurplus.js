@@ -2,6 +2,7 @@
     {
         //find and select the page in the parent dropdown
         var selectBox = document.add.parent;
+console.info(selectBox);
         for (var i = 0; i < selectBox.options.length; i++)
         {
               if (selectBox.options[i].value == page_id)

@@ -38,7 +38,7 @@ if(!isset($_POST['code']) || $_POST['code'] == "") {
     $code = '';
     $admin->print_error( $MESSAGE['GENERIC_FORGOT_OPTIONS'], $js_back );
 } else {
-    $code = $admin->add_slashes($_POST['code']);
+    $code = $database->escapeString($_POST['code']); 
 }
 
 if (!preg_match('/^[A-Z]{2}$/', $code) && $code!='' ) {

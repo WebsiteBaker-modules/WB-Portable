@@ -22,20 +22,12 @@ require(WB_PATH.'/languages/'.DEFAULT_LANGUAGE.'.php');
 // Include the database class file and initiate an object
 require(WB_PATH.'/framework/class.admin.php');
 $admin = new admin('Start', 'start', false, false);
-
-// Get the website title
-//$sql = 'SELECT `value` FROM `'.TABLE_PREFIX.'settings` '
-//     . 'WHERE `name` = \'title\'';
-//$oRes = $database->query($sql);
-//$aSetting = $oRes->fetchRow(MYSQLI_ASSOC);
-//$website_title = $aSetting['value'];
-//unset($oRes);
 // Check if the user has already submitted the form, otherwise show it
 if(isset($_POST['email']) && $_POST['email'] != "") {
     $email = htmlspecialchars($_POST['email'],ENT_QUOTES);
     // Check if the email exists in the database
     $query = 'SELECT `user_id`, `username`, `display_name`, `email`, `last_reset`, `password` FROM `'.TABLE_PREFIX.'users` '
-    . 'WHERE `email` = \''.$admin->add_slashes($_POST['email']).'\'';
+    . 'WHERE `email` = \''.$database->escapeString($_POST['email']).'\'';
     $oRes = $database->query($query);
     if($oRes->numRows() > 0) {
         // Get the id, username, email, and last_reset from the above db query
@@ -145,7 +137,7 @@ if(defined('FRONTEND')) {
 } else {
     $template->set_var('LOGIN_URL', ADMIN_URL.'/login/index.php');
 }
-$template->set_var('INTERFACE_URL', ADMIN_URL.'/interface');    
+$template->set_var('INTERFACE_URL', ADMIN_URL.'/interface');
 
 if(defined('DEFAULT_CHARSET')) {
     $charset=DEFAULT_CHARSET;

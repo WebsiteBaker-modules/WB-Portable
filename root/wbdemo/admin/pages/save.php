@@ -48,7 +48,9 @@ if ( $bBackLink ) {
 if (!$admin->checkFTAN())
 {
     $admin->print_header();
-    $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+    $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, '.'.PAGE_EXTENSION)).'::';
+    $sDEBUG=(@DEBUG?$sInfo:'');
+    $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
 }
 // After check print the header
 $admin->print_header();
@@ -62,7 +64,9 @@ $results_array = $results->fetchRow();
 if(!$admin->ami_group_member($results_array['admin_users']) &&
    !$admin->is_group_match($admin->get_groups_id(), $results_array['admin_groups']))
 {
-    $admin->print_error($MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
+    $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, '.'.PAGE_EXTENSION));
+    $sDEBUG=(@DEBUG?$sInfo:'');
+    $admin->print_error($sDEBUG.$MESSAGE['PAGES_INSUFFICIENT_PERMISSIONS']);
 }
 // Get page module
 $sql = 'SELECT `module` FROM `'.TABLE_PREFIX.'sections` '
@@ -72,7 +76,7 @@ if(!$module)
 {
     $admin->print_error( $database->is_error() ? $database->get_error() : $MESSAGE['PAGES_NOT_FOUND']);
 }
-
+/*
 // Update the pages table
 $now = time();
 $sql = 'UPDATE `'.TABLE_PREFIX.'pages` '
@@ -80,11 +84,11 @@ $sql = 'UPDATE `'.TABLE_PREFIX.'pages` '
      .     '`modified_by`='.$admin->get_user_id().' '
      . 'WHERE `page_id`='.$page_id;
 $database->query($sql);
-
+*/
 // Include the modules saving script if it exists
 if(file_exists(WB_PATH.'/modules/'.$module.'/save.php'))
 {
-    include_once(WB_PATH.'/modules/'.$module.'/save.php');
+    include(WB_PATH.'/modules/'.$module.'/save.php');
 }
 // Check if there is a db error, otherwise say successful
 if($database->is_error())

@@ -23,14 +23,25 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
     $display_name = ( $display_name == '' ? $wb->get_display_name() : $display_name );
     $language = preg_match('/^[a-z]{2}$/si', $wb->get_post('language'))
                 ? $wb->get_post('language') : 'EN';
-    $timezone = is_numeric($wb->get_post('timezone')) ? $wb->get_post('timezone')*3600 : 0;
+    $user_time = true;
+// timezone must be between -12 and +13  or -20 as system_default
+    $timezone         = $wb->get_post('timezone');
+    $timezone         = (is_numeric($timezone) ? $timezone : DEFAULT_TIMEZONE/3600);
+    $timezone         = (($timezone >= -12 && $timezone <= 13) ? $timezone : DEFAULT_TIMEZONE/3600) * 3600;
+
+/*
+    $timezone    = $wb->get_post('timezone');
+    $timezone    = is_numeric($wb->get_post('timezone')) ? $wb->get_post('timezone')*3600 : 0;
+    $timezone    = (is_numeric($timezone) ? $timezone : DEFAULT_TIMEZONE/3600);
+    $timezone    = (($timezone >= -12 && $timezone <= 13) ? $timezone : DEFAULT_TIMEZONE/3600) * 3600;
+*/
     $date_format = $wb->get_post('date_format');
     $time_format = $wb->get_post('time_format');
     // check that display_name is unique in whoole system (prevents from User-faking)
     $sql  = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` ';
     $sql .= 'WHERE `user_id` <> '.(int)$wb->get_user_id().' AND `display_name` LIKE \''.$display_name.'\'';
-    if ($database->get_one($sql) > 0) {
-        $error[] = $MESSAGE['MEDIA_BLANK_NAME'].' ('.$TEXT['DISPLAY_NAME'].')';
+    if ($database->get_one($sql)) {
+        $error[] = ( @$oTrans->MESSAGE_USERS_DISPLAYNAME_TAKEN ?:$oTrans->MESSAGE_MEDIA_BLANK_NAME.' ('.$oTrans->TEXT_DISPLAY_NAME.')');
     } else {
 // Update the database
     $sql  = 'UPDATE `'.TABLE_PREFIX.'users` SET '
@@ -44,7 +55,7 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
           if($database->is_error()) {
               $error[] = $database->get_error();
           } else {
-              $success[] = $MOD_PREFERENCE['DETAILS_SAVED'];
+              $success[] = $oTrans->MOD_PREFERENCE_DETAILS_SAVED;
               $_SESSION['DISPLAY_NAME'] = $display_name;
               $_SESSION['LANGUAGE'] = $language;
               $_SESSION['TIMEZONE'] = $timezone;

@@ -34,9 +34,9 @@
 if (!defined('WB_PATH')) { throw new Exception('Cannot access the addon \"'.basename(__DIR__).'\" directly'); }
 /* -------------------------------------------------------- */
     $module_directory   = 'wrapper';
-    $module_name        = 'Wrapper v3.0.1';
+    $module_name        = 'Wrapper v3.0.3';
     $module_function    = 'page';
-    $module_version     = '3.0.1';
+    $module_version     = '3.0.3';
     $module_platform    = '2.8.3-SP6';
     $module_author      = 'Manuela v.d.Decken <manuela@isteam.de>';
     $module_license     = 'GNU General Public License';

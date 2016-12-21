@@ -14,9 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * upgrade.php
- * 
+ *
  * @category     Module
  * @package      Module_form
  * @subpackage   upgrade
@@ -30,7 +30,7 @@
  * @lastmodified $Date: 2013-03-19 11:45:14 +0100 (Di, 19. Mrz 2013) $
  * @since        File available since 17.01.2013
  * @description  xyz
- * 
+ *
  */
 
 /* -------------------------------------------------------- */
@@ -43,18 +43,13 @@ if(!defined('WB_URL')) {
 
 //if(!function_exists('mod_form_upgrade')){
     function mod_form_upgrade($bDebug=false) {
-        global $OK ,$FAIL;
+        global $OK ,$FAIL, $callingScript, $globalStarted;
         $oDb = ( @$GLOBALS['database'] ?: null );
         $msg = array();
-        $callingScript = $_SERVER["SCRIPT_NAME"];
-        // check if upgrade startet by upgrade-script to echo a message
-        $tmp = 'upgrade-script.php';
-        $globalStarted = substr_compare($callingScript, $tmp,(0-strlen($tmp)),strlen($tmp)) === 0;
-
         $getMissingTables = (function (array $aTablesList) use ( $oDb )
         {
             $aTablesList = array_flip($aTablesList);
-            $sPattern =  addcslashes( TABLE_PREFIX, '%_' );
+            $sPattern =  $oDb->escapeString( TABLE_PREFIX, '%_' );
             $sql = 'SHOW TABLES LIKE \''.$sPattern.'%\'';
             if (($oTables = $oDb->query( $sql ))) {
                 while ($aTable = $oTables->fetchRow(MYSQLI_NUM)) {
@@ -74,7 +69,7 @@ if(!defined('WB_URL')) {
         if( sizeof($aPackage) > 0){
             $msg[] =  'TABLE '.implode(' missing! '.$FAIL.'<br />TABLE ',$aPackage).' missing! '.$FAIL;
             $msg[] = 'Form upgrade failed'." $FAIL";
-            if($globalStarted) {
+            if(!$globalStarted) {
                 echo '<strong>'.implode('<br />',$msg).'</strong><br />';
             }
             return ( ($globalStarted==true ) ? $globalStarted : $msg);
@@ -91,7 +86,7 @@ if(!defined('WB_URL')) {
                         $msg[] = 'TABLE `'.TABLE_PREFIX.$aTable[$x].'` has Engine = \'MyISAM\''." $OK";
                     }
                 } else {
-                    $msg[] = $oDb->get_error();
+//                    $msg[] = $oDb->get_error();
                 }
             }
 
@@ -105,14 +100,14 @@ if(!defined('WB_URL')) {
                 $msg[] = 'Field `perpage_submissions` already exists'." $OK";
             }
 // only for upgrade-script
-            if($globalStarted) {
+            if (!$globalStarted) {
                 if($bDebug) {
                     echo '<strong>'.implode('<br />',$msg).'</strong><br />';
                 }
             }
         }
         $msg[] = 'Form upgrade successfull finished ';
-        if($globalStarted) {
+        if(!$globalStarted) {
             echo "<strong>Form upgrade successfull finished $OK</strong><br />";
         }
         return ( ($globalStarted==true ) ? $globalStarted : $msg);
@@ -120,7 +115,16 @@ if(!defined('WB_URL')) {
 //}
 // ------------------------------------
 
-$bDebugModus = ((isset($bDebugModus)) ? $bDebugModus : false);
+    $bDebugModus = ((isset($bDebugModus)) ? $bDebugModus : false);
+    $callingScript = $_SERVER["SCRIPT_NAME"];
+    // check if upgrade startet by upgrade-script to echo a message
+    $globalStarted = preg_match('/upgrade\-script\.php$/', $callingScript);
+
+/*
+    $tmp = 'upgrade-script.php';
+    $globalStarted = substr_compare($callingScript, $tmp,(0-strlen($tmp)),strlen($tmp)) === 0;
+*/
 if( is_array($msg = mod_form_upgrade($bDebugModus))) {
-    echo '<strong>'.implode('<br />',$msg).'</strong><br />';
+    if (!$globalStarted) {print implode("\n", $msg)."\n";}
+//    echo '<strong>'.implode('<br />',$msg).'</strong><br />';
 }

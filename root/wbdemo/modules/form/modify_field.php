@@ -32,9 +32,9 @@ if (!$field_id) {
 }
 // load module language file
 $sAddonName = basename(__DIR__);
-require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+require(__DIR__.'/languages/EN.php');
+if(file_exists(__DIR__.'/languages/'.LANGUAGE .'.php')) {
+    require(__DIR__.'/languages/'.LANGUAGE .'.php');
 }
 
 $type = 'none';
@@ -59,7 +59,7 @@ $sToken = $aFtan['name'].'='.$aFtan['value'];
 <input type="hidden" name="field_id" value="<?php echo $field_id; ?>" />
 <input type="hidden" name="<?php echo $aFtan['name']; ?>" value="<?php echo $aFtan['value']; ?>">
 
-<table summary="" class="row_a" cellpadding="2" cellspacing="0" border="0" width="100%">
+<table class="frm-table">
     <tr>
         <td colspan="2"><strong><?php echo $TEXT['MODIFY'].' '.$TEXT['FIELD']; ?></strong></td>
     </tr>
@@ -116,13 +116,13 @@ $sToken = $aFtan['name'].'='.$aFtan['value'];
     <tr>
         <td valign="top"><?php echo $TEXT['LIST_OPTIONS']; ?>:</td>
         <td>
-            <table summary="<?php echo $TEXT['LIST_OPTIONS']; ?>" cellpadding="3" cellspacing="0" width="100%" border="0">
-            <?php
+            <table >
+<?php
             $option_count = 0;
             $list = explode(',', $form['value']);
             foreach($list AS $option_value) {
                 $option_count = $option_count+1;
-                ?>
+?>
                 <tr>
                     <td width="70"><?php echo $TEXT['OPTION'].' '.$option_count; ?>:</td>
                     <td>
@@ -133,7 +133,7 @@ $sToken = $aFtan['name'].'='.$aFtan['value'];
             }
             for($i = 0; $i < 2; $i++) {
                 $option_count = $option_count+1;
-                ?>
+?>
                 <tr>
                     <td width="70"><?php echo $TEXT['OPTION'].' '.$option_count; ?>:</td>
                     <td>
@@ -142,7 +142,7 @@ $sToken = $aFtan['name'].'='.$aFtan['value'];
                 </tr>
                 <?php
             }
-            ?>
+?>
                 </table>
             <input type="hidden" name="list_count" value="<?php echo $option_count; ?>" />
         </td>
@@ -152,7 +152,10 @@ $sToken = $aFtan['name'].'='.$aFtan['value'];
     <tr>
         <td><?php echo $TEXT['SIZE']; ?>:</td>
         <td>
-            <?php $form['extra'] = explode(',',$form['extra']); ?>
+            <?php
+            $form['extra'] = explode(',',$form['extra']);
+            $form['extra'][0] = (@$form['extra'][0]?:3);
+            ?>
             <input type="text" name="size" value="<?php echo trim($form['extra'][0]); ?>" style="width: 98%;" maxlength="3" />
         </td>
     </tr>

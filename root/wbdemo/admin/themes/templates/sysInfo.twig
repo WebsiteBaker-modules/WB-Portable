@@ -1,0 +1,116 @@
+<!-- BEGIN mainBlock -->
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+<style type="text/css">
+<!--
+.group {
+  background: #f3f3f3 none repeat scroll 0 0;
+  border: 1px solid #999;
+  border-radius: 4px;
+  box-shadow: 2px 2px 5px #ccc;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+}
+.group h2 {
+  background-color: #bbb;
+  box-shadow: 1px 1px 15px #999 inset;
+  color: #fff;
+  font-size: 1.6em;
+  font-weight: normal;
+  margin-top: 0;
+  padding: 0.1em 0.3em;
+  text-shadow: 0 1px 0 #777;
+}
+.icon {
+  background-image: url("{{ THEME_URL }}img/help_16.png") !important;
+  background-position: left top !important;
+  background-repeat: no-repeat !important;
+  height: 16px;
+  margin: 0 0 0 0.3em;
+  padding: 0 !important;
+  width: 16px;
+}
+a img {
+  border: 0 none;
+}
+img, button {
+  vertical-align: middle;
+}
+-->
+</style>
+  </head>
+  <body>
+    <div class="sysinfo-box" style="margin: 1.125em auto; width: 100%;">
+      <div class="group">
+        <h2>
+          Datenbank-Server
+        </h2>
+        <ul>
+          <li id="li_server_info">{}
+            Server: localhost via TCP/IP
+          </li>
+          <li id="li_server_type">{}
+            Server-Typ: MariaDB
+          </li>
+          <li id="li_server_version">{}
+            Server-Version: 10.1.14-MariaDB - mariadb.org binary distribution
+          </li>
+          <li id="li_mysql_proto">{}
+            Protokoll-Version: 10
+          </li>
+          <li id="li_user_info">{}
+            Benutzer: root@localhost
+          </li>
+          <li id="li_select_mysql_charset">{}
+            Server-Zeichensatz:
+            <span lang="en" dir="ltr">
+              UTF-8 Unicode (utf8)
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="group">
+        <h2>
+          Webserver
+        </h2>
+        <ul>
+          <li id="li_web_server_software">{}
+            Apache/2.4.18 (Win32) OpenSSL/1.0.2e PHP/7.0.6
+          </li>
+          <li id="li_mysql_client_version">{}
+            Datenbank-Client Version: libmysql - mysqlnd 5.0.12-dev - 20150407 - $Id: 241ae00989d1995ffcbbf63d579943635faf9972 $
+          </li>
+          <li id="li_used_php_extension">{}
+            PHP-Erweiterung: mysqli
+            <a target="documentation" href="https://secure.php.net/manual/de/book.mysqli.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}img/dot.gif"></a>
+            curl
+            <a target="documentation" href="https://secure.php.net/manual/de/book.curl.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}img/dot.gif"></a>
+            mbstring
+            <a target="documentation" href="https://secure.php.net/manual/de/book.mbstring.php"><img class="icon ic_b_help" alt="Dokumentation" title="Dokumentation" src="{{ THEME_URL }}img/dot.gif"></a>
+          </li>
+          <li id="li_used_php_version">{}
+            PHP-Version: 7.0.6
+          </li>
+        </ul>
+      </div>
+      <div class="group">
+        <h2>
+          Webspace
+        </h2>
+        <ul>
+          <li id="">{}
+          </li>
+          <li id="">{}
+          </li>
+          <li id="">{}
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </body>
+
+</html>
+<!-- END mainBlock -->

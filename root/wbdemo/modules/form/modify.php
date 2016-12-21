@@ -33,9 +33,9 @@ $ModulePath = WB_PATH.'/modules/'.basename(__DIR__).'/';
 
 // load module language file
 $sAddonName = basename(__DIR__);
-require(WB_PATH .'/modules/'.$sAddonName.'/languages/EN.php');
-if(file_exists(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php')) {
-    require(WB_PATH .'/modules/'.$sAddonName.'/languages/'.LANGUAGE .'.php');
+require(__DIR__.'/languages/EN.php');
+if(file_exists(__DIR__.'/languages/'.LANGUAGE .'.php')) {
+    require(__DIR__.'/languages/'.LANGUAGE .'.php');
 }
 
 if( !function_exists( 'make_dir' ) )  {  require(WB_PATH.'/framework/functions.php');  }
@@ -61,38 +61,38 @@ if(!$database->field_exists($table_name,$field_name)) {
 $FTAN = $admin->getFTAN('');
 
 ?><table class="mod_form" style="width: 100%;">
-<tbody>
-<tr>
-    <td >
-        <form action="<?php echo $ModuleUrl; ?>add_field.php" method="post" class="mod_form" >
-            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
-            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
-            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
-            <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['FIELD']; ?>" style="width: 100%;" />
-        </form>
-    </td>
-    <td >
-        <form action="<?php echo $ModuleUrl; ?>modify_settings.php" method="post" class="mod_form" >
-            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
-            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
-            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
-            <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
-        </form>
-    </td>
-<?php if( $admin->ami_group_member('1') ) {  ?>
-    <td >
-        <form action="<?php echo WB_URL; ?>/modules/form/reorgPosition.php" method="post" class="mod_form" >
-            <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
-            <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
-            <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
-            <input type="submit" value="Reorg Position" style="width: 100%;" />
-        </form>
-    </td>
+    <tbody>
+        <tr>
+            <td style="width: 33.336%;">
+                <form action="<?php echo $ModuleUrl; ?>add_field.php" method="post" class="mod_form" >
+                    <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+                    <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+                    <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+                    <input type="submit" value="<?php echo $TEXT['ADD'].' '.$TEXT['FIELD']; ?>" style="width: 100%;" />
+                </form>
+            </td>
+            <td style="width: 33.336%;">
+                <form action="<?php echo $ModuleUrl; ?>modify_settings.php" method="post" class="mod_form" >
+                    <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+                    <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+                    <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+                    <input type="submit" value="<?php echo $TEXT['SETTINGS']; ?>" style="width: 100%;" />
+                </form>
+            </td>
+<?php if(@DEBUG && $admin->ami_group_member('1') ) {  ?>
+            <td style="width: 33.336%;">
+                <form action="<?php echo WB_URL; ?>/modules/form/reorgPosition.php" method="post" class="mod_form" >
+                    <input type="hidden" value="<?php echo $page_id; ?>" name="page_id">
+                    <input type="hidden" value="<?php echo $section_id; ?>" name="section_id">
+                    <input type="hidden" value="<?php echo $FTAN['value'];?>" name="<?php echo $FTAN['name'];?>">
+                    <input type="submit" value="Reorg Position" style="width: 100%;" />
+                </form>
+            </td>
 <?php } ?>
-</tr>
-</tbody>
+        </tr>
+    </tbody>
 </table>
-
+<p id="tablecontent" ></p>
 <br />
 
 <h2><?php echo $TEXT['MODIFY'].'/'.$TEXT['DELETE'].' '.$TEXT['FIELD']; ?></h2>
@@ -106,30 +106,29 @@ if($oFields = $database->query($sql)) {
     $num_fields = $oFields->numRows();
     if($num_fields) {
         ?><div class="jsadmin hide"></div>
-        <table class="mod_form" >
-        <thead>
-            <tr >
-                <th style="padding-left: 5px; width: 3%;">&nbsp;</th>
-                <th style="text-align: right; width: 3%;">ID</th>
-                <th style=" width: 50%;"><?php print $TEXT['FIELD']; ?></th>
-                <th style=" width: 20%;"><?php print $TEXT['TYPE']; ?></th>
-                <th style=" width: 5%;"><?php print $TEXT['REQUIRED']; ?></th>
-                <th style=" width: 5%;">
-                <?php
-                    echo $TEXT['MULTISELECT'];
-                ?>
-                </th>
-                <th style=" width: 10%;" colspan="3">
-                <?php
-                    echo $TEXT['ACTIONS'];
-                ?>
-                <th style=" width: 3%;">POS</th>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
+        <table class="mod_form tableData" id="tableData" >
+            <thead>
+                <tr >
+                    <th style="padding-left: 5px; width: 3%;">&nbsp;</th>
+                    <th style="text-align: right; width: 3%;">ID</th>
+                    <th style=" width: 50%;"><?php print $TEXT['FIELD']; ?></th>
+                    <th style=" width: 20%;"><?php print $TEXT['TYPE']; ?></th>
+                    <th style=" width: 5%;"><?php print $TEXT['REQUIRED']; ?></th>
+                    <th style=" width: 5%;">
+                    <?php
+                        echo $TEXT['MULTISELECT'];
+                    ?>
+                    </th>
+                    <th style=" width: 10%;" colspan="3">
+                    <?php
+                        echo $TEXT['ACTIONS'];
+                    ?></th>
+                    <th style=" width: 3%;">POS</th>
+                </tr>
+            </thead>
+            <tbody>
 <?php
-        while($aFields = $oFields->fetchRow(MYSQL_ASSOC)) {
+        while($aFields = $oFields->fetchRow(MYSQLI_ASSOC)) {
           $sFielIdkey = $admin->getIDKEY($aFields['field_id']);
 ?><tr class=" sectionrow">
                 <td style="padding-left: 5px;">
@@ -176,24 +175,6 @@ if($oFields = $database->query($sql)) {
                         break;
                     endswitch;
                     echo $sTitle;
-/**
- * 
-                    if($aFields['type'] == 'textfield') {
-                        echo $TEXT['SHORT_TEXT'];
-                    } elseif($aFields['type'] == 'textarea') {
-                        echo $TEXT['LONG_TEXT'];
-                    } elseif($aFields['type'] == 'heading') {
-                        echo $TEXT['HEADING'];
-                    } elseif($aFields['type'] == 'select') {
-                        echo $TEXT['SELECT_BOX'];
-                    } elseif($aFields['type'] == 'checkbox') {
-                        echo $TEXT['CHECKBOX_GROUP'];
-                    } elseif($aFields['type'] == 'radio') {
-                        echo $TEXT['RADIO_BUTTON_GROUP'];
-                    } elseif($aFields['type'] == 'email') {
-                        echo $TEXT['EMAIL_ADDRESS'];
-                    }
- */
 ?></td>
                 <td style="text-align: center;">
 <?php
@@ -212,15 +193,15 @@ if($oFields = $database->query($sql)) {
                 </td>
                 <td style="text-align: center;">
 <?php if($aFields['position'] != 1) { ?>
-                    <a href="<?php echo $ModuleUrl; ?>move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>&amp;move_id=<?php echo $aFields['field_id']; ?>&amp;position=<?php echo $aFields['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>"> 
-                        <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="^" />
+                    <a href="<?php echo $ModuleUrl; ?>move_up.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>&amp;move_id=<?php echo $aFields['field_id']; ?>&amp;position=<?php echo $aFields['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_UP']; ?>">
+                        <img src="<?php echo THEME_URL; ?>/images/up_16.png" alt="up" />
                     </a>
 <?php } ?>
                 </td>
                 <td  style="text-align: center;">
 <?php if($aFields['position'] != $num_fields) { ?>
                     <a href="<?php echo $ModuleUrl; ?>move_down.php?page_id=<?php echo $page_id; ?>&amp;section_id=<?php echo $section_id; ?>&amp;field_id=<?php echo $sFielIdkey; ?>&amp;move_id=<?php echo $aFields['field_id']; ?>&amp;position=<?php echo $aFields['position']; ?>&amp;module=<?php echo $sModulName; ?>" title="<?php echo $TEXT['MOVE_DOWN']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="v" />
+                        <img src="<?php echo THEME_URL; ?>/images/down_16.png" alt="down" />
                     </a>
 <?php } ?>
                 </td>
@@ -229,13 +210,13 @@ if($oFields = $database->query($sql)) {
                 $url = ($ModuleUrl.'delete_field.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;field_id='.$sFielIdkey)
 ?>
                     <a href="javascript:confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>','<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
-                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" border="0" alt="X" />
+                        <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                     </a>
                 </td>
                 <td style="text-align: right; padding-right: 5px;">
 <?php
-if ( DEBUG ) { 
                     echo $aFields['position'];
+if ( DEBUG ) {
 }
 ?>
                 </td>
@@ -246,7 +227,13 @@ if ( DEBUG ) {
 ?>
         </tbody>
         </table>
-        <?php
+<?php
+        // include the required file for Javascript admin
+        if(file_exists(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php'))
+        {
+//            $js_buttonCell = 6;
+            include(WB_PATH.'/modules/jsadmin/jsadmin_backend_include.php');
+        }
     } else {
         echo $TEXT['NONE_FOUND'];
     }
@@ -276,33 +263,46 @@ if($oSubmissions = $database->query($sql)) {
 <!-- submissions -->
     <div class="frm-ScrollTableDiv">
         <table id="frm-ScrollTable">
-        <thead class="frm-Scroll">
-        <tr id="frm-Scroll">
-            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
-            <th class="frm-Scroll" style="text-align: center; width: 3%;"> ID </th>
-            <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['SUBMITTED'] ?></th>
-            <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['USER']; ?></th>
-            <th class="frm-Scroll" style=" width: 10%;"><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['FROM'] ?></th>
-            <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
-            <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
-            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
-            <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
-        </tr>
-        </thead>
-        <tfoot>
-            <tr><td colspan="9"></td></tr>
-        </tfoot>
+            <thead class="frm-Scroll">
+                <tr id="frm-Scroll">
+                    <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
+                    <th class="frm-Scroll" style="text-align: center; width: 3%;"> ID </th>
+                    <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['SUBMITTED'] ?></th>
+                    <th class="frm-Scroll" style=" width: 19%;"><?php echo $TEXT['USER']; ?></th>
+                    <th class="frm-Scroll" style=" width: 10%;"><?php echo $TEXT['EMAIL'].' '.$MOD_FORM['FROM'] ?></th>
+                    <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
+                    <th class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</th>
+                    <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
+                    <th class="frm-Scroll" style="text-align: center; width: 3%;">&nbsp;</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr><td colspan="9"></td></tr>
+            </tfoot>
         <tbody class="scrolling">
 <?php
     if($oSubmissions->numRows() > 0) {
         // List submissions
-        while($submission = $oSubmissions->fetchRow(MYSQL_ASSOC)) {
-            $submission['display_name'] = (($submission['display_name']!=null) ? $submission['display_name'] : '');
+       $emailUser = (function ($userid=0) use ($database)
+       {
+            $retval = '';
+            if ($userid!='0') {
+                $sql  = 'SELECT `email` FROM `'.TABLE_PREFIX.'users` '
+                      . 'WHERE `user_id`=\' '.$userid.'\' ';
+                $retval = $database->get_one($sql);
+            }
+            return $retval;
+        });
+        while($submission = $oSubmissions->fetchRow(MYSQLI_ASSOC)) {
+            $submission['display_name'] = (($submission['display_name']!=null) ? $submission['display_name'] : $TEXT['GUEST']);
             $sBody = $submission['body'];
-            $regex = "/[a-z0-9\-_]?[a-z0-9.\-_]+[a-z0-9\-_]?@[a-z0-9.-]+\.[a-z]{2,}/i";
-            preg_match ($regex, $sBody, $output);
+            $submission['email'] = $emailUser($submission['submitted_by']);
+            if ($submission['email']==''){
+                $regex = "/[a-z0-9\-_]?[a-z0-9.\-_]+[a-z0-9\-_]?@[a-z0-9.-]+\.[a-z]{2,}/i";
+                preg_match ($regex, $sBody, $output);
 // workout if output is empty
-            $submission['email'] = (isset($output['0']) ? $output['0'] : '');
+                $submission['email'] = (isset($output['0']) ? $output['0'] : '');
+            }
             $sSubmissionIdkey = $admin->getIDKEY($submission['submission_id']);
 ?>
             <tr class="frm-Scroll" >
@@ -318,14 +318,14 @@ if($oSubmissions = $database->query($sql)) {
                 <td class="frm-Scroll" style="text-align: center; width: 5%;">&nbsp;</td>
                 <td class="frm-Scroll" style=" width: 5%;"  >&nbsp;</td>
                 <td class="frm-Scroll"  style="text-align: center; width: 5%;">
-<?php 
+<?php
                 $url = (WB_URL.'/modules/form/delete_submission.php?page_id='.$page_id.'&amp;section_id='.$section_id.'&amp;submission_id='.$sSubmissionIdkey)
 ?>
                     <a href="javascript:confirm_link('<?php echo url_encode($TEXT['ARE_YOU_SURE']); ?>', '<?php echo $url; ?>');" title="<?php echo $TEXT['DELETE']; ?>">
                         <img src="<?php echo THEME_URL; ?>/images/delete_16.png" alt="X" />
                     </a>
                 </td>
-<?php 
+<?php
 if ( DEBUG ) { ?>
                 <td class="frm-Scroll" style=" width: 3%;" ><?php echo $sSubmissionIdkey; ?></td>
 <?php } else  { ?>

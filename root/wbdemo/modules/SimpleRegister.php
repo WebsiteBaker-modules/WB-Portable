@@ -3,15 +3,15 @@
 // Must include code to stop this file being accessed directly
 //if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
+
 if( !isset( $oReg ) && !class_exists('WbAdaptor')) {
     $oThis = new stdClass;
     // first reinitialize arrays
     $oThis->aObjects = array('Db' => null, 'Trans' => null, 'App' => null);
-    $oApp    = $oThis->aObjects['App']    = ( @$GLOBALS['wb'] ?: null );
-    $oApp    = $oThis->aObjects['App']    = ( @$GLOBALS['admin'] ?: $oApp );
-    $oDb     = $oThis->aObjects['Db']     = ( @$GLOBALS['database'] ?: null );
-    $oTrans  = $oThis->aObjects['Trans']  = ( @$GLOBALS['Trans'] ?: null );
-
+    $oApp    = $oThis->aObjects['App']     = ( @$GLOBALS['wb'] ?: null );
+    $oApp    = $oThis->aObjects['App']     = ( @$GLOBALS['admin'] ?: $oApp );
+    $oDb     = $oThis->aObjects['Db']      = ( @$GLOBALS['database'] ?: null );
+    $oTrans  = $oThis->aObjects['Trans']   = (class_exists('Translate') ?Translate::getInstance (): null );
     $oThis->aReservedVars = array('Db', 'Trans', 'App');
     $oThis->aProperties = array(
         'System' => array(),
@@ -154,7 +154,7 @@ if( !isset( $oReg ) && !class_exists('WbAdaptor')) {
                 $aSysList = array(
                 // list of values which should be placed in ['System']
                     'DefaultCharset','DefaultDateFormat','DefaultLanguage','DefaultTimeFormat',
-                    'DefaultTimezone','DevInfos'
+                    'DefaultTimezone','DevInfos','Timezone'
                 );
                 // convert 'true' or 'false' strings into boolean
                 $sVal = ($sVal == 'true' ? true : ($sVal == 'false' ? false : $sVal));
@@ -190,12 +190,9 @@ if( !isset( $oReg ) && !class_exists('WbAdaptor')) {
             $oThis->aProperties['Request'],
             $oThis->aProperties['System']
         );
-
         ksort($oThis->aProperties['System']);
         ksort($oThis->aProperties['Request']);
-
         $aReg = array_merge( $oThis->aProperties['System'], $oThis->aProperties['Request'],  $oThis->aObjects );
 //        foreach ($aReg as $key => $value) { $oReg->$key = $value; }
         $oReg = new ArrayObject( $aReg, ArrayObject::ARRAY_AS_PROPS );
-
 }

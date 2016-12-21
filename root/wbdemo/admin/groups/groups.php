@@ -15,44 +15,59 @@
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
  */
-
+/*---------------------------------------------------------------------------------------------------------*/
 // Include config file and admin class file
 if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('admin', false) ) { require(WB_PATH.'/framework/class.admin.php'); }
 // Set parameter 'action' as alternative to javascript mechanism
+$js_back = ADMIN_URL.'/groups/index.php';
+$requestMethod = '_'.($GLOBALS['_SERVER']['REQUEST_METHOD']);
+$aRequestVars  = (@(${$requestMethod}) ? : null);
+
+$bAdvanced = intval (@$aRequestVars['advanced'] ?: 0);
+$bAdvancedSave   = intval(@$aRequestVars['advanced_exented'] ?: 0);
+$sDefaultModules   = array();
+$sDefaultTemplates = array();
+
 $action = 'cancel';
 // Set parameter 'action' as alternative to javascript mechanism
-$action = (isset($_POST['action']) && ($_POST['action'] ='modify') ? 'modify' : $action );
-$action = (isset($_POST['modify']) ? 'modify' : $action );
-$action = (isset($_POST['delete']) ? 'delete' : $action );
-
+$action = (isset($aRequestVars['action']) && ($aRequestVars['action'] ='modify') ? 'modify' : $action );
+$action = (isset($aRequestVars['modify']) ? 'modify' : $action );
+$action = (isset($aRequestVars['delete']) ? 'delete' : $action );
+/*-------------------------------------------------------------------------------------------------------*/
 switch ($action):
-
+    case 'cancel' :
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: '.$js_back);
+            exit;
     case 'modify' :
             // Create new admin object
             $admin = new admin('Access', 'groups_modify' );
             // Check if group group_id is a valid number and doesnt equal 1
-            $group_id = intval($admin->checkIDKEY('group_id', 0, $_SERVER['REQUEST_METHOD']));
-            if($group_id == 0){
-                $admin->print_error($MESSAGE['USERS_NO_GROUP'] );
+            $group_id = intval($admin->checkIDKEY('group_id', false, $_SERVER['REQUEST_METHOD']));
+            if($group_id === false){
+                $admin->print_error($MESSAGE['USERS_NO_GROUP'], $js_back);
             }
             if( ($group_id < 2 ) )
             {
                 // if($admin_header) { $admin->print_header(); }
-                $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+                $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION).'_'.$group_id.'_::');
+                $sDEBUG=(@DEBUG?$sInfo:'');
+                $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
             }
-
             // Get existing values
-            $sql = 'SELECT * FROM  `'.TABLE_PREFIX.'groups` WHERE `group_id` =  '.$group_id;
+            $sql  = 'SELECT * FROM  `'.TABLE_PREFIX.'groups` '
+                  . 'WHERE `group_id` = '.$group_id;
             $results = $database->query($sql);
             $group = $results->fetchRow(MYSQLI_ASSOC);
             // Setup template object, parse vars to it, then parse it
             // Create new template object
-            $template = new Template(dirname($admin->correct_theme_source('groups_form.htt')));
+            $template = new Template(dirname($admin->correct_theme_source('groups_form.htt')), 'remove');
             // $template->debug = true;
+            //$template->set_unknowns('keep');
             $template->set_file('page', 'groups_form.htt');
             $template->set_block('page', 'main_block', 'main');
-            $template->set_var(    array(
+            $template->set_var(array(
                                 'ADMIN_URL' => ADMIN_URL,
                                 'WB_URL' => WB_URL,
                                 'THEME_URL' => THEME_URL,
@@ -65,81 +80,113 @@ switch ($action):
                                 'FTAN' => $admin->getFTAN(),
                                 ));
             // Tell the browser whether or not to show advanced options
-            if( true == (isset( $_POST['advanced']) AND ( strpos( $_POST['advanced'], ">>") > 0 ) ) ) {
-                $template->set_var('DISPLAY_ADVANCED', '');
-                $template->set_var('DISPLAY_BASIC', 'display:none;');
-                $template->set_var('ADVANCED', 'yes');
-                $template->set_var('ADVANCED_BUTTON', '&lt;&lt; '.$TEXT['HIDE_ADVANCED']);
-            } else {
-                $template->set_var('DISPLAY_ADVANCED', 'display:none;');
-                $template->set_var('DISPLAY_BASIC', '');
-                $template->set_var('ADVANCED', 'no');
-                $template->set_var('ADVANCED_BUTTON', $TEXT['SHOW_ADVANCED'].'  &gt;&gt;');
-            }
-
+            $template->set_block('main_block', 'groups_basic_block', 'groups_basic');
+            $template->set_block('main_block', 'groups_extended_block', 'groups_extended');
             // Explode system permissions
-            $system_permissions = explode(',', $group['system_permissions']);
-            // Check system permissions boxes
-            foreach($system_permissions AS $name) {
-                    $template->set_var($name.'_checked', ' checked="checked"');
-            }
-            // Explode module permissions
-            $module_permissions = explode(',', $group['module_permissions']);
-
-            // Explode template permissions
-            $template_permissions = explode(',', $group['template_permissions']);
-
-            // Insert values into module list
-            $template->set_block('main_block', 'module_list_block', 'module_list');
-
-            $sql = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
-                  .'WHERE `type` = \'module\' '
-                  .'AND (`function` = \'page\' OR `function` = \'tool\' ) ORDER BY `function`, `name`';
-
-            $result = $database->query($sql);
-            $aCheckedList = array();
-
-            $ChangeFunction = 'page';
-            if($result->numRows() > 0) {
-                $i=0;
-                while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
-                    if( $addon['function']!=$ChangeFunction ){
-                        $ChangeFunction = $addon['function'];
-                    }
-                    $template->set_var('VALUE', $addon['directory']);
-                    $template->set_var('NAME', (($addon['function'] == 'page') ? $addon['name'].'':' (A) '.$addon['name'])   );
-                    if(!is_numeric(array_search($addon['directory'], $module_permissions))) {
-                        $template->set_var('CHECKED', ' checked="checked"');
-                        $aCheckedList[$i]['directory'] = $addon['directory'];
-                        $aCheckedList[$i]['name'] = $addon['name'];
-                        ++$i;
-                    } else {
-                        $template->set_var('CHECKED', '');
-                    }
-                    $template->parse('module_list', 'module_list_block', true);
+            if ($group['system_permissions']) {
+                $system_permissions = explode(',', $group['system_permissions']);
+                // Check system permissions boxes
+                foreach($system_permissions as $name) {
+//                    echo (@DEBUG?$name.'_checked':'');
+//                    $template->set_var($name.'_checked', '');
+                    $template->set_var($name.'_checked', (!$admin->get_permission($name) ?' checked="checked"':''));
                 }
+          }
+          if($bAdvanced)
+          {
+              $template->set_var('DISPLAY_ADVANCED', '');
+              $template->set_var('DISPLAY_BASIC', 'display:none;');
+              $template->set_var('ADVANCED_VALUE', 0);
+              $template->set_var('ADVANCED_BUTTON', '&laquo; '.$TEXT['HIDE_ADVANCED']);
+              $template->parse('groups_extended', 'groups_extended_block', true);
+              $template->set_block('groups_basic', '', '');
+          } else {
+              $template->set_var('DISPLAY_ADVANCED', 'display:none;');
+              $template->set_var('DISPLAY_BASIC', '');
+              $template->set_var('ADVANCED_VALUE', 1);
+              $template->set_var('ADVANCED_BUTTON', $TEXT['SHOW_ADVANCED'].' &raquo;');
+              $template->parse('groups_basic', 'groups_basic_block', true);
+              $template->set_block('groups_extended', '');
+          }
+          // Explode module permissions
+          $module_permissions = explode(',', $group['module_permissions']);
+          $module_permissions = array_diff($module_permissions, $sDefaultModules);
+          // Explode template permissions
+          $template_permissions = explode(',', $group['template_permissions']);
+          $template_permissions = array_diff($template_permissions, $sDefaultTemplates);
+/*-------------------------------------------------------------------------------------------------------*/
+// Insert values into module list
+    $template->set_block('main_block', 'module_list_block', 'module_list');
+    $template->set_block('main_block', 'module_group_block', 'module_group');
+    $aCheckedList = array();
+    $GroupsFunction = '';
+    $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+          . 'WHERE `type` = \'module\' '
+          .   'AND `function` IN (\'page\', \'tool\') '
+          . 'ORDER BY `function`, `name`';
+    if($result = $database->query($sql))
+    {
+        $i=0;
+        while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
+            $template->set_var('OPTGROUP', '');
+            $template->set_block('module_function', '');
+            if (strcasecmp($addon['function'], $GroupsFunction)!== 0){
+                $template->set_var('OPTGROUP', ucwords($addon['function']));
+                $template->parse('module_group', 'module_group_block', true);
             }
-
-            // Insert values into template list
-            $template->set_block('main_block', 'template_list_block', 'template_list');
-            $result = $database->query('SELECT * FROM `'.TABLE_PREFIX.'addons` WHERE `type` = "template" ORDER BY `name`');
-            if($result->numRows() > 0) {
-                while($addon = $result->fetchRow(MYSQLI_ASSOC)) {
-                    $template->set_var('VALUE', $addon['directory']);
-                    $template->set_var('NAME', $addon['name']);
-                    if(!is_numeric(array_search($addon['directory'], $template_permissions))) {
-                        $template->set_var('CHECKED', ' checked="checked"');
-                    } else {
-                        $template->set_var('CHECKED', '');
-                    }
-                    $template->parse('template_list', 'template_list_block', true);
-                }
+            $template->set_var('VALUE', $addon['directory']);
+            $template->set_var('NAME', (($addon['function'] == 'page') ? $addon['name'] :''.$addon['name']));
+            if (!is_numeric(array_search($addon['directory'], $module_permissions)) )
+            {
+                $template->set_var('CHECKED', ' checked="checked"');
+                $aCheckedList[$i]['directory'] = $addon['directory'];
+                $aCheckedList[$i]['name'] = $addon['name'];
+                ++$i;
+            } else {
+                $template->set_var('CHECKED', '');
             }
-
+            $GroupsFunction = $addon['function'];
+            $template->parse('module_list', 'module_list_block', true);
+        }
+    }
+/*-------------------------------------------------------------------------------------------------------*/
+// Insert values into template list
+    $template->set_block('main_block', 'template_list_block', 'template_list');
+    $template->set_block('main_block', 'template_group_block', 'template_group');
+    $sql  = 'SELECT * FROM `'.TABLE_PREFIX.'addons` '
+          . 'WHERE `type` = \'template\' '
+          . 'ORDER BY `function`, `name`';
+    if($result = $database->query($sql))
+    {
+        $i=0;
+        while( $addon = $result->fetchRow(MYSQLI_ASSOC)) {
+            $template->set_var('OPTGROUP', '');
+            $template->set_block('template_function', '');
+            if (strcasecmp($addon['function'], $GroupsFunction)!== 0){
+                $template->set_var('OPTGROUP', ucwords($addon['function']));
+                $template->parse('template_group', 'template_group_block', true);
+            }
+            $template->set_var('VALUE', $addon['directory']);
+            $template->set_var('NAME', $addon['name']   );
+            if(!is_numeric(array_search($addon['directory'], $template_permissions)))
+            {
+                $template->set_var('CHECKED', ' checked="checked"');
+                $aCheckedList[$i]['directory'] = $addon['directory'];
+                $aCheckedList[$i]['name'] = $addon['name'];
+                ++$i;
+            } else {
+                $template->set_var('CHECKED', '');
+            }
+            $GroupsFunction = $addon['function'];
+            $template->parse('template_list', 'template_list_block', true);
+        }
+    }
+/*-------------------------------------------------------------------------------------------------------*/
             // Insert language text and messages
             $template->set_var(array(
                         'TEXT_CANCEL' => $TEXT['CANCEL'],
                         'TEXT_RESET' => $TEXT['RESET'],
+                        'TEXT_FILESYSTEM_PERMISSIONS' => $TEXT['FILESYSTEM_PERMISSIONS'],
                         'TEXT_ACTIVE' => $TEXT['ACTIVE'],
                         'TEXT_DISABLED' => $TEXT['DISABLED'],
                         'TEXT_PLEASE_SELECT' => $TEXT['PLEASE_SELECT'],
@@ -170,17 +217,18 @@ switch ($action):
                         'TEXT_DELETE' => $TEXT['DELETE'],
                         'TEXT_MODIFY_CONTENT' => $TEXT['MODIFY_CONTENT'],
                         'TEXT_MODIFY_SETTINGS' => $TEXT['MODIFY_SETTINGS'],
-                        'HEADING_MODIFY_INTRO_PAGE' => $HEADING['MODIFY_INTRO_PAGE'],
+                        'HEADING_MODIFY_INTRO_PAGE' => $TEXT['INTRO_PAGE'],
                         'TEXT_CREATE_FOLDER' => $TEXT['CREATE_FOLDER'],
                         'TEXT_RENAME' => $TEXT['RENAME'],
                         'TEXT_UPLOAD_FILES' => $TEXT['UPLOAD_FILES'],
                         'TEXT_BASIC' => $TEXT['BASIC'],
                         'TEXT_ADVANCED' => $TEXT['ADVANCED'],
-                        'CHANGING_PASSWORD' => $MESSAGE['USERS']['CHANGING_PASSWORD'],
+                        'CHANGING_PASSWORD' => $MESSAGE['USERS_CHANGING_PASSWORD'],
                         'DISPLAY_EXTRA' => 'display:block;',
                         'HEADING_MODIFY_GROUP' => $HEADING['MODIFY_GROUP'],
+                        'DEBUG_MSG'=>(@$DebugOLutput?:'')
                     ));
-
+/*-------------------------------------------------------------------------------------------------------*/
             // Parse template object
             $template->parse('main', 'main_block', false);
             $template->pparse('output', 'page');
@@ -190,32 +238,40 @@ switch ($action):
         case 'delete' :
             // Create new admin object
             $admin = new admin('Access', 'groups_delete', false);
-            $group_id = intval($admin->checkIDKEY('group_id', 0, $_SERVER['REQUEST_METHOD']));
-            if($group_id == 0){
+            $group_id = intval($admin->checkIDKEY('group_id', false, $_SERVER['REQUEST_METHOD']));
+            if($group_id === false){
                 $admin->print_header();
-                $admin->print_error($MESSAGE['USERS_NO_GROUP'] );  //  GENERIC_CANNOT_UNINSTALL
+                $admin->print_error($MESSAGE['USERS_NO_GROUP'], $js_back);  //  GENERIC_CANNOT_UNINSTALL
             }
             // Check if user id is a valid number and doesnt equal 1
             if( ($group_id < 2 ) )
             {
                 $admin->print_header();
-                $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'], ADMIN_URL );
+                $sInfo = strtoupper(basename(__DIR__).'_'.basename(__FILE__, ''.PAGE_EXTENSION).'_idkey::');
+                $sDEBUG=(@DEBUG?$sInfo:'');
+                $admin->print_error($sDEBUG.$MESSAGE['GENERIC_SECURITY_ACCESS'], $js_back );
             }
             // Print header
             $admin->print_header();
-            $query = "SELECT `name` FROM `".TABLE_PREFIX."groups` WHERE `group_id` = ".$group_id;
-            if ( ($group_name = $database->get_one($query)) ) { }
-            $query = "SELECT COUNT(*) FROM `".TABLE_PREFIX."users` WHERE `groups_id` like '%".$group_id."%'";
+            $sql  = 'SELECT `name` FROM `'.TABLE_PREFIX.'groups` '
+                  .'WHERE `group_id`='.(int)$group_id.''
+                  .'';
+            if ( ($group_name = $database->get_one($sql)) ) { }
+            $query = 'SELECT COUNT(*) FROM `'.TABLE_PREFIX.'users` '
+                   . 'WHERE `groups_id` like \'%'.$group_id.'%\'';
             if ( $database->get_one($query) == 0 ) {
                 // Delete the group
-                $database->query("DELETE FROM `".TABLE_PREFIX."groups` WHERE `group_id` = '".$group_id."' LIMIT 1");
+            $sql  = 'DELETE FROM `'.TABLE_PREFIX.'groups` '
+                  .'WHERE `group_id`='.(int)$group_id.''
+                  .'';
+                $database->query($sql);
                 if($database->is_error()) {
                     $admin->print_error($database->get_error());
                 } else {
-                        $admin->print_success($MESSAGE['GROUPS_DELETED']);
+                        $admin->print_success($MESSAGE['GROUPS_DELETED'], $js_back);
                 }
             } else {
-              $admin->print_error('('.$TEXT['GROUP'].' '.$group_name.') '.$MESSAGE['GENERIC_CANNOT_UNINSTALL'] );  //  
+              $admin->print_error('('.$TEXT['GROUP'].' '.$group_name.') '.$MESSAGE['GENERIC_CANNOT_UNINSTALL'], $js_back);
             }
             $admin->print_footer();
             break;

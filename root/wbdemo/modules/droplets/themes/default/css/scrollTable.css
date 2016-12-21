@@ -1,0 +1,86 @@
+/* Terence Ordona, portal[AT]imaputz[DOT]com         */
+/* http://creativecommons.org/licenses/by-sa/2.0/    */
+html > body div.tableContainer { overflow: hidden; width: 100%; }
+html > body div.tableContainer table { border-collapse: collapse; table-layout: fixed; /*width: 100%;*/ white-space: nowrap; }
+div.tableContainer { clear: both; border: 0px solid #963; overflow: auto; width: 100%; margin: 1.525em auto; /*font-size: 1.225em;*/ }
+div.tableContainer table { float: left;  /* width: 740px;*/ }
+html > body tfoot.fixedFooter tr,
+html > body thead.fixedHeader tr { display: block; background: #3D6A8A; height: 2.525em; text-align: left; }
+thead.fixedFooter tr,
+thead.fixedHeader tr { position: relative; color: #fff;/* font-size: 1.125em;*/ font-weight: bold; }
+html>body tbody.scrollContent { display: block; max-height: 40.525em; overflow: auto; width: 100% }
+
+tfoot.fixedFooter td,
+thead.fixedHeader th, 
+tbody.scrollContent td { padding: 0.525em 0.325em; }
+tbody.scrollContent tr { line-height: 2.925em; }
+tbody.scrollContent tr:nth-child(odd) td,
+tbody.scrollContent tr:nth-child(even) td { border-bottom: none; border-left: none; border-right: 1px solid #CCC; border-top: 1px solid #DDD; padding: 2px 3px 3px 4px; }
+
+tbody.scrollContent tr:nth-child(odd) td { background: #e8e8e8; }
+tbody.scrollContent tr:nth-child(even) td { background: #fff; }
+tbody.scrollContent tr:hover { background: #FBFCE0; cursor: default; }
+html>body tfoot.fixedFooter td:nth-child(1),
+html>body thead.fixedHeader th:nth-child(1),
+html>body tbody.scrollContent td:nth-child(1) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(2),
+html>body thead.fixedHeader th:nth-child(2),
+html>body tbody.scrollContent td:nth-child(2) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(3),
+html>body thead.fixedHeader th:nth-child(3),
+html>body tbody.scrollContent td:nth-child(3) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(4),
+html>body thead.fixedHeader th:nth-child(4),
+html>body tbody.scrollContent td:nth-child(4) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(5),
+html>body thead.fixedHeader th:nth-child(5),
+html>body tbody.scrollContent td:nth-child(5) { width: 10%; text-align: left; }
+
+html>body tfoot.fixedFooter td:nth-child(6),
+html>body thead.fixedHeader th:nth-child(6),
+html>body tbody.scrollContent td:nth-child(6) { width: 40%; text-align: left; }
+
+html>body tfoot.fixedFooter td:nth-child(7),
+html>body thead.fixedHeader th:nth-child(7),
+html>body tbody.scrollContent td:nth-child(7) { width:  10%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(8),
+html>body thead.fixedHeader th:nth-child(8),
+html>body tbody.scrollContent td:nth-child(8) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(9),
+html>body thead.fixedHeader th:nth-child(9),
+html>body tbody.scrollContent td:nth-child(9) { width: 5%; text-align: center; }
+
+html>body tfoot.fixedFooter td:nth-child(10),
+html>body thead.fixedHeader th:nth-child(10),
+html>body tbody.scrollContent td:nth-child(10) { width: 5%; text-align: center; }
+
+tbody.scrollContent tr:hover td { background: #FBFCE0; cursor: default; }
+
+select.selectOrder { 
+/*width: 35%; */
+height: 2.125em; 
+border-radius: 0.225em; 
+/*font-size: 1.225em;*/
+font-weight: bold; 
+text-overflow: ellipsis;
+border: 1px solid #15697B;
+color: #28659A;
+background-color: #fff;
+}
+select.selectOrder optgroup { 
+color: #F00101;
+font-weight: bold;
+}
+select.selectOrder optgroup option { 
+color: #000;
+background-color: #fff;
+font-weight: bold;
+/*font-size: 0.925em;*/
+padding: 0.225em 1.825em;
+}

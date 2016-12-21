@@ -1,0 +1,13 @@
+span.title { display :block; }
+.section { margin-top :10px; padding :0px; border :1px solid #999999; font-size :1em; width :100%; background-color :#fdfdfd; height :95px; }
+
+#admintools { margin : auto 1%; }
+#admintools ul { padding :0;  width :100%; }
+#admintools li { list-style-type :none; display :inline; float :left; width :47%; margin :0 1%; }
+
+.tool_table td { text-align :left; vertical-align :top; }
+
+input#admintools { margin : auto 0.225em; }
+
+.tool_table ul { margin :0; padding :0; margin-left :20px; margin-bottom :2px; }
+.tool_table li { padding :1px; list-style-type :disc; }

@@ -20,15 +20,12 @@
 if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
 /* -------------------------------------------------------- */
 function get_setting($name, $default = '') {
-    global $database, $sql;
+    global $database;
+    $retVal = $default;
     $sql  = 'SELECT `value` FROM `'.TABLE_PREFIX.'mod_jsadmin` '
           . 'WHERE `name` = \''.$database->escapeString($name).'\'';
-    if( $rs = $database->get_one($sql) ) {
-        return $rs;
-    } else {
-      return $default;
-      
-    }
+    if ($retVal = $database->get_one($sql) ) { }
+    return $retVal;
 }
 
 function save_setting($name, $value) {

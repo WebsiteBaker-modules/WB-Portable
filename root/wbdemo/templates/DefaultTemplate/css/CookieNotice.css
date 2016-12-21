@@ -1,0 +1,43 @@
+/*
+    Document   : CookieNotice
+    Created on : 04.07.2015, 14:39:54
+    Author     : Manuela v.d.Decken <manuela@isteam.de>
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    format the cookie notice
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#CookieNotice {
+    box-sizing: border-box;
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    padding: 15px;
+    background-color: rgba(120, 120, 120, 0.6);
+    display: none;
+    z-index: 9999;
+}
+#CookieNoticeBar {
+    position: relative;
+    top: 30%;
+    background-color: rgba(244,239,195,0.8);
+    text-align: center;
+    color: #777;
+    font-size: 0.9em;
+    padding: 6px 4px;
+    border-radius: 6px;
+    border: solid 1px red;
+}
+#CookieNoticeClose {
+    float:right;
+    background: #ff0000;
+    color: #ffffff;
+    font-weight: bold;
+    width: 1.525em;
+    cursor: pointer;
+    border-radius: 4px;
+}
+#CookieNoticeInfo {}
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+

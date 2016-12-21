@@ -19,7 +19,7 @@
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
 if(!defined('WB_PATH')) {
-    require_once(dirname(__FILE__).'/globalExceptionHandler.php');
+    require_once((__DIR__).'/globalExceptionHandler.php');
     throw new IllegalFileException();
 }
 /* -------------------------------------------------------- */
@@ -48,7 +48,7 @@ function getVersion($version, $strip_suffix = true)
         $revision = substr($minor, -1);
         $minor = substr($minor, 0, 1);
     }
-    
+
     // extract possible non numerical suffix from revision part (e.g. Alpha, Beta, RC1)
     $suffix = strtoupper(trim(substr($revision, strlen(intval($revision)))));
 
@@ -62,17 +62,17 @@ function getVersion($version, $strip_suffix = true)
 }
 
 /**
- *    As "version_compare" it self seems only got trouble 
+ *    As "version_compare" it self seems only got trouble
  *    within words like "Alpha", "Beta" a.s.o. this function
  *    only modify the version-string in the way that these words are replaced by values/numbers.
  *
  *    E.g:    "1.2.3 Beta2" => "1.2.322"
  *            "0.1.1 ALPHA" => "0.1.11"
  *
- *    Notice:    Please keep in mind, that this will not correct the way "version_control" 
+ *    Notice:    Please keep in mind, that this will not correct the way "version_control"
  *            handel "1 < 1.0 < 1.0.0 < 1.0.0.0" and will not correct missformed version-strings
  *            below 2.7, e.g. "1.002 released candidate 2.3"
- *            
+ *
  *    @since    2.8.0 RC2
  *
  *    @param    string    A versionstring
@@ -80,16 +80,16 @@ function getVersion($version, $strip_suffix = true)
  *
  */
 function getVersion2 ($version="") {
-    
+
     $states = array (
         '1' => "alpha",
         '2' => "beta",
         '4' => "rc",
-        '8' => "final"    
+        '8' => "final"
     );
 
     $version = strtolower($version);
-    
+
     foreach($states as $value=>$keys) $version = str_replace($keys, $value, $version);
 
     $version = str_replace(" ", "", $version);
@@ -101,7 +101,7 @@ function versionCompare($version1, $version2, $operator = '>=')
 {
     /**
      * This funtion performs a comparison of two provided version strings
-     * The versions are first converted into a string following the major.minor.revision 
+     * The versions are first converted into a string following the major.minor.revision
      * convention and performs a version_compare afterwards.
      */
     // return version_compare(getVersion($version1), getVersion($version2), $operator);
@@ -132,25 +132,25 @@ function preCheckAddon($temp_addon_file)
      * be defined in the optional Add-on file precheck.php.
      */
     global $database, $admin, $TEXT, $HEADING, $MESSAGE;
-    
+
     // path to the temporary Add-on folder
     $temp_path = WB_PATH . '/temp/unzip';
-    
+
     // check if file precheck.php exists for the Add-On uploaded via WB installation routine
     if (!file_exists($temp_path . '/precheck.php')) return;
-    
+
     // unset any previous declared PRECHECK array
     unset($PRECHECK);
 
     // include Add-On precheck.php file
     include($temp_path . '/precheck.php');
-    
+
     // check if there are any Add-On requirements to check for
     if (!(isset($PRECHECK) && count($PRECHECK) > 0)) return;
-    
+
     // sort precheck array
     $PRECHECK = sortPreCheckArray($PRECHECK);
-    
+
     $failed_checks = 0;
     $msg = array();
     // check if specified addon requirements are fullfilled
@@ -160,7 +160,7 @@ function preCheckAddon($temp_addon_file)
                 if (isset($value['VERSION'])) {
                     // obtain operator for string comparison if exist
                     $operator = (isset($value['OPERATOR']) &&  trim($value['OPERATOR']) != '') ? $value['OPERATOR'] : '>=';
-                
+
                     // compare versions and extract actual status
                     $status = versionCompare(WB_VERSION, $value['VERSION'], $operator);
                     $msg[] = array(
@@ -187,24 +187,24 @@ function preCheckAddon($temp_addon_file)
                             $addon = strip_tags($values);
                             $version = ''; $operator = '';
                         }
-                    
+
                         // check if addon is listed in WB database
                         $table = TABLE_PREFIX . 'addons';
-                        $sql = "SELECT * FROM `$table` WHERE `directory` = '" . addslashes($addon) . "'";
+                        $sql = "SELECT * FROM `$table` WHERE `directory` = '" . $database->escapeString($addon) . "'";
                         $results = $database->query($sql);
-                    
+
                         $status = false; $addon_status = $TEXT['NOT_INSTALLED'];
                         if ($results && $row = $results->fetchRow()) {
-                            $status = true; 
+                            $status = true;
                             $addon_status = $TEXT['INSTALLED'];
-                        
+
                             // compare version if required
                             if ($version != '') {
                                 $status = versionCompare($row['version'], $version, $operator);
                                 $addon_status = $row['version'];
                             }
                         }
-                    
+
                         // provide addon status
                         $msg[] = array(
                             'check'        => '&nbsp; ' . $TEXT['ADDON'] . ': ' . htmlentities($addon),
@@ -212,7 +212,7 @@ function preCheckAddon($temp_addon_file)
                             'actual'    => $addon_status,
                             'status'    => $status
                         );
-                        
+
                         // increase counter if required
                         if (!$status) $failed_checks++;
                     }
@@ -223,7 +223,7 @@ function preCheckAddon($temp_addon_file)
                 if (isset($value['VERSION'])) {
                     // obtain operator for string comparison if exist
                     $operator = (isset($value['OPERATOR']) &&  trim($value['OPERATOR']) != '') ? $value['OPERATOR'] : '>=';
-                
+
                     // compare versions and extract actual status
                     $status = versionCompare(PHP_VERSION, $value['VERSION'], $operator);
                     $msg[] = array(
@@ -261,7 +261,7 @@ function preCheckAddon($temp_addon_file)
                     foreach($PRECHECK['PHP_SETTINGS'] as $setting => $value) {
                         $actual_setting = ($temp = ini_get($setting)) ? $temp : 0;
                         $status = ($actual_setting == $value);
-                    
+
                         $msg[] = array(
                             'check'        => '&nbsp; '. ($setting),
                             'required'    => $value,
@@ -296,11 +296,11 @@ function preCheckAddon($temp_addon_file)
 
     // leave if all requirements are fullfilled
     if ($failed_checks == 0) return;
-    
+
     // output summary table with requirements not fullfilled
     echo <<< EOT
     <h2>{$HEADING['ADDON_PRECHECK_FAILED']}</h2>
-    <p>{$MESSAGE['ADDON']['PRECHECK_FAILED']}</p> 
+    <p>{$MESSAGE['ADDON']['PRECHECK_FAILED']}</p>
 
     <table width="700px" cellpadding="4" border="0" style="margin: 0.5em; border-collapse: collapse; border: 1px solid silver;">
     <tr>
@@ -315,7 +315,7 @@ EOT;
         $style = $check['status'] ? 'color: #46882B;' : 'color: #C00;';
         foreach($check as $key => $value) {
             if ($key == 'status') continue;
-            
+
             echo '<td style="' . $style . '">' . $value . '</td>';
         }
         echo '</tr>';
@@ -323,11 +323,11 @@ EOT;
     echo '</table>';
 
     // delete the temp unzip directory
-    rm_full_dir($temp_path);    
+    rm_full_dir($temp_path);
 
     // delete the temporary zip file of the Add-on
-    if(file_exists($temp_addon_file)) { unlink($temp_addon_file); }    
-    
+    if(file_exists($temp_addon_file)) { unlink($temp_addon_file); }
+
     // output status message and die
     $admin->print_error('');
 }

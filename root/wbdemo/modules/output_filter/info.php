@@ -23,10 +23,10 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
 /* -------------------------------------------------------- */
 
 $module_directory = 'output_filter';
-$module_name = 'Output Filter Frontend v1.0.0 ';
+$module_name = 'Output Filter Frontend v1.0.6';
 $module_function = 'tool';
-$module_version = '1.0.0';
-$module_platform = '2.8.3 SP6';
+$module_version = '1.0.6';
+$module_platform = '2.8.3 SP7';
 $module_author = 'Christian Sommer(doc), Manuela v.d. Decken(DarkViper), Dietmar Wöllbrink(luisehahne)';
 $module_license = 'GNU General Public License';
 $module_description = 'This module allows to filter the output before displaying it on the frontend. Support for filtering mailto links and mail addresses in strings.';

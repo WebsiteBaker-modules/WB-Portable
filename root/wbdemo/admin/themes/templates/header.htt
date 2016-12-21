@@ -41,14 +41,14 @@ var EDITOR = '{EDITOR}';
     <td class="version" style="white-space: normal; float: right; margin-top: 1.5em;">
       <!-- BEGIN infoBlockBasis -->
       <ul class="infoBlockBasis" style="width: 23.5em;">
-          <li>WB Version {VERSION}+{SP} </li>
-          <li>{REVISION}</li>
+          <li>WB Version {VERSION}+{SP} (r{REVISION})</li>
+          <li></li>
           <li>{SERVER_ADDR1}</li>
       </ul>
       <!-- END infoBlockBasis -->
       <!-- BEGIN infoBlockExented -->
       <ul class="infoBlockExented" >
-          <li>WB Version {VERSION}+{SP} {REVISION} </li>
+          <li>WB Version {VERSION}+{SP} (r{REVISION}) </li>
           <li>PHP Version {PHP_VERSION}</li>
           <li>SQL Server Version {MYSQLI_VERSION} ( {MYSQLSTRICT} )</li>
       </ul>

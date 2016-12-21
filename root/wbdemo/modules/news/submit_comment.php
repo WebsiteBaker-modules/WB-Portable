@@ -4,17 +4,16 @@
  * @category        modules
  * @package         news
  * @author          WebsiteBaker Project
- * @copyright       2009-2011, Website Baker Org. e.V.
- * @link            http://www.websitebaker2.org/
+ * @copyright       Website Baker Org. e.V.
+ * @link            http://websitebaker.org/
  * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.x
- * @requirements    PHP 5.2.2 and higher
+ * @platform        WebsiteBaker 2.8.3
+ * @requirements    PHP 5.3.6 and higher
  * @version         $Id: submit_comment.php 1634 2012-03-09 02:20:16Z Luisehahne $
- * @filesource        $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/news/submit_comment.php $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/modules/news/submit_comment.php $
  * @lastmodified    $Date: 2012-03-09 03:20:16 +0100 (Fr, 09. Mrz 2012) $
  *
  */
-
 // Include config file
 if ( !defined( 'WB_PATH' ) ){ require( dirname(dirname((__DIR__))).'/config.php' ); }
 if ( !class_exists('wb')) { require(WB_PATH.'/framework/class.wb.php');  }
@@ -36,21 +35,20 @@ if (!isset($wb) || !($wb instanceof wb)) { $wb = new wb(); }
         header("Location: ".WB_URL."/modules/news/comment.php?post_id=".(int)$aRequestVars['post_id']."&section_id=".(int)$aRequestVars['section_id']."" ) ;
         exit( 0 );
     }
-    $position = (isset($aRequestVars['p']) ? $aRequestVars['p'] : '' );
-    $comment = (isset($aRequestVars['comment']) ? $aRequestVars['comment'] : '' );
-    $comment_date = (isset($aRequestVars['comment_'.date('W')]) ? $aRequestVars['comment_'.date('W')] : '' );
+    $position       = (isset($aRequestVars['p']) ? $aRequestVars['p'] : '' );
+    $comment        = (isset($aRequestVars['comment']) ? $aRequestVars['comment'] : '' );
+    $comment_date   = (isset($aRequestVars['comment_'.date('W')]) ? $aRequestVars['comment_'.date('W')] : '' );
     $sRecallAddress = (isset($aRequestVars['redirect']) ? $aRequestVars['redirect'] : WB_URL );
     $action = intval(isset($aRequestVars['cancel']) ? true : false );
 // Check if we should show the form or add a comment
-    if($page_id && $section_id  && $post_id  && !$action
-                && ( ( ENABLED_ASP && $comment_date != '')
-                || ( !ENABLED_ASP && $comment != '' ) ) )
-    {
+    if (
+        $page_id && $section_id  && $post_id  && !$action
+        && ( ( ENABLED_ASP && $comment_date != '')
+        || ( !ENABLED_ASP && $comment != '' ) ) 
+      ){
         if(ENABLED_ASP){
             $comment = $_POST['comment_'.date('W')];
-        }
-        else
-        {
+        } else {
             $comment = $_POST['comment'];
         }
         $comment = strip_tags($comment);
@@ -119,7 +117,6 @@ if (!isset($wb) || !($wb instanceof wb)) { $wb = new wb(); }
             unset($_SESSION['comes_from_view_time']);
             unset($_SESSION['submitted_when']);
         }
-    
         // Insert the comment into db
         $commented_when = time();
         if($wb->is_authenticated() == true)
@@ -131,13 +128,13 @@ if (!isset($wb) || !($wb instanceof wb)) { $wb = new wb(); }
             $commented_by = 0;
         }
         $sql  = 'INSERT INTO `'.TABLE_PREFIX.'mod_news_comments` SET '
-              . '`section_id` = '.$database->escapeString($section_id).', '
-              . '`page_id` = '.$database->escapeString($page_id).', '
-              . '`post_id` = '.$database->escapeString($post_id).', '
+              . '`section_id` = '.intval($section_id).', '
+              . '`page_id` = '.intval($page_id).', '
+              . '`post_id` = '.intval($post_id).', '
               . '`title` = \''.$database->escapeString($title).'\', '
               . '`comment` = \''.$database->escapeString($comment).'\', '
-              . '`commented_when` = '.$database->escapeString($commented_when).', '
-              . '`commented_by` = '.(int)$database->escapeString($commented_by).' '
+              . '`commented_when` = '.intval($commented_when).', '
+              . '`commented_by` = '.intval($commented_by).' '
               .'';
         $query = $database->query( $sql );
     
@@ -147,9 +144,7 @@ if (!isset($wb) || !($wb instanceof wb)) { $wb = new wb(); }
         $page = $query_page->fetchRow( MYSQLI_ASSOC );
         header('Location: '.$wb->page_link($page['link']).'?post_id='.$post_id.'' );
         exit;
-    }
-else
-{
+    }else{
     if( $post_id && $section_id && !$action )
     {
         header("Location: ".WB_URL.'/modules/news/comment.php?post_id='.$post_id.'&section_id='.$section_id );

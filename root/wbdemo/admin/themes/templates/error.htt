@@ -1,6 +1,6 @@
 <!-- BEGIN main_block -->
-<div class="error-box rounded">
+<div class="error-box rounded" style="margin: 1.225em auto;">
     <p>{MESSAGE}</p>
-<input type="button" name="submit" value="{BACK}" onclick="javascript: window.location = '{LINK}';" />
+<input type="button" name="submit" value="{BACK}" onclick="window.location = '{LINK}';" />
 </div>
 <!-- END main_block -->

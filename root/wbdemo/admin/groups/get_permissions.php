@@ -15,230 +15,93 @@
  * @lastmodified    $Date: 2015-04-27 10:02:19 +0200 (Mo, 27. Apr 2015) $
  *
  */
-
-if(defined('WB_PATH') == false) { die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly'); }
-
-$system_permissions = array_flip($system_permissions);
+/*---------------------------------------------------------------------------------------------------------------*/
+if(defined('WB_PATH') == false)
+{
+    die('Cannot access '.basename(__DIR__).'/'.basename(__FILE__).' directly');
+} else {
+/*---------------------------------------------------------------------------------------------------------------*/
+// merge extended system_permission  
+    $system_permissions = array_flip($system_permissions);
 // Get system permissions
-if($admin->get_post('advanced') != 'yes') {
-
-        $system_permissions['pages'] = $admin->get_post('pages');
-        $system_permissions['pages_view']     = $system_permissions['pages'];
-        if( !$system_permissions['pages_view'] ) {
-            $system_permissions['pages_add']      = $system_permissions['pages'];
-            $system_permissions['pages_add_l0']   = $system_permissions['pages'];
-            $system_permissions['pages_settings'] = $system_permissions['pages'];
-            $system_permissions['pages_modify']   = $system_permissions['pages'];
-            $system_permissions['pages_intro']    = $system_permissions['pages'];
-            $system_permissions['pages_delete']   = $system_permissions['pages'];
+    $system_permissions = (@$bResetSystem?array():$system_permissions);
+    function getSystemDefaultPermission(){
+        global $database;
+        $sqlAdmin = 'SELECT `system_permissions` FROM `'.TABLE_PREFIX.'groups` '
+                  . 'WHERE `group_id`=\'1\' ';
+        $sPermissions = $database->get_one($sqlAdmin);
+        return (@$database->get_error()?:$sPermissions);
+    }
+/*---------------------------------------------------------------------------------------------------------------*/
+    function getSystemFromRequest($aRequestVars=null)
+    {
+        global $bResetSystem;
+        if ($bResetSystem){return null;}
+        $aPermissions = array_flip(explode(',', getSystemDefaultPermission()));
+        // define Lambda-Callback for sanitize POST arguments   secunia 2010-92-2
+        $cbSanitize = (function($sValue) { $sValue = preg_replace('/[^a-z0-9_-]/i', '', $sValue); return $sValue;});
+        $aPermissions = (is_array($aPermissions) ? $aPermissions : array());
+        $aPermissions = array_map($cbSanitize, $aPermissions);
+        $aPermissions = array_intersect_key($aRequestVars, $aPermissions);
+        return $aPermissions;
+    }
+/*---------------------------------------------------------------------------------------------------------------*/
+    function getSystemPermissions($aRequestVars=null)
+    {
+        $aPermissions = array();
+        if (!$aRequestVars){return $aPermissions;}
+        $aValidType = $aValidView = $aValidAddons = $aValidAccess = $aValidSettings = array();
+        $aTmpPermissions  = getSystemFromRequest($aRequestVars);
+        if (($aTmpPermissions)){
+            $aValidType     = preg_replace('/^(.*?)_.*$/', '\1', array_keys($aTmpPermissions));
+            $aValidView     = preg_replace('/^(.*)/', '\1_view', $aValidType);
+            $aValidAddons   = preg_replace('/^(modules.*|templates.*|languages.*)$/', 'addons', $aValidView);
+            $aValidAccess   = preg_replace('/^(groups.*|users.*)$/', 'access', $aValidView);
+            $aValidSettings = preg_replace('/^(settings.*)$/', 'settings_basic', $aValidView);
+            $aPermissions   = array_merge(
+                              $aTmpPermissions, 
+                              array_flip($aValidType), 
+                              array_flip($aValidView), 
+                              array_flip($aValidAccess),
+                              array_flip($aValidAddons),
+                              array_flip($aValidSettings) 
+                              );
+            ksort ($aPermissions,  SORT_NATURAL|SORT_FLAG_CASE);
         }
-
-        $system_permissions['media'] = $admin->get_post('media');
-        $system_permissions['media_view']     = $system_permissions['media'];
-        if( !$system_permissions['media_view'] ) {
-            $system_permissions['media_upload']   = $system_permissions['media'];
-            $system_permissions['media_rename']   = $system_permissions['media'];
-            $system_permissions['media_delete']   = $system_permissions['media'];
-            $system_permissions['media_create']   = $system_permissions['media'];
-        }
-        if($admin->get_post('modules') != '' OR $admin->get_post('templates') != '' OR $admin->get_post('languages') != '') {
-            $system_permissions['addons'] = 1;
-        } else {
-            $system_permissions['addons'] = 0;
-        }
-
-        $system_permissions['modules']             = $admin->get_post('modules');
-        $system_permissions['modules_view']        = $system_permissions['modules'];
-        if( !$system_permissions['modules_view'] ) {
-            $system_permissions['modules_install']     = $system_permissions['modules'];
-            $system_permissions['modules_uninstall']   = $system_permissions['modules'];
-        }
-
-        $system_permissions['templates']           = $admin->get_post('templates');
-        $system_permissions['templates_view']      = $system_permissions['templates'];
-        if( !$system_permissions['templates_view'] ) {
-            $system_permissions['templates_install']   = $system_permissions['templates'];
-            $system_permissions['templates_uninstall'] = $system_permissions['templates'];
-        }
-
-        $system_permissions['languages']           = $admin->get_post('languages');
-        $system_permissions['languages_view']      = $system_permissions['languages'];
-        if( !$system_permissions['languages_view'] ) {
-            $system_permissions['languages_install']   = $system_permissions['languages'];
-            $system_permissions['languages_uninstall'] = $system_permissions['languages'];
-        }
-
-        $system_permissions['settings']            = $admin->get_post('settings');
-        $system_permissions['settings_basic']      = $system_permissions['settings'];
-        if( !$system_permissions['settings_basic'] ) {
-            $system_permissions['settings_advanced']   = $system_permissions['settings'];
-        }
-
-        if($admin->get_post('users') != '' OR $admin->get_post('groups') != '') {
-            $system_permissions['access'] = 1;
-        } else {
-            $system_permissions['access'] = 0;
-        }
-
-        $system_permissions['users']         = $admin->get_post('users');
-        $system_permissions['users_view']    = $system_permissions['users'];
-        if( !$system_permissions['users_view'] ) {
-            $system_permissions['users_add']     = $system_permissions['users'];
-            $system_permissions['users_modify']  = $system_permissions['users'];
-            $system_permissions['users_delete']  = $system_permissions['users'];
-        }
-
-        $system_permissions['groups']        = $admin->get_post('groups');
-        $system_permissions['groups_view']   = $system_permissions['groups'];
-        if( !$system_permissions['groups_view'] ) {
-            $system_permissions['groups_add']    = $system_permissions['groups'];
-            $system_permissions['groups_modify'] = $system_permissions['groups'];
-            $system_permissions['groups_delete'] = $system_permissions['groups'];
-        }
-
-    $system_permissions['admintools'] = $admin->get_post('admintools');
-    $system_permissions['admintools_settings'] = $system_permissions['admintools'];
-
-} else {  // advanced == yes
-    // Pages
-    $system_permissions['pages_view'] = $admin->get_post('pages_view');
-    $system_permissions['pages_add']  = $admin->get_post('pages_add');
-    if($admin->get_post('pages_add') != 1 AND $admin->get_post('pages_add_l0') == 1) {
-        $system_permissions['pages_add'] = 1;
+        return $aPermissions;
     }
-    $system_permissions['pages_add_l0']   = $admin->get_post('pages_add_l0');
-    $system_permissions['pages_settings'] = $admin->get_post('pages_settings');
-    $system_permissions['pages_modify']   = $admin->get_post('pages_modify');
-    $system_permissions['pages_intro']    = $admin->get_post('pages_intro');
-    $system_permissions['pages_delete']   = $admin->get_post('pages_delete');
-    if($system_permissions['pages_view'] == 1 OR $system_permissions['pages_add'] == 1 OR $system_permissions['pages_settings'] == 1 OR $system_permissions['pages_modify'] == 1 OR $system_permissions['pages_intro'] == 1 OR $system_permissions['pages_delete'] == 1) {
-        $system_permissions['pages']  = 1;
-        $system_permissions['pages_view'] = 1;
-    } else {
-        $system_permissions['pages'] = '';
-    }
-    // Media
-    $system_permissions['media_view']   = $admin->get_post('media_view');
-    $system_permissions['media_upload'] = $admin->get_post('media_upload');
-    $system_permissions['media_rename'] = $admin->get_post('media_rename');
-    $system_permissions['media_delete'] = $admin->get_post('media_delete');
-    $system_permissions['media_create'] = $admin->get_post('media_create');
-    if($system_permissions['media_view'] == 1 OR $system_permissions['media_upload'] == 1 OR $system_permissions['media_rename'] == 1 OR $system_permissions['media_delete'] == 1 OR $system_permissions['media_create'] == 1) {
-        $system_permissions['media'] = 1;
-        $system_permissions['media_view'] = 1;
-    } else {
-        $system_permissions['media'] = '';
-    }
-    // Add-ons
-    // Modules
-    $system_permissions['modules_view']      = $admin->get_post('modules_view');
-    $system_permissions['modules_install']   = $admin->get_post('modules_install');
-    $system_permissions['modules_uninstall'] = $admin->get_post('modules_uninstall');
-    if($system_permissions['modules_view'] == 1 OR $system_permissions['modules_install'] == 1 OR $system_permissions['modules_uninstall'] == 1) {
-        $system_permissions['modules'] = 1;
-        $system_permissions['modules_view'] = 1;
-    } else {
-        $system_permissions['modules'] = '';
-    }
-    // Templates
-    $system_permissions['templates_view']      = $admin->get_post('templates_view');
-    $system_permissions['templates_install']   = $admin->get_post('templates_install');
-    $system_permissions['templates_uninstall'] = $admin->get_post('templates_uninstall');
-    if($system_permissions['templates_view'] == 1 OR $system_permissions['templates_install'] == 1 OR $system_permissions['templates_uninstall'] == 1) {
-        $system_permissions['templates'] = 1;
-        $system_permissions['templates_view'] = 1;
-    } else {
-        $system_permissions['templates'] = '';
-    }
-    // Languages
-    $system_permissions['languages_view']      = $admin->get_post('languages_view');
-    $system_permissions['languages_install']   = $admin->get_post('languages_install');
-    $system_permissions['languages_uninstall'] = $admin->get_post('languages_uninstall');
-    if( $system_permissions['languages_view']==1 OR $system_permissions['languages_install'] == 1 OR $system_permissions['languages_uninstall'] == 1) {
-        $system_permissions['languages'] = 1;
-        $system_permissions['languages_view'] = 1;
-    } else {
-        $system_permissions['languages'] = '';
-    }
-    // Admintools
-    $system_permissions['admintools_settings'] = $admin->get_post('admintools_settings');
-    if($system_permissions['admintools_settings'] == 1) {
-        $system_permissions['admintools'] = 1;
-        $system_permissions['admintools_settings'] = 1;
-    } else {
-        $system_permissions['admintools'] = '';
-    }
-    if($system_permissions['modules'] == 1 OR $system_permissions['templates'] == 1 OR $system_permissions['languages'] == 1) {
-        $system_permissions['addons'] = 1;
-    } else {
-        $system_permissions['addons'] = '';
-    }
-    // Settings
-    $system_permissions['settings_basic']    = $admin->get_post('settings_basic');
-    $system_permissions['settings_advanced'] = $admin->get_post('settings_advanced');
-    if($system_permissions['settings_basic'] == 1 OR $system_permissions['settings_advanced'] == 1) {
-        $system_permissions['settings'] = 1;
-        $system_permissions['settings_basic'] = 1;
-    } else {
-        $system_permissions['settings'] = '';
-    }
-    // Access
-    // Users
-    $system_permissions['users_view']   = $admin->get_post('users_view');
-    $system_permissions['users_add']    = $admin->get_post('users_add');
-    $system_permissions['users_modify'] = $admin->get_post('users_modify');
-    $system_permissions['users_delete'] = $admin->get_post('users_delete');
-    if($system_permissions['users_view'] == 1 OR $system_permissions['users_add'] == 1 OR $system_permissions['users_modify'] == 1 OR $system_permissions['users_delete'] == 1) {
-        $system_permissions['users'] = 1;
-        $system_permissions['users_view'] = 1;
-    } else {
-        $system_permissions['users'] = '';
-    }
-    // Groups
-    $system_permissions['groups_view']   = $admin->get_post('groups_view');
-    $system_permissions['groups_add']    = $admin->get_post('groups_add');
-    $system_permissions['groups_modify'] = $admin->get_post('groups_modify');
-    $system_permissions['groups_delete'] = $admin->get_post('groups_delete');
-    if($system_permissions['groups_view'] == 1 OR $system_permissions['groups_add'] == 1 OR $system_permissions['groups_modify'] == 1 OR $system_permissions['groups_delete'] == 1) {
-        $system_permissions['groups'] = 1;
-        $system_permissions['groups_view'] = 1;
-    } else {
-        $system_permissions['groups'] = '';
-    }
-    if($system_permissions['users'] == 1 OR $system_permissions['groups'] == 1) {
-        $system_permissions['access'] = 1;
-    } else {
-        $system_permissions['access'] = '';
-    }
-}
+    $aRequestSystemPermissions = getSystemPermissions($aRequestVars);
 /* WB283 SP4 Fixes ***************************************************/
-
+    // clean up system_permission
+    $system_permissions = ($bAdvancedSave ? array_intersect_key($aRequestSystemPermissions, $system_permissions):$system_permissions);
+    $aSystemPermissions = array_merge($aRequestSystemPermissions, $system_permissions);
+    $aSystemPermissions = (@$bResetSystem?array():$aSystemPermissions);
+    ksort ($aSystemPermissions,  SORT_NATURAL|SORT_FLAG_CASE);
     // Implode system permissions
     $aAllowedSystemPermissions = array();
-    foreach ($system_permissions as $sName => $sValue) {
-        if (((bool)$sValue)) {
-            $aAllowedSystemPermissions[$sName] = $sName;
-        }
+/*------------------------------------------------------------------------------------------------------------*/
+    foreach ($aSystemPermissions as $sName => $sValue) {
+        $aAllowedSystemPermissions[] = $sName;
     }
     $system_permissions = implode(',', $aAllowedSystemPermissions);
-
-    function getPermissionsFromPost($sType)
+/*------------------------------------------------------------------------------------------------------------*/
+    function getPermissionsFromPost($sType, $bReset=false)
     {
         // define Lambda-Callback for sanitize POST arguments   secunia 2010-92-2
         $cbSanitize = function($sValue) { $sValue = preg_replace('/[^a-z0-9_-]/i', '', $sValue); return $sValue; };
-        $sPermissions = $GLOBALS['admin']->get_post($sType.'_permissions');
-        $sPermissions = is_array($sPermissions) ? $sPermissions : array();
-        $sPermissions = array_map($cbSanitize, $sPermissions);
+        $aPermissions = $GLOBALS['admin']->get_post($sType.'_permissions');
+        $aPermissions = is_array($aPermissions) ? $aPermissions : array();
+        $aPermissions = array_map($cbSanitize, $aPermissions);
         $sOldWorkingDir = getcwd();
         chdir(WB_PATH.'/'.$sType.'s/');
         $aAvailableItemsList = glob('*', GLOB_ONLYDIR|GLOB_NOSORT);
         chdir($sOldWorkingDir);
-        $aUncheckedItems = array_diff($aAvailableItemsList, $sPermissions);
+        $aPermissions = (@$bReset?array():$aPermissions);
+        $aUncheckedItems = array_diff($aAvailableItemsList, $aPermissions);
         return implode(',', $aUncheckedItems);
     }
-
     // Get module permissions
-    $module_permissions   = getPermissionsFromPost('module');
+    $module_permissions   = getPermissionsFromPost('module', $bResetModules);
     // Get template permissions
-    $template_permissions = getPermissionsFromPost('template');
-
+    $template_permissions = getPermissionsFromPost('template', $bResetTemplates);
+}

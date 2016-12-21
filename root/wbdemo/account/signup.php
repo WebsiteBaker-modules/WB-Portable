@@ -16,8 +16,7 @@
  *
  */
 
-require_once('../config.php');
-
+if ( !defined( 'WB_PATH' ) ){ require(dirname(__DIR__).'/config.php'); }
 if(!( intval(FRONTEND_SIGNUP) && (  0 == (isset($_SESSION['USER_ID']) ? intval($_SESSION['USER_ID']) : 0) )))
 {
     if(INTRO_PAGE) {
@@ -27,7 +26,7 @@ if(!( intval(FRONTEND_SIGNUP) && (  0 == (isset($_SESSION['USER_ID']) ? intval($
 }
 
 if(ENABLED_ASP && isset($_POST['username']) && ( // form faked? Check the honeypot-fields.
-    (!isset($_POST['submitted_when']) OR !isset($_SESSION['submitted_when'])) OR 
+    (!isset($_POST['submitted_when']) OR !isset($_SESSION['submitted_when'])) OR
     ($_POST['submitted_when'] != $_SESSION['submitted_when']) OR
     (!isset($_POST['email-address']) OR $_POST['email-address']) OR
     (!isset($_POST['name']) OR $_POST['name']) OR

@@ -149,7 +149,6 @@ if(!rm_full_dir(WB_PATH.'/templates/'.$file)) {
 }
 
 // Update pages that use this template with default template
-// $database = new database();
 $database->query("UPDATE ".TABLE_PREFIX."pages SET template = '".DEFAULT_TEMPLATE."' WHERE template = '$file'");
 
 // Print success message

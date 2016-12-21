@@ -38,11 +38,13 @@ if (!check_media_path($directory)) {
 }
 
 // Get the temp id
-$file_id = intval($admin->checkIDKEY('id', false, $_SERVER['REQUEST_METHOD']));
-if (!$file_id) {
+$iFileId = $file_id = intval($admin->checkIDKEY('id', false, $_SERVER['REQUEST_METHOD']));
+if ($file_id===false) {
     $admin->print_error($MESSAGE['GENERIC_SECURITY_ACCESS'],$dirlink, false);
 }
 
+$DIR  = array();
+$FILE = array();
 // Check for potentially malicious files
 $forbidden_file_types  = preg_replace( '/\s*[,;\|#]\s*/','|',RENAME_FILES_ON_UPLOAD);
 // Get home folder not to show
@@ -51,10 +53,11 @@ $home_folders = get_home_folders();
 // Figure out what folder name the temp id is
 if($handle = opendir(WB_PATH.MEDIA_DIRECTORY.'/'.$directory)) {
     // Loop through the files and dirs an add to list
-   while (false !== ($file = readdir($handle))) {
-        $info = pathinfo($file);
-        $ext = isset($info['extension']) ? $info['extension'] : '';
+    $temp_id = 0;
+    while (false !== ($file = readdir($handle))) {
         if(substr($file, 0, 1) != '.' AND $file != '.svn' AND $file != 'index.php') {
+            $info = pathinfo($file);
+            $ext = isset($info['extension']) ? $info['extension'] : '';
             if( !preg_match('/'.$forbidden_file_types.'$/i', $ext) ) {
                 if(is_dir(WB_PATH.MEDIA_DIRECTORY.$directory.'/'.$file)) {
                     if(!isset($home_folders[$directory.'/'.$file])) {
@@ -66,28 +69,25 @@ if($handle = opendir(WB_PATH.MEDIA_DIRECTORY.'/'.$directory)) {
             }
         }
     }
-    $temp_id = 0;
-    if(isset($DIR)) {
-        sort($DIR);
-        foreach($DIR AS $name) {
-            $temp_id++;
-            if($file_id == $temp_id) {
-                $rename_file = $name;
-                $type = 'folder';
-            }
-        }
-    }
-    if(isset($FILE)) {
-        sort($FILE);
-        foreach($FILE AS $name) {
-            $temp_id++;
-            if($file_id == $temp_id) {
-                $rename_file = $name;
-                $type = 'file';
-            }
-        }
-    }
+closedir($handle);
 }
+
+    $iSortFlags = ((version_compare(PHP_VERSION, '5.4.0', '<'))?SORT_REGULAR:SORT_NATURAL|SORT_FLAG_CASE);
+    sort($DIR,  $iSortFlags);
+    sort($FILE, $iSortFlags);
+    $aListDir = array_merge($DIR,$FILE);
+    $temp_id = 0;
+    if(isset($aListDir)) {
+//        sort($aListDir, SORT_REGULAR|SORT_FLAG_CASE);
+        foreach($aListDir AS $name)
+        {
+            if(!isset($rename_file)&& ($file_id == $temp_id)) {
+                $rename_file = $name;
+                $type = is_dir(WB_PATH.MEDIA_DIRECTORY.$directory.'/'.$rename_file)?'folder':'file';
+            }
+            $temp_id++;
+        }
+    }
 
 $file_id = $admin->getIDKEY($file_id);
 
@@ -105,17 +105,21 @@ if(media_filename($admin->get_post('name')) == "") {
 
 // Check if they entered an extension
 if($type == 'file') {
+    if (strstr($new_name,'.')){
+        $new_name = str_replace('.', '_', $new_name);
+    }
     if(media_filename($admin->get_post('extension')) == "") {
-        $admin->print_error($MESSAGE['MEDIA_BLANK_EXTENSION'], "rename.php?dir=$directory&id=$file_id", false);
+        $name = $new_name;
     } else {
         $extension = media_filename($admin->get_post('extension'));
+        $name = $new_name.'.'.trim($extension,'.');
     }
-} else {
+} elseif($type == 'folder') {
     $extension = '';
+    $name = $new_name;
 }
 
 // Join new name and extension
-$name = $new_name.$extension;
 
 $info = pathinfo(WB_PATH.MEDIA_DIRECTORY.$directory.'/'.$name);
 $ext = isset($info['extension']) ? $info['extension'] : '';
@@ -162,7 +166,6 @@ if(rename(WB_PATH.MEDIA_DIRECTORY.$directory.'/'.$rename_file, WB_PATH.MEDIA_DIR
     $usedFiles = array();
     // feature freeze
     // require_once(ADMIN_PATH.'/media/dse.php');
-
     $admin->print_success($MESSAGE['MEDIA_RENAMED'], $dirlink);
 } else {
     $admin->print_error($MESSAGE['MEDIA_CANNOT_RENAME'], "rename.php?dir=$directory&id=$file_id", false);

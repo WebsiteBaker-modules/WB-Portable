@@ -424,10 +424,10 @@ class Template
  /******************************************************************************
   * This functions clears the value of a variable.
   *
-  * It may be called with either a varname as a string or an array with the 
+  * It may be called with either a varname as a string or an array with the
   * values being the varnames to be cleared.
   *
-  * The function sets the value of the variable in the $varkeys and $varvals 
+  * The function sets the value of the variable in the $varkeys and $varvals
   * hashes to "". It is not necessary for a variable to exist in these hashes
   * before calling this function.
   *
@@ -465,7 +465,7 @@ class Template
  /******************************************************************************
   * This functions unsets a variable completely.
 
-  * It may be called with either a varname as a string or an array with the 
+  * It may be called with either a varname as a string or an array with the
   * values being the varnames to be cleared.
   *
   * The function removes the variable from the $varkeys and $varvals hashes.
@@ -535,9 +535,18 @@ class Template
     while (list($k, $v) = each($this->varvals)) {
       $varvals_quoted[$k] = preg_replace(array('/\\\\/', '/\$/'), array('\\\\\\\\', '\\\\$'), $v);
     }
-
     $str = $this->get_var($varname);
-    $str = preg_replace($this->varkeys, $varvals_quoted, $str);
+    $str = @preg_replace($this->varkeys, $varvals_quoted, $str);
+    if (class_exists('ParseError')) {
+        $bRetval = true;
+        try{
+            $str = @preg_replace($this->varkeys, $varvals_quoted, $str);
+        } catch(ParseError $e) {
+            echo "<p><b>subst:</b> varname = $varname</p>\n";
+        }
+    } else {
+        $str = @preg_replace($this->varkeys, $varvals_quoted, $str);
+    }
     return $str;
   }
 
@@ -885,7 +894,7 @@ class Template
     if ($this->debug & 4) {
       echo "<p><b>filename:</b> filename = $filename</p>\n";
     }
-    if (substr($filename, 0, 1) != "/" 
+    if (substr($filename, 0, 1) != "/"
        && substr($filename, 0, 1) != "\\"
        && substr($filename, 1, 2) != ":\\"
        && substr($filename, 1, 2) != ":/"

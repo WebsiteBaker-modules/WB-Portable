@@ -1,0 +1,99 @@
+<!-- BEGIN main_block -->
+<div class="title-line">
+<table  style="margin-bottom:10px; width: 100%;">
+    <tbody>
+        <tr>
+            <td style="float: left;">{CHANGE_TEMPLATE_NOTICE}</td>
+            <td style="float: right; line-height: 3.225em;">
+    <!-- BEGIN addon_template_block -->
+                <span><a class="btn btn-default btn-large" href="{URL_TEMPLATES}">{MENU_TEMPLATES}</a> </span>
+                -
+    <!-- END addon_template_block -->
+    <!-- BEGIN addon_module_block -->
+                <span><a class="btn btn-default btn-large" href="{URL_MODULES}">{MENU_MODULES}</a> </span>
+                -
+    <!-- END addon_module_block -->
+    <!-- BEGIN addon_language_block -->
+                <span class="btn btn-default btn-large" style="min-width: 8.525em;">{URL_ADVANCED}</span>
+    <!-- END addon_language_block -->
+            </td>
+         </tr>
+    </tbody>
+</table>
+</div>
+
+<div class="block-outer">
+<!-- BEGIN language_install_block -->
+<form name="install" enctype="multipart/form-data" action="install.php" method="post" class="{DISPLAY_INSTALL}">
+{FTAN}
+    <h2>{HEADING_INSTALL_LANGUAGE}</h2>
+    <table style="width: 100%;">
+        <tbody>
+            <tr>
+              <td style="line-height: 3.525em;">
+                <input type="file" name="userfile" size="97" />
+                <script type="text/javascript">
+                document.install.userfile.focus();
+                </script>
+              </td>
+              <td style="width: 10%;">
+                <input type="submit" name="submit" value="{TEXT_INSTALL}" class="btn btn-default" style="min-width: 8.525em;" />
+              </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+</form>
+<!-- END language_install_block -->
+
+<!-- BEGIN language_uninstall_block -->
+<form name="uninstall" action="uninstall.php" method="post" class="{DISPLAY_UNINSTALL}">
+{FTAN}
+    <h2>{HEADING_UNINSTALL_LANGUAGE}</h2>
+    <table style="width: 100%;">
+        <tbody>
+            <tr>
+              <td>
+                <select class="w3-border" name="code" style="width: 75%;">
+                <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+                <!-- BEGIN language_uninstall_select_block -->
+                    <option value="{VALUE}">{NAME}</option>
+                  <!-- END language_uninstall_select_block -->
+                </select>
+              </td>
+              <td style="width: 10%;">
+                <input type="submit" name="submit" value="{TEXT_UNINSTALL}" class="btn btn-default" style="min-width: 8.525em;" />
+              </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+</form>
+<!-- END language_uninstall_block -->
+
+<!-- BEGIN language_detail_block -->
+<form name="details" action="details.php" method="post" class="{DISPLAY_LIST}">
+{FTAN}
+    <h2>{HEADING_LANGUAGE_DETAILS}</h2>
+    <table style="width: 100%;">
+        <tbody>
+            <tr>
+              <td>
+                <select class="w3-border" name="code" style="width: 75%;">
+                <option value="" selected="selected">{TEXT_PLEASE_SELECT}...</option>
+                <!-- BEGIN language_detail_select_block -->
+                    <option value="{VALUE}">{NAME}</option>
+                  <!-- END language_detail_select_block -->
+                </select>
+              </td>
+              <td style="width: 10%;">
+                <input type="submit" name="submit" value="{TEXT_VIEW_DETAILS}" class="btn btn-default" style="min-width: 8.525em;" />
+              </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+</form>
+<!-- END language_detail_block -->
+</div>
+<!-- END main_block -->

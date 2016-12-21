@@ -20,10 +20,10 @@
 if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
 /* -------------------------------------------------------- */
 $module_directory = 'wysiwyg';
-$module_name = 'WYSIWYG';
+$module_name = 'WYSIWYG v3.0.2';
 $module_function = 'page';
-$module_version = '3.0.0';
-$module_platform = '2.8.2';
+$module_version = '3.0.2';
+$module_platform = '2.8.3';
 $module_author = 'Ryan Djurovich';
 $module_license = 'GNU General Public License';
 $module_description = 'This module allows you to edit the contents of a page using a graphical editor';

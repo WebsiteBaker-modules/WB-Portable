@@ -32,13 +32,13 @@ if(defined('WB_PATH') == false) { die("Cannot access this file directly"); }
     $aRequestVars  = (isset(${$requestMethod}) ? ${$requestMethod} : null);
 // Get page id (on error page_id == 0))
     $page_id = intval(isset(${$requestMethod}['page_id'])
-                      ? ${$requestMethod}['page_id'] 
+                      ? ${$requestMethod}['page_id']
                       : (isset($page_id) ? $page_id : 0)
                );
 
     $requestMethod = '_'.strtoupper($_SERVER['REQUEST_METHOD']);
-    $section_id = intval(isset(${$requestMethod}['section_id']) 
-                         ? ${$requestMethod}['section_id'] 
+    $section_id = intval(isset(${$requestMethod}['section_id'])
+                         ? ${$requestMethod}['section_id']
                          : (isset($section_id) ? $section_id : 0)
                   );
 
@@ -96,7 +96,7 @@ if(isset($print_info_banner) && $print_info_banner == true) {
     $modified_ts = 'Unknown';
     if($page['modified_when'] != 0) {
         $modified_ts = gmdate(TIME_FORMAT.', '.DATE_FORMAT, $page['modified_when']+TIMEZONE);
-    } 
+    }
 
     // Setup template object, parse vars to it, then parse it
     // Create new template object
@@ -170,8 +170,9 @@ if(isset($print_info_banner) && $print_info_banner == true) {
     $template->pparse('output', 'page');
     // unset($print_info_banner);
     unset($template);
+    $sSectionBlock = '<div class="block-outer">'."\n";
 
-    if (SECTION_BLOCKS && isset($section) ) {
+    if (/*SECTION_BLOCKS && */isset($section) ) {
         if (isset($block[$section['block']]) && trim(strip_tags(($block[$section['block']]))) != '')
         {
             $block_name = htmlentities(strip_tags($block[$section['block']]));
@@ -183,21 +184,61 @@ if(isset($print_info_banner) && $print_info_banner == true) {
                 $block_name = '#' . (int) $section['block'];
             }
         }
-
+        $now = time();
+        $bSectionInactive = !(($now<=$section['publ_end'] || $section['publ_end']==0) && ($now>=$section['publ_start'] || $section['publ_start']==0));
+//        $sSectionInfoLine  = ($bSectionInactive ? false: true);
+        $sSectionInfoLine  = ($bSectionInactive ? 'inactive': 'active');
+//        $sSectionInfoLine  = ($bSectionInactive ? '<div class="section-inactive">': '<div class="section-active">')."\n" ;
+/*
         $sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? 'id="'.SEC_ANCHOR.$section['section_id'].'"' : '');
         $sSectionInfoLine = '<div class="section-info" '.$sec_anchor.' ><b>'.$TEXT['BLOCK']
                           . ': </b>'.$block_name.' ('.$section['block'].') <b> Modul: </b>'
                           . $section['module'].'<b>  ID: </b>'.$section_id.'</div>'.PHP_EOL;
         echo $sSectionInfoLine;
+*/
+        $sSectionIdPrefix = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? SEC_ANCHOR : '' );
+        $sCallingScript = $_SERVER['SCRIPT_NAME'];
+        $data = array();
+        echo $sSectionBlock;
+
+        $tpl = new Template(dirname($admin->correct_theme_source('SectionInfoLine.htt')),'keep');
+        // $template->debug = true;
+        $tpl->set_file('page', 'SectionInfoLine.htt');
+
+        $tpl->set_block('page', 'main_block', 'main');
+        $tpl->set_block('main_block', 'section_block', 'section_save');
+
+        $data['aTarget.SectionIdPrefix'] = $sSectionIdPrefix.$section_id;
+        $data['aTarget.SectionInfoLine'] = $sSectionInfoLine;
+        $data['aTarget.SectionIdPrefix'] = $sSectionIdPrefix.$section_id;
+        $data['aTarget.sectionBlock'] = $section['block'];
+        $data['aTarget.SectionId'] = $section_id;
+        $data['aTarget.pageId'] = $page_id;
+        $data['aTarget.FTAN'] = $admin->getFTAN();
+        $data['aTarget.BlockName'] = $block_name;
+        $data['aTarget.sectionUrl'] = ADMIN_URL.'/pages/';
+        $data['aTarget.sectionModule'] = $section['module'];
+        $data['aTarget.title'] = $section['title'];
+        $tpl->parse('section_save', '');
+        if( preg_match( '/'.preg_quote(ADMIN_PATH,'/').'\/pages\/(settings|sections)\.php$/is', $sCallingScript)) {
+            if( $admin->get_permission('pages_settings') ) {
+                $data['lang.TEXT_SUBMIT'] = $TEXT['SAVE'];
+                $tpl->parse('section_save', 'section_block');
+            }
+        }
+        $tpl->set_var($data);
+        $tpl->parse('main', 'main_block', false);
+        $tpl->pparse('output', 'page');
+        unset($tpl);
     }
 //print '<pre>';print_r( $aTokens = unserialize($_SESSION['TOKENS']) );print '</pre>';
 } //
 
 // Work-out if the developer wants us to update the timestamp for when the page was last modified
 if(isset($update_when_modified) && $update_when_modified == true) {
-    $sql  = 'UPDATE '.TABLE_PREFIX.'"pages` SET '
-          . 'modified_when` = '.time().','
-          . '`modified_by` = '.$admin->get_user_id().''
+    $sql  = 'UPDATE `'.TABLE_PREFIX.'pages` SET '
+          . '`modified_when` = '.time().','
+          . '`modified_by` = '.$admin->get_user_id().' '
           . 'WHERE `page_id` = '.$page_id;
     $database->query($sql);
 }

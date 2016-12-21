@@ -52,7 +52,10 @@ if(defined('FINALIZE_SETUP')) {
     if($database->query($sql)) { }
 }
 // ---------------------------------------
-$msg = '<br />';
+$msg  = '<br />';
+$sReplace = '<a style="font-weight:bold; color: #FF0000" href="'.WB_URL.'/upgrade-script.php">upgrade-script.php</a>';
+//$msg .= (is_readable(WB_PATH.'/install/')) ?  $MESSAGE['START_INSTALL_DIR_EXISTS'].'<br />' : $msg;
+$msg .= (is_readable(WB_PATH.'/upgrade-script.php') ?  str_replace('"upgrade-script.php"', $sReplace, $MESSAGE['START_UPGRADE_SCRIPT_EXISTS'].'<br />') : '');
 // check if it is neccessary to start the uograde-script
 if(($admin->ami_group_member('1')) && file_exists(WB_PATH.'/upgrade-script.php')) {
     // check if it is neccessary to start the uograde-script
@@ -74,8 +77,14 @@ if(($admin->ami_group_member('1')) && file_exists(WB_PATH.'/upgrade-script.php')
             exit;
         }
     }
-    $msg .= ''.$MESSAGE['START_UPGRADE_SCRIPT_EXISTS'].'<br />';
+//    $msg .= ''.$MESSAGE['START_UPGRADE_SCRIPT_EXISTS'].'<br />';
 }
+
+/**
+ * delete stored ip adresses default after 60 days
+ */
+$sql = 'UPDATE `'.TABLE_PREFIX.'users` SET `login_ip` = \'\' WHERE `login_when` < '.(time()-(60*84600));
+$database->query($sql);
 
 // Setup template object, parse vars to it, then parse it
 // Create new template object
@@ -85,48 +94,41 @@ $template->set_block('page', 'main_block', 'main');
 
 // Insert values into the template object
 $template->set_var(array(
-                    'WELCOME_MESSAGE' => $MESSAGE['START']['WELCOME_MESSAGE'],
-                    'CURRENT_USER' => $MESSAGE['START']['CURRENT_USER'],
+                    'WELCOME_MESSAGE' => $MESSAGE['START_WELCOME_MESSAGE'],
+                    'CURRENT_USER' => $MESSAGE['START_CURRENT_USER'],
                     'DISPLAY_NAME' => $admin->get_display_name(),
                     'ADMIN_URL' => ADMIN_URL,
                     'WB_URL' => WB_URL,
                     'THEME_URL' => THEME_URL,
-                    'WB_VERSION' => WB_VERSION
+                    'WB_VERSION' => WB_VERSION,
+                    'START_LIST' => ' '
                 )
             );
-
 // Insert permission values into the template object
-if($admin->get_permission('pages') != true)
-{
-    $template->set_var('DISPLAY_PAGES', 'display:none;');
-}
-if($admin->get_permission('media') != true)
-{
-    $template->set_var('DISPLAY_MEDIA', 'display:none;');
-}
-if($admin->get_permission('addons') != true)
-{
-    $template->set_var('DISPLAY_ADDONS', 'display:none;');
-}
-if($admin->get_permission('access') != true)
-{
-    $template->set_var('DISPLAY_ACCESS', 'display:none;');
-}
-if($admin->get_permission('settings') != true)
-{
-    $template->set_var('DISPLAY_SETTINGS', 'display:none;');
-}
-if($admin->get_permission('admintools') != true)
-{
-    $template->set_var('DISPLAY_ADMINTOOLS', 'display:none;');
-}
-$msg .= (file_exists(WB_PATH.'/install/')) ?  $MESSAGE['START']['INSTALL_DIR_EXISTS'] : '';
+$get_permission = (function($type='preferences', $ParentBlock='main_block') use ($admin, $template){
+    $template->set_block($ParentBlock, 'show_'.$type.'_block', 'show_'.$type);
+    if ($admin->get_permission($type) != true) {
+        $template->set_block('show_'.$type, '');
+        return false;
+    } else {
+        $template->parse('show_'.$type, 'show_'.$type.'_block', true);
+    }
+    return true;
+});
+$get_permission ('pages');
+$get_permission ('media');
+$get_permission ('addons');
+$get_permission ('settings');
+$get_permission ('admintools');
+$get_permission ('access');
+
+//$msg .= (file_exists(WB_PATH.'/install/')) ?  $MESSAGE['START_INSTALL_DIR_EXISTS'] : $msg;
 
 // Check if installation directory still exists
-if(file_exists(WB_PATH.'/install/') || file_exists(WB_PATH.'/upgrade-script.php') ) {
-    // Check if user is part of Adminstrators group
-    if(in_array(1, $admin->get_groups_id()))
-    {
+if (file_exists(WB_PATH.'/upgrade-script.php') ) {
+// Check if user is part of Adminstrators group / better be a Systemadministrator
+//    if ($admin->ami_group_member(1)){
+    if ($admin->get_user_id() == 1) {
         $template->set_var('WARNING', $msg );
     } else {
         $template->set_var('DISPLAY_WARNING', 'display:none;');

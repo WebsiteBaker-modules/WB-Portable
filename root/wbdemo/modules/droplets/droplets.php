@@ -11,9 +11,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
- * @version         $Id: droplets.php 1503 2011-08-18 02:18:59Z Luisehahne $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/droplets/droplets.php $
- * @lastmodified    $Date: 2011-08-18 04:18:59 +0200 (Do, 18. Aug 2011) $
+ * @version         $Id: droplets.php 16 2016-09-13 20:52:49Z dietmar $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2-modules/addons/droplets/droplets.php $
+ * @lastmodified    $Date: 2016-09-13 22:52:49 +0200 (Di, 13. Sep 2016) $
  *
  *    droplets are small codeblocks that are called from anywhere in the template.
  *     To call a droplet just use [[dropletname]]. optional parameters for a droplet can be used like [[dropletname?parameter=value&parameter2=value]]\
@@ -41,7 +41,8 @@ if(!defined('WB_PATH')) {
 // collect all droplets from document
         $droplet_tags = array();
         $droplet_replacements = array();
-        if( preg_match_all( '/\[\[(.*?)\]\]/', $wb_page_data, $found_droplets ) )
+        $droplet_search = '\[\[(.*?)\]\]'; // \[\[(\S*?)\]\]
+        if( preg_match_all( '/'.$droplet_search.'/', $wb_page_data, $found_droplets ) )
         {
             foreach( $found_droplets[1] as $droplet )
             {
@@ -76,7 +77,9 @@ if(!defined('WB_PATH')) {
                         $droplet_name = $droplet;
                     }
 // request the droplet code from database
-                    $sql = 'SELECT `code` FROM `'.TABLE_PREFIX.'mod_droplets` WHERE `name` LIKE "'.$droplet_name.'" AND `active` = 1';
+                    $sql  = 'SELECT `code` FROM `'.TABLE_PREFIX.'mod_droplets` '
+                          . 'WHERE `name` LIKE \''.$droplet_name.'\''
+                          .   'AND `active` = 1';
                     $codedata = $GLOBALS['database']->get_one($sql);
                     if (!is_null($codedata))
                     {
@@ -87,9 +90,7 @@ if(!defined('WB_PATH')) {
                             if(DEBUG === true)
                             {
                                 $newvalue = '<span class="mod_droplets_err">Error in: '.$droplet.', no valid returnvalue.</span>';
-                            }
-                            else
-                            {
+                            } else {
                                 $newvalue = true;
                             }
                         }
@@ -112,7 +113,7 @@ if(!defined('WB_PATH')) {
     function evalDroplets( &$wb_page_data, $max_loops = 3 ) {
         $max_loops = ((int)$max_loops = 0 ? 3 : (int)$max_loops);
         while( (processDroplets($wb_page_data) == true) && ($max_loops > 0))
-        { 
+        {
             $max_loops--;
         }
         return $wb_page_data;

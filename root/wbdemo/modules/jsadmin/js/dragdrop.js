@@ -20,14 +20,46 @@ JsAdmin.init_drag_drop = function() {
     //        pages/sections.php has a TABLE with many rows
     //        pages/modify.php for manuals is completely weird...
     // So we only want to deal with pages & sections...
+    var StashAllULIds =(function () {
+        // Stash all UL ids
+        var ids = {};
+        var lists = document.getElementsByTagName('ul.draggable');
+        for(var i = 0; i < lists.length; i++) {
+            if(lists[i].id) {
+                ids[lists[i].id] = true;
+            }
+        }
+        // Now fix all LIs
+        var items = document.getElementsByTagName('li');
+         for(var i = 0; i < items.length; i++) {
+            var item = items[i];
+            // Fix duplicate ID
+            if(ids[item.id]) {
+                item.id =  JsAdmin.util.getUniqueId();
+            }
+            // Fix UL parented by UL
+            var ul = JsAdmin.util.getNextSiblingNode(item, 'ul');
+            if(ul) {
+                var lis = ul.getElementsByTagName('li');
+                 if(!lis || lis.length == 0) {
+                    // Remove list without items
+                    ul.parentNode.removeChild(ul);
+                } else {
+                    // Make list child of list item
+                    item.appendChild(ul);
+                }
+            }
+        }
+    });
 
     var page_type = '';
     var is_tree = false;
-
-    if(document.URL.indexOf(JsAdmin.ADMIN_URL + "/pages/index.php") > -1) {
+    var is_list = false;
+    if(document.URL.indexOf(JsAdmin.ADMIN_DIRECTORY + "/pages/index.php") > -1) {
+        is_list  = document.querySelector('ul.draggable');
+        is_tree = ((is_list!==null)?true:false);
         page_type = 'pages';
-        is_tree = true;
-
+//        is_tree = true;
         // This page uses duplicate IDs and incorrectly nested lists:
         // <ul id="p1">
         //        <li id="p1"><table /></li>
@@ -41,88 +73,29 @@ JsAdmin.init_drag_drop = function() {
         //        </li>
         // </ul>
 
-        // Stash all UL ids
-        var ids = {};
-        var lists = document.getElementsByTagName('ul');
-        for(var i = 0; i < lists.length; i++) {
-            if(lists[i].id) {
-                ids[lists[i].id] = true;
-            }
-        }
-
-        // Now fix all LIs
-        var items = document.getElementsByTagName('li');
-         for(var i = 0; i < items.length; i++) {
-            var item = items[i];
-
-            // Fix duplicate ID
-            if(ids[item.id]) {
-                item.id =  JsAdmin.util.getUniqueId();
-            }
-
-            // Fix UL parented by UL
-            var ul = JsAdmin.util.getNextSiblingNode(item, 'ul');
-            if(ul) {
-                var lis = ul.getElementsByTagName('li');
-                 if(!lis || lis.length == 0) {
-                    // Remove list without items
-                    ul.parentNode.removeChild(ul);
-                } else {
-                    // Make list child of list item
-                    item.appendChild(ul);
-                }
-            }
-        }
-
-    } else if(document.URL.indexOf("/admin/pages/sections.php") > 0) {
+    } else if(document.URL.indexOf(JsAdmin.ADMIN_DIRECTORY + "/pages/sections.php") > 0) {
+        is_list  = document.querySelector('ul.draggable');
+        is_tree = ((is_list!==null)?true:false);
         page_type = 'sections';
-    } else if(document.URL.indexOf("/admin/pages/modify.php") > 0) {
+    } else if(document.URL.indexOf(JsAdmin.ADMIN_DIRECTORY + "/pages/modify.php") > 0) {
+        is_list  = document.querySelector('ul.draggable');
+        is_tree = ((is_list!==null)?true:false);
         page_type = 'modules';
-/**
- * 
-        is_tree = true;
-        // Stash all UL ids
-        var ids = {};
-        var lists = document.getElementsByTagName('ul');
-        for(var i = 0; i < lists.length; i++) {
-            if(lists[i].id) {
-                ids[lists[i].id] = true;
-            }
-        }
-
-        // Now fix all LIs
-        var items = document.getElementsByTagName('li');
-         for(var i = 0; i < items.length; i++) {
-            var item = items[i];
-
-            // Fix duplicate ID
-            if(ids[item.id]) {
-                item.id =  JsAdmin.util.getUniqueId();
-            }
-
-            // Fix UL parented by UL
-            var ul = JsAdmin.util.getNextSiblingNode(item, 'ul');
-            if(ul) {
-                var lis = ul.getElementsByTagName('li');
-                 if(!lis || lis.length == 0) {
-                    // Remove list without items
-                    ul.parentNode.removeChild(ul);
-                } else {
-                    // Make list child of list item
-                    item.appendChild(ul);
-                }
-            }
-        }
- */
-
+    } else if(document.URL.indexOf(JsAdmin.ADMIN_DIRECTORY + "/admintools/tool.php") > 0) {
+        is_list  = document.querySelector('ul.draggable');
+        is_tree = ((is_list!==null)?true:false);
+        page_type = 'tool';
     } else {
-        page_type = 'modules';
-        // We don't do any other pages
-        return;
-        // page_type = 'modules';
+//         We don't do any other pages
+        return false;
     }
-
-    var links = document.getElementsByTagName('a');
+console.log(is_list);
+console.log('is_tree: '+is_tree);
+    if (is_list){StashAllULIds();}
+//    var linkType = ((page_type==='modules')?'button':'a');
+//    var linkType = ((page_type==='modules')?'a':'a');
+    var linkType = 'a';
+    var links = document.getElementsByTagName(linkType);
     var reImg = /(.*)move_(down|up)\.php(.*)/;
     for(var i = 0; i < links.length; i++) {
         var link = links[i];
@@ -139,12 +112,10 @@ JsAdmin.init_drag_drop = function() {
         if(!item) {
             continue;
         }
-
         // Make sure we have a unique id
         if(!item.id || YAHOO.util.Dom.get(item.id) != item) {
             item.id = JsAdmin.util.getUniqueId();
         }
-
         if(is_tree) {
             var parent = JsAdmin.util.getAncestorNode(item, 'ul');
             new JsAdmin.DD.liDDSwap(item.id, (parent && parent.id) ? parent.id : 'top');
@@ -152,7 +123,6 @@ JsAdmin.init_drag_drop = function() {
             new JsAdmin.DD.trDDSwap(item.id);
         }
         item.className += " jsadmin_drag";
-
         this.movable_rows[item.id] = { item: item, tr : tr, url : url, params : params };
     }
 };
@@ -164,10 +134,13 @@ JsAdmin.init_drag_drop = function() {
 JsAdmin.DD.dragee = null;
 
 JsAdmin.DD.addMoveButton = function(tr, cell, op) {
-    if(op == 'down') {
+    if(op === 'down') {
         cell++;
     }
-    var item = JsAdmin.movable_rows[tr.id];
+console.log(tr);
+    if (tr) {
+        var item = JsAdmin.movable_rows[tr.id];
+    } else { return;}
     if(!JsAdmin.util.isNodeType(tr, 'tr')) {
         var rows = tr.getElementsByTagName('tr');
         tr = rows[0];
@@ -177,6 +150,8 @@ JsAdmin.DD.addMoveButton = function(tr, cell, op) {
                 + '"><img src="' + JsAdminTheme.THEME_URL + '/images/' + op
                 + '_16.png" border="0" alt="' + op + '" /></a>';
     tr.cells[cell].innerHTML = html;
+//console.log(html);
+
 };
 
 JsAdmin.DD.deleteMoveButton = function(tr, cell, op) {
@@ -187,7 +162,7 @@ JsAdmin.DD.deleteMoveButton = function(tr, cell, op) {
         var rows = tr.getElementsByTagName('tr');
         tr = rows[0];
     }
-    
+
     tr.cells[cell].innerHTML = "";
 };
 
@@ -202,11 +177,11 @@ JsAdmin.DD.trDDSwap = function(id, sGroup) {
     this.addInvalidHandleType('select');
     this.initFrame();
     this.buttonCell = buttonCell;//, by Swen Uth
-    
+
     // For Connection
     this.scope = this;
 };
-//console.info(page_type);
+//console.log('buttonCell: '+buttonCell);
 
 JsAdmin.DD.trDDSwap.prototype = new YAHOO.util.DDProxy();
 
@@ -235,11 +210,12 @@ JsAdmin.DD.trDDSwap.prototype.onDragEnter = function(e, id) {
     }
     // Fixup buttons
     var isFirst = item.tr.rowIndex == 1;
-    var isLast = item.tr.rowIndex == this.numRows - 2;
-
+    var isLast  = item.tr.rowIndex == this.numRows - 2;
+//console.log(this.numRows);
     if(wasFirst != isFirst) {
         if(isFirst) {
             JsAdmin.DD.deleteMoveButton(item.tr, this.buttonCell, 'up');
+//console.log(JsAdmin.util.getNextSiblingNode(item.tr));
             JsAdmin.DD.addMoveButton(JsAdmin.util.getNextSiblingNode(item.tr), this.buttonCell, 'up');
         } else {
             JsAdmin.DD.addMoveButton(item.tr, this.buttonCell, 'up');
@@ -262,7 +238,7 @@ JsAdmin.DD.trDDSwap.prototype.onDragEnter = function(e, id) {
 JsAdmin.DD.trDDSwap.prototype.endDrag = function(e) {
     YAHOO.util.Dom.setStyle(this.getEl(), "opacity", this.opacity);
     YAHOO.util.Dom.setStyle(this.getEl(), "background", "#f0f0f0");
-    
+
     JsAdmin.DD.dragee = null;
 
     var newIndex = this.getEl().rowIndex;
@@ -270,7 +246,7 @@ JsAdmin.DD.trDDSwap.prototype.endDrag = function(e) {
 
         var url = JsAdmin.WB_URL + "/modules/"+JsAdmin.ModuleUrl+"/move_to.php";
         url += JsAdmin.movable_rows[this.getEl().id].params + "&newposition=" + newIndex;
-console.info(url);
+//console.info(url);
         document.body.className = String(document.body.className).replace(/(\s*)jsadmin_([a-z]+)/g, "$1") + " jsadmin_busy";
         YAHOO.util.Connect.asyncRequest('GET', url, this, null);
     }

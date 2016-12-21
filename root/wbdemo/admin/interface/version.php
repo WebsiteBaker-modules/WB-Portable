@@ -39,7 +39,7 @@
  * @version         $Id: version.php 1638 2012-03-13 23:01:47Z darkviper $
  * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/branches/2.8.x/wb/admin/interface/version.php $
  * @lastmodified    $Date: 2012-03-14 00:01:47 +0100 (Mi, 14. Mrz 2012) $
- * 
+ *
  */
 
 /* -------------------------------------------------------- */
@@ -49,5 +49,6 @@ if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__)
 
 // check if defined to avoid errors during installation (redirect to admin panel fails if PHP error/warnings are enabled)
 if(!defined('VERSION')) define('VERSION', '2.8.3');
-if(!defined('REVISION')) define('REVISION', '1645');
-if(!defined('SP')) define('SP', 'SP6');
+if(!defined('REVISION')) define('REVISION', '1647');
+if(!defined('SP')) define('SP', 'SP7');
+

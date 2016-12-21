@@ -1,0 +1,28 @@
+<!-- BEGIN main_block -->
+<form name="groups" action="groups.php" method="post">
+ {FTAN}
+    <table style="margin-bottom:10px; width: 100%; border-collapse: collapse; white-space-collapsing: collapse; ">
+        <tbody>
+            <tr >
+                <td style="float: left;"><h2 class="page_titel">{HEADING_MODIFY_DELETE_GROUP}</h2></td>
+                <td style="float: right; line-height: 3.225em;" >
+                <!-- BEGIN manage_users_block -->
+                    <span><a class="btn btn-default btn-large" href="{ADMIN_URL}/users/index.php">{TEXT_MANAGE_USERS}</a></span>
+                <!-- END manage_users_block -->
+                </td>
+             </tr>
+        </tbody>
+    </table>
+    <button type="button" name="status" title="{TEXT_GROUPS}" style="width: 1.825em; " value="{USER_STATUS}"  class="status {DISPLAY_MODIFY}" >&nbsp;</button>
+    <select name="group_id" style="width: 41.855em;">
+        <!-- BEGIN list_block -->
+        <option value="{VALUE}">
+        {NAME}
+        </option>
+        <!-- END list_block -->
+    </select>
+    <input class="btn btn-default {DISPLAY_MODIFY}" type="submit" name="modify" value="{TEXT_MODIFY}" />
+    <input class="btn btn-default {DISPLAY_DELETE}" type="submit" name="delete" value="{TEXT_DELETE}" onclick="return confirm('{CONFIRM_DELETE}');" >
+</form>
+<h2 style="margin-top: 1.825em;" class="{DISPLAY_ADD}">&nbsp;{HEADING_ADD_GROUP}</h2>
+<!-- END main_block -->

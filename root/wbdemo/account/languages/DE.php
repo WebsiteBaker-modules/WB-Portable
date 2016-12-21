@@ -32,3 +32,4 @@ $MOD_PREFERENCE = array(
     'SAVE_PASSWORD' => 'Passwort speichern',
 );
 $MESSAGE['USERS_DISPLAYNAME_TAKEN'] = 'Der angegebene Anzeigename wird bereits verwendet';
+$TEXT['FULL_NAME'] = '&Ouml;ffentlich sichtbarer Name';

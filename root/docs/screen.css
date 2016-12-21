@@ -1,8 +1,8 @@
-html   { margin: 0; padding: 0 }
-body      { background-color: #99BBD7; background-image: url(bg_full.jpg); background-repeat: repeat-x; background-position: 0 1px; text-align: center; margin: 0; padding: 1px 0 0 }
+html { margin: 0; padding: 0 }
+body { background-color: #99BBD7; background-image: url(bg_full.jpg); background-repeat: repeat-x; background-position: 0 1px; text-align: center; margin: 0; padding: 1px 0 0 }
 
 /*
-----------------------| BASIC ELEMENTS 
+----------------------| BASIC ELEMENTS
 */
 #content a,  #content a:visited   { color: #597FA4; font-weight: bold; text-decoration: none; padding-right: 4px; padding-left: 4px }
 #content a:hover  { text-decoration: underline }
@@ -13,29 +13,39 @@ h1   { color: #475765; font-size: 22pt; padding: 0 }
 h2, h3   { color: #5b6f81; margin-top: 3px; margin-bottom: 1px;padding-bottom: 1px }
 
 #content ul  { font-size: 90%; font-family: Arial, Helvetica; }
-#content ul li   { background-position: left 0; list-style-type: none; list-style-image: url(a.gif); margin-top: 3px; margin-bottom: 3px }
+#content ul li   { background-position: left 0; list-style-type: none; margin-top: 3px; margin-bottom: 3px }
+ul, li {  list-style: outside none none; margin: 0;  padding: 0; }
+div.links ul.links li {
+  display: inline;
+  line-height: 1.9;
+  padding: 0.455em 0.225em;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 /*images*/
 #content img.right  { padding: 2px; float: right; border-color: #222d36 }
 
 /*
-----------------------| PAN WRAPPER 
+----------------------| PAN WRAPPER
 */
-#framers_framer       { text-align: left; margin-top: 1px; margin-right: auto; margin-left: auto; padding-top: 0; width: 906px }
+#framers_framer { text-align: left; margin-top: 1px; margin-right: auto; margin-left: auto; padding-top: 0; width: 906px }
 /*
-----------------------| HEAD Section 
+----------------------| HEAD Section
 */
-#header       { background-color: #fff; background-image: url(header.jpg); background-repeat: no-repeat; margin-top: 9px; padding-top: 70px; height: 170px }
-.logo    { width: 300px; height: 70px; float: left; border-color:  }
+#header { background-color: #fff; background-image: url(header.jpg); background-repeat: no-repeat; margin-top: 9px; padding-top: 70px; height: 170px }
+.logo { width: 300px; height: 70px; float: left; border-color:  }
 .about_pic  { background-image: url(about_pic.png); background-repeat: no-repeat; background-position: right 3px; text-align: right; margin-top: 0; margin-left: 575px; padding-right: 4px; width: 300px; height: 106px }
 .pic_EN { background-position: right 3px }
 .pic_NL    { background-position: right -100px }
 .pic_DE  { background-position: right -203px }
 /*
----------------------------------------------| CONTENT Framer Section 
+---------------------------------------------| CONTENT Framer Section
 */
 #content_framer   { background-image: url(bg_content.jpg); background-repeat: repeat-y }
 #help {margin-top: -40px;}
-#bars     { background-image: url(bar.jpg); background-repeat: no-repeat; margin: 0 0 5px; padding: 0; height: 60px }
+#bars { background-image: url(bar.jpg); background-repeat: no-repeat; margin: 0 0 5px; padding: 0; height: 60px }
     .download_bar       { background-image: url(download_btn.jpg); background-repeat: no-repeat; background-position: 16px 0; width: 255px; height: 56px; float: left }
         .download_bar p   { color: #fff; font-size: 18px; margin: 0 0 0 90px; padding: 2px 0 0 }
         .download_bar small  { font-size: 70% }
@@ -51,7 +61,7 @@ h2, h3   { color: #5b6f81; margin-top: 3px; margin-bottom: 1px;padding-bottom: 1
     div.breadcrumb span    {    font-weight: bold;    padding: 0 0 0 10px;    }
     div.breadcrumb a, div.breadcrumb span.arrow     { background: url(breadcrumb.gif) no-repeat right center; padding: 15px 20px 15px 10px }
 /*----------------| sidebar*/
-#sidebar     { font-family: arial, helvetica;  margin: -40px 0 0 5px; width: 250px; float: left }
+#sidebar { font-family: arial, helvetica;  margin: -40px 0 0 5px; width: 250px; float: left }
     #sidebar div  { font-size: 75%; line-height: 100%; margin-left: 16px }
     #sidebar hr{margin-left:15px; width: 200px;}
     #sidebar h2{margin-top:10px;}
@@ -60,13 +70,13 @@ h2, h3   { color: #5b6f81; margin-top: 3px; margin-bottom: 1px;padding-bottom: 1
     #copyright a,  #copyright a:visited   { color: #475765; font-weight: bold; text-decoration: none; padding-right: 4px; padding-left: 4px }
     #copyright a:hover  { text-decoration: underline }
 /*----------------| content*/
-#content        { margin-top: 0; margin-left: 285px; padding-top: 0; width: 590px }
+#content { margin-top: 0; margin-left: 285px; padding-top: 0; width: 590px }
 #skip{text-align:center;}
-#skip img{border:none;}
+#skip img{border: 0 none;}
 
 .content_framer_end   { background-image: url(content_end.jpg); background-repeat: no-repeat; height: 25px }
 /*
--------------------------------------------| NAVIGATION 
+-------------------------------------------| NAVIGATION
 */
 ul.leftmenu         { font-family: "Trebuchet MS"; font-weight: bold; text-align: left; list-style-type: none; margin: 4px 0 25px 5px; padding: 0 }
 ul.leftmenu li  { display: block; margin: 0; padding: 0 }
@@ -81,7 +91,7 @@ ul.leftmenu li a:hover, ul.leftmenu li.active a:hover { color: #3f556b !importan
 #fb-link { margin: 5px 0 -5px!important; text-align: center;}
 #fb-link img{border:none;}
 /*
--------------------------------------------| FOOT Section 
+-------------------------------------------| FOOT Section
 */
 #footer_framer { background-color: #537EA7; background-image: url(footer_bg.jpg); background-repeat: repeat-x; text-align: center; margin: 25px 0 0; padding: 10px 0 20px; width: 100% }
 #footer { color: #ccc; background-image: url(global.gif); background-repeat: no-repeat; background-position: left; text-align: left; margin-right: auto; margin-left: auto; width: 900px; height: 120px }
@@ -100,22 +110,23 @@ p.backtotop  { position: fixed; right: 30px; bottom: 200px;}
 /*PRINT SHEET*/
 .print_logo { display: none }
 /*
-----------------------| Schrims A-Z 
+----------------------| Schrims A-Z
 */
-blockquote   { color: #222d36; font-size: 18px; margin-left: 15%; padding: 6px 4px; width: 70%; border-top: 4px solid #ccc; border-right: #ccc; border-bottom: 4px solid #ccc; border-left: #ccc }
-blockquote cite    { color: #475765; font-size: 90%; margin-top: 10px; padding-top: 2px }
-fieldset     { background: url(fieldset.gif) repeat-x 0 bottom; margin-top: 8px; margin-bottom: 8px; padding: 6px 12px; border: solid 2px #394b5f; border-radius: 5px; }
+blockquote { color: #222d36; font-size: 1.2525em; padding: 6px 4px; border-top: 4px solid #ccc; border-right: #ccc; border-bottom: 4px solid #ccc; border-left: #ccc }
+blockquote cite    { color: #475765; font-size: 101%; margin-top: 10px; padding-top: 2px }
+fieldset { background: url(fieldset.gif) repeat-x 0 bottom; margin-top: 8px; margin-bottom: 8px; padding: 6px 12px; border: solid 2px #394b5f; border-radius: 5px; }
 fieldset legend   { color: #fff; font-size: 14px; font-weight: bold; background-color: #394b5f; padding: 4px 60px 4px 14px; border: solid 1px #394b5f; border-radius: 5px; }
 fieldset p  { color: #475765; font-size: 90% }
-hr  { margin-left: -17px; width: 105%; border-top: 1px solid #b3b8be; border-right: #b3b8be; border-bottom: 1px solid #b3b8be; border-left: #b3b8be }
-label    { color: #475765; font-size: 80%; font-weight: bold; background-color: #e3e9ef; margin: 2px; padding: 2px 2px 2px 4px; border: solid 2px #fff }
+hr { margin-left: -17px; width: 105%; border-top: 1px solid #b3b8be; border-right: #b3b8be; border-bottom: 1px solid #b3b8be; border-left: #b3b8be }
+label { color: #475765; font-size: 80%; font-weight: bold; background-color: #e3e9ef; margin: 2px; padding: 2px 2px 2px 4px; border: solid 2px #fff }
 sup, sub, acronym, abbr   { color: #475765; letter-spacing: 0.6pt }
 tt { color: #760000; }
 
 /*table*/
 table.separat {
     border-collapse: separate;
-}table.datatable    { font-family: Arial, Helvetica, Verdana; font-size:90%; background-color: #e3e9ef; width: 98%; border: solid 2px #475765 }
+}
+table.datatable { font-family: Arial, Helvetica, Verdana; font-size:90%; background-color: #e3e9ef; width: 98%; border: solid 2px #475765 }
 table.datatable caption  { color: #fff; font-size: 14pt; background-color: #475765; text-align: left; margin-left: 20px; padding: 4px 4px 4px 10px; width: 200px }
 table.datatable tfoot  { font-size: 10pt; background-color: #546778; padding: 1px }
 table.datatable tr th, table.datatable tr td   { margin: 2px; padding: 3px; border: solid 1px #546778 }
@@ -139,3 +150,35 @@ table.datatable th   { color: #fff; background-color: #394b5f }
   max-width: 100%;
 }
 
+img { border: 0 none; }
+
+.fb-link { text-align: center; text-shadow: 0px -1px 1px black }
+.fb-link > a { text-decoration: none; font-weight: normal; color: #fff; font-size: 1.2525em !important; }
+.fb-link p { line-height: 0; font-weight: normal; font-size: 1.2525em !important; }
+.fb-link p span { line-height: 0; font-weight: bold;font-size: 1.4525em; }
+
+.mbox {
+  max-height: 3.025em;
+  width: 70%;
+ border: 0.225em solid;
+ padding: 0.925em;
+ position: relative;
+ margin: 3% auto !important;
+box-shadow: 0.1525em 0.1525em 0.1525em 0.0525em #868686;
+border-radius: 0.6525em;
+
+ }
+
+
+.gradient {
+    background: #286E9C;
+/*
+    background: -moz-linear-gradient( to bottom, #286E9C 0%, #7A97B7 61%);
+    background: -webkit-linear-gradient(to bottom, #286E9C 0% 0%,#7A97B7 61%);
+*/
+    background: linear-gradient(135deg, #1C5275 35%,#6B8DB2 61%);
+    border : #255e83 solid 1px;
+    font-family : Verdana, Arial;
+    font-weight : normal;
+
+}

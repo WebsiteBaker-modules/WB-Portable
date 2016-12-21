@@ -22,10 +22,11 @@ CREATE TABLE IF NOT EXISTS `{TABLE_PREFIX}mod_droplets` (
   `modified_when` int(11) NOT NULL DEFAULT '0',
   `modified_by` int(11) NOT NULL DEFAULT '0',
   `active` int(11) NOT NULL DEFAULT '0',
-  `admin_edit` int(11) NOT NULL DEFAULT '0',
-  `admin_view` int(11) NOT NULL DEFAULT '0',
-  `show_wysiwyg` int(11) NOT NULL DEFAULT '0',
   `comments` text{FIELD_COLLATION} NOT NULL,
   PRIMARY KEY (`id`)
 ){TABLE_ENGINE=MyISAM};
 
+ALTER TABLE `{TABLE_PREFIX}mod_droplets` ADD `admin_edit` INT(11) NOT NULL DEFAULT '0' AFTER `active`;
+ALTER TABLE `{TABLE_PREFIX}mod_droplets` ADD `admin_view` INT(11) NOT NULL DEFAULT '0' AFTER `admin_edit`;
+ALTER TABLE `{TABLE_PREFIX}mod_droplets` ADD `show_wysiwyg` INT(11) NOT NULL DEFAULT '0' AFTER `admin_view`;
+ALTER TABLE `{TABLE_PREFIX}mod_droplets` ADD UNIQUE `droplet_name` ( `name` );

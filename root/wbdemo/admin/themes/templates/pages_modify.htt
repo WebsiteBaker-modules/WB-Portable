@@ -1,25 +1,23 @@
 <!-- BEGIN main_block -->
-
-<table style="border-collapse: separate; margin-bottom:10px; width: 100%;">
-<tr >
-   <td valign="middle" align="left"><h2>{HEADING_MODIFY_PAGE}</h2></td>
-   <td align="left" width="20%">ID: {PAGE_ID}</td>
-   <td align="right">
-      {TEXT_CURRENT_PAGE}:
-      <b>{PAGE_TITLE}</b>
-      - 
-      <a href="{ADMIN_URL}/pages/settings.php?page_id={PAGE_IDKEY}">{TEXT_CHANGE_SETTINGS}</a>
-<!-- BEGIN show_section_block -->
-      <font style="{DISPLAY_MANAGE_SECTIONS}">-</font>
-      <a href="{ADMIN_URL}/pages/sections.php?page_id={PAGE_IDKEY}" style="{DISPLAY_MANAGE_SECTIONS}">{TEXT_MANAGE_SECTIONS}</a>
-<!-- END show_section_block -->
-      <font style="color:#999;" class="{CLASS_DISPLAY_MODIFIED}"><br />
-<!-- BEGIN show_modify_block -->
-      {LAST_MODIFIED} {MODIFIED_BY}, {MODIFIED_WHEN}
-<!-- END show_modify_block -->
-      </font>
-   </td>
-</tr>
+<table class="header-info">
+    <tbody>
+        <tr >
+           <td class="header-modify-page" ><h2>{HEADING_MODIFY_PAGE}</h2></td>
+           <td class="header-page_id" style="">ID: {PAGE_ID}</td>
+           <td class="header-current-page">{TEXT_CURRENT_PAGE}:<b>{PAGE_TITLE}</b>
+        <!-- BEGIN show_settings_block -->
+              <span style="{DISPLAY_MANAGE_MODIFY}">-</span>
+              <a href="{ADMIN_URL}/pages/settings.php?page_id={PAGE_IDKEY}">{TEXT_CHANGE_SETTINGS}</a>
+        <!-- END show_settings_block -->
+        <!-- BEGIN show_section_block -->
+              <span style="{DISPLAY_MANAGE_MODIFY}">-</span>
+              <a href="{ADMIN_URL}/pages/sections.php?page_id={PAGE_IDKEY}">{TEXT_MANAGE_SECTIONS}</a>
+        <!-- END show_section_block -->
+              <span style="color:#999;" class="{CLASS_DISPLAY_MODIFIED}"><br />
+              {LAST_MODIFIED} {MODIFIED_BY}, {MODIFIED_WHEN}
+              </span>
+           </td>
+        </tr>
+    </tbody>
 </table>
-
 <!-- END main_block -->
